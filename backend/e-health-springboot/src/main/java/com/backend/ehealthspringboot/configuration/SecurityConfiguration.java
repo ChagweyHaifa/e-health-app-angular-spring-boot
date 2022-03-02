@@ -1,4 +1,4 @@
-package configuration;
+package com.backend.ehealthspringboot.configuration;
 
 
 import org.springframework.context.annotation.Configuration;
