@@ -31,8 +31,8 @@ public class JWTTokenProvider {
 	
 	@Value("${jwt.secret}")
     private String secret;
-	//the user have been authenticated
-	//the method that will generate the token
+
+	//once the username and password are validated this method will generate the token for the user
     public String generateJwtToken(UserPrincipal userPrincipal) {
         String[] claims = getClaimsFromUser(userPrincipal);
         return JWT.create().withIssuer(GET_ARRAYS_LLC).withAudience(GET_ARRAYS_ADMINISTRATION)
@@ -40,7 +40,7 @@ public class JWTTokenProvider {
                 .withArrayClaim(AUTHORITIES, claims).withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .sign(HMAC512(secret.getBytes()));//the algorithm that will encrypt the token
     }
-
+// get authorities from token after the user have been authenticated
     public List<GrantedAuthority> getAuthorities(String token) {
         String[] claims = getClaimsFromToken(token);
         return stream(claims).map(SimpleGrantedAuthority::new).collect(Collectors.toList());

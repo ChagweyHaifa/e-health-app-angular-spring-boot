@@ -44,6 +44,7 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter{
         	}
 			String token = authorizationHeader.substring(TOKEN_PREFIX.length());
 			String username = jwtTokenProvider.getSubject(token);
+//			we alse have to verify that the user  already has an authentication is the security context holder
 			if (jwtTokenProvider.isTokenValid(username, token) && SecurityContextHolder.getContext().getAuthentication() == null) {
                 List<GrantedAuthority> authorities = jwtTokenProvider.getAuthorities(token);
                 Authentication authentication = jwtTokenProvider.getAuthentication(username, authorities, request);
@@ -53,6 +54,7 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter{
                 SecurityContextHolder.clearContext();
             }
         }
+//		let the request continue its flow 
 		filterChain.doFilter(request, response);
 	
 		
