@@ -107,11 +107,11 @@ public class ExceptionHandling implements ErrorController {
         return createHttpResponse(INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR_MSG);
     }
 
-//    @ExceptionHandler(NotAnImageFileException.class)
-//    public ResponseEntity<HttpResponse> notAnImageFileException(NotAnImageFileException exception) {
-//        LOGGER.error(exception.getMessage());
-//        return createHttpResponse(BAD_REQUEST, exception.getMessage());
-//    }
+    @ExceptionHandler(NotAnImageFileException.class)
+    public ResponseEntity<HttpResponse> notAnImageFileException(NotAnImageFileException exception) {
+        LOGGER.error(exception.getMessage());
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
 
     @ExceptionHandler(NoResultException.class)
     public ResponseEntity<HttpResponse> notFoundException(NoResultException exception) {
@@ -126,8 +126,9 @@ public class ExceptionHandling implements ErrorController {
     
     
     private ResponseEntity<HttpResponse> createHttpResponse(HttpStatus httpStatus, String message) {
-        return new ResponseEntity<>(new HttpResponse(httpStatus.value(), httpStatus,
-                httpStatus.getReasonPhrase().toUpperCase(), message), httpStatus);
+        HttpResponse body = new HttpResponse(httpStatus.value(), httpStatus,
+                httpStatus.getReasonPhrase().toUpperCase(), message);
+        return new ResponseEntity<>(body , httpStatus);
     }
     
     @RequestMapping(ERROR_PATH)

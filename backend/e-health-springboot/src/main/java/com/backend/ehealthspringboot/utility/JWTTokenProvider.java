@@ -12,7 +12,7 @@ import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.stream.Collectors;
-import static java.util.Arrays.*;
+import static java.util.Arrays.stream;
 
 
 import org.springframework.security.core.Authentication;

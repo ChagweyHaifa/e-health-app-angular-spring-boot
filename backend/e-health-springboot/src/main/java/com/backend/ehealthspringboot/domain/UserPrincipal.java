@@ -1,12 +1,14 @@
 package com.backend.ehealthspringboot.domain;
+import static java.util.Arrays.stream;
 
+import com.backend.ehealthspringboot.enumeration.Role;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import static java.util.Arrays.stream;
+
 
 public class UserPrincipal implements UserDetails {
 	
@@ -19,6 +21,7 @@ public class UserPrincipal implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return stream(this.user.getAuthorities()).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+//        return stream(getRoleEnumName(this.user.getRole()).getAuthorities()).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
     }
 
     @Override
@@ -49,6 +52,10 @@ public class UserPrincipal implements UserDetails {
     @Override
     public boolean isEnabled() {
         return this.user.isActive();
+    }
+
+    private Role getRoleEnumName(String role) {
+        return Role.valueOf(role.toUpperCase());
     }
 
 }
