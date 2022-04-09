@@ -4,6 +4,7 @@ import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 import { User } from '../model/user';
 import { CustomHttpRespone } from '../model/custom-http-response';
+import { Doctor } from '../model/doctor';
 
 @Injectable({
   providedIn: 'root',
@@ -25,6 +26,16 @@ export class UserService {
     return this.http.put<User>(`${this.host}/users`, formData);
   }
 
+  public deleteUser(username: string): Observable<CustomHttpRespone> {
+    return this.http.delete<CustomHttpRespone>(
+      `${this.host}/users/${username}`
+    );
+  }
+
+  public getDoctorInfo(username: string): Observable<Doctor> {
+    return this.http.get<Doctor>(`${this.host}/users/doctors/${username}`);
+  }
+
   public resetPassword(email: string): Observable<CustomHttpRespone> {
     return this.http.get<CustomHttpRespone>(
       `${this.host}/resetpassword/${email}`
@@ -36,12 +47,6 @@ export class UserService {
       reportProgress: true,
       observe: 'events',
     });
-  }
-
-  public deleteUser(username: string): Observable<CustomHttpRespone> {
-    return this.http.delete<CustomHttpRespone>(
-      `${this.host}/users/${username}`
-    );
   }
 
   public addUsersToLocalCache(users: User[]): void {

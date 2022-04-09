@@ -11,10 +11,13 @@ import javax.mail.MessagingException;
 
 public interface UserService {
 
-	User register(String firstName, String lastName, String username, String email) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException;
+//    void register(User user) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException;
+
+    Doctor register(Doctor doctor) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException;
+
+    Visitor register(Visitor visitor) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException;
 
     User findUserByUsername(String username) ;
-
 
     User findUserByEmail(String email);
 
@@ -28,13 +31,12 @@ public interface UserService {
 
     User updateProfileImage(String username, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException, NotAnImageFileException;
 
-    List<Student> getStudents();
-    List<Course> getCourses();
+
 
     List<User> getUsers();
     List<Doctor> getDoctors();
-
-    public Doctor findDoctorByUsername(String theDoctorUsername);
+    List<Doctor> searchDoctors(String speciality,String state);
+    Doctor findDoctorbyUsername(String username);
     List<Visitor> getVisitors();
 
 

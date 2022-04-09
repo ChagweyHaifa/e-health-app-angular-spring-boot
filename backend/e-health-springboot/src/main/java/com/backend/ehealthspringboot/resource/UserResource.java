@@ -2,6 +2,8 @@ package com.backend.ehealthspringboot.resource;
 
 import com.backend.ehealthspringboot.domain.*;
 import com.backend.ehealthspringboot.exception.domain.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import com.backend.ehealthspringboot.service.UserService;
 import com.backend.ehealthspringboot.utility.JWTTokenProvider;
 
 import static com.backend.ehealthspringboot.constant.FileConstant.*;
+import static com.backend.ehealthspringboot.constant.UserImplConstant.FOUND_USER_BY_USERNAME;
 import static org.springframework.http.HttpStatus.*;
 import static com.backend.ehealthspringboot.constant.SecurityConstant.*;
 import static org.springframework.http.MediaType.IMAGE_JPEG_VALUE;
@@ -43,6 +46,8 @@ public class UserResource extends ExceptionHandling {
 	private AuthenticationManager authenticationManager;
 	private JWTTokenProvider jwtTokenProvider;
 
+    private Logger LOGGER = LoggerFactory.getLogger(getClass());
+
 	@Autowired
 	public UserResource(AuthenticationManager authenticationManager, UserService userService, JWTTokenProvider jwtTokenProvider) {
 	    this.authenticationManager = authenticationManager;
@@ -63,22 +68,23 @@ public class UserResource extends ExceptionHandling {
         return new ResponseEntity(doctors, OK);
     }
 
+    @GetMapping("/users/doctors/{username}")
+    public ResponseEntity<Doctor> findDoctorByUsername(@PathVariable("username") String username) {
+        Doctor doctor = userService.findDoctorbyUsername(username);
+        return new ResponseEntity(doctor, OK);
+    }
+
+    @GetMapping("/users/doctors/search")
+    public ResponseEntity<List<Doctor>> searchDoctors(@RequestParam("speciality") String speciality,
+                                                      @RequestParam("state") String state) {
+        List<Doctor> doctors = userService.searchDoctors(speciality,state);
+        return new ResponseEntity(doctors, OK);
+    }
+
     @GetMapping("/users/visitors")
     public ResponseEntity<List<Visitor>> getAllVisitors() {
         List<Visitor> visitors = userService.getVisitors();
         return new ResponseEntity<>(visitors, OK);
-    }
-
-    @GetMapping("/students")
-    public ResponseEntity<List<Student>> getAllStudents() {
-        List<Student> students = userService.getStudents();
-        return new ResponseEntity<>(students, OK);
-    }
-
-    @GetMapping("/courses")
-    public ResponseEntity<List<Course>> getAllCourses() {
-        List<Course> courses = userService.getCourses();
-        return new ResponseEntity<>(courses, OK);
     }
 
 	@PostMapping("/login")
@@ -89,11 +95,21 @@ public class UserResource extends ExceptionHandling {
 	    HttpHeaders jwtHeader = getJwtHeader(userPrincipal);
 	    return new ResponseEntity<>(loginUser, jwtHeader, OK);
 	}
+//    @PostMapping("/register")
+//    public void registerDoctor(@RequestBody User user) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
+//        userService.register(user);
+//    }
 
-	@PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
-        User newUser = userService.register(user.getFirstName(), user.getLastName(), user.getUsername(), user.getEmail());
-        return new ResponseEntity<>(newUser, OK);
+	@PostMapping("/registerDoctor")
+    public ResponseEntity<Doctor> registerDoctor(@RequestBody Doctor doctor ) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
+        Doctor newDoctor = userService.register(doctor);
+        return new ResponseEntity<>(newDoctor, OK);
+    }
+
+    @PostMapping("/registerVisitor")
+    public ResponseEntity<Visitor> registerVisitor(@RequestBody Visitor visitor) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
+        Visitor newVisitor = userService.register(visitor);
+        return new ResponseEntity<>(newVisitor, OK);
     }
 
 //    @PostMapping("/users")
@@ -146,8 +162,6 @@ public class UserResource extends ExceptionHandling {
 //           = ResponseEntity<>(HttpResponseObject, HttpStatusObject)
 //           = ResponseEntity<>((HttpStatusObject ,message,..), HttpStatusObject)
     }
-
-
 
     @GetMapping("/users/{username}")
     public ResponseEntity<User> getUser(@PathVariable("username") String username) {

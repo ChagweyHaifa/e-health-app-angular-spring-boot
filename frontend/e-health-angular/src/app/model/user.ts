@@ -1,9 +1,13 @@
+import { Address } from './address';
+
 export class User {
   public userId: string;
   public firstName: string;
   public lastName: string;
   public username: string;
   public email: string;
+  public address: Address;
+  public phoneNumber: string;
   public lastLoginDate: Date;
   public lastLoginDateDisplay: Date;
   public joinDate: Date;

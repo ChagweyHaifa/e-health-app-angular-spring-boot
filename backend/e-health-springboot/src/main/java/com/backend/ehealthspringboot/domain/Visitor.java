@@ -19,8 +19,8 @@ public class Visitor extends User{
     private String question;
 
     //    the list of doctors recommended by this visitor
-    @JsonBackReference
-//    @JsonIgnore
+
+    @JsonIgnore
     @ManyToMany(fetch=FetchType.LAZY,
             cascade= {CascadeType.PERSIST, CascadeType.MERGE,
                     CascadeType.DETACH, CascadeType.REFRESH}, mappedBy = "recommendations")

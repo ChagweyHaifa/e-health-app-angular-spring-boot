@@ -5,9 +5,7 @@ import com.backend.ehealthspringboot.exception.ExceptionHandling;
 import com.backend.ehealthspringboot.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,9 +22,15 @@ public class ReviewRessource extends ExceptionHandling {
         this.reviewService = reviewService;
     }
 
-    @GetMapping("")
-    public ResponseEntity<List<Review>> getAllReviews() {
-        List<Review> reviews = reviewService.getReviews();
+    @GetMapping("/{username}")
+    public ResponseEntity<List<Review>> getDoctorReviews(@PathVariable("username") String username) {
+        List<Review> reviews = reviewService.getDoctorReviews(username);
         return new ResponseEntity<>(reviews, OK);
     }
+
+//    @PostMapping("")
+//    public ResponseEntity<Review> addReview(Review theReview) {
+//        Review review = reviewService.addReview(theReview);
+//        return new ResponseEntity<>(review, OK);
+//    }
 }

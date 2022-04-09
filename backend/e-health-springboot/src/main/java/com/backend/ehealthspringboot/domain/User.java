@@ -12,7 +12,7 @@ import java.util.Date;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
 @Table(name="user")
-public class User implements Serializable  {
+public class User  {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
 //  @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -38,6 +38,14 @@ public class User implements Serializable  {
   @Column(name="email")
   private String email;
 
+//  ******* address relationship *******
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "address", referencedColumnName = "id")
+  private Address address;
+
+    @Column(name="phone_number")
+    private String phoneNumber;
+
   @Column(name="profile_image_url")
   private String profileImageUrl;
 
@@ -61,5 +69,7 @@ public class User implements Serializable  {
 
   @Column(name="is_not_locked")
   private boolean isNotLocked;
-  
+
+
+
 }

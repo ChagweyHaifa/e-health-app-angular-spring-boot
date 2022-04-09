@@ -2,15 +2,10 @@ package com.backend.ehealthspringboot.domain;
 
 import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Data
@@ -18,15 +13,14 @@ import java.util.Set;
 @DiscriminatorValue(value="doctor")
 public class Doctor extends User {
 
-    @Column(name = "speciality")
-    private String speciality;
+    @ManyToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = "speciality_id" )
+    private Speciality speciality;
 
-    @Column(name = "nb_of_recommendations")
-    private Integer nbOfRecommendations;
+    @Column(name = "nb_of_recommendations",columnDefinition = "integer default 0")
+    private Integer nbOfRecommendations ;
 
-    //    the list of visitors that have recommended this doctor
-    @JsonManagedReference
-//    @JsonIgnore
+    // the list of visitors that have recommended this doctor
     @ManyToMany(fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE,
                     CascadeType.DETACH, CascadeType.REFRESH})
@@ -36,6 +30,9 @@ public class Doctor extends User {
             inverseJoinColumns = @JoinColumn(name = "visitor_id"))
     List<Visitor> recommendations;
 
+
+    @Column(name = "nb_of_reviews",columnDefinition = "integer default 0")
+    private Integer nbOfReviews ;
 
     @JsonIgnore
     @OneToMany(mappedBy = "doctor")
@@ -70,6 +67,17 @@ public class Doctor extends User {
         }
         return false;
     }
+
+//    public void addReview(Visitor visitor,String content){
+//
+//        if (this.reviews == null) {
+//            this.reviews = new ArrayList<>();
+//        }
+//        this.reviews.add(new Review(visitor,this,content));
+//        this.nbOfReviews++;
+//
+//    }
+
 
 
 }

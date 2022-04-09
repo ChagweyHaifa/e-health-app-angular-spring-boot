@@ -36,12 +36,14 @@ import com.backend.ehealthspringboot.service.UserService;
 
 import javax.mail.MessagingException;
 //import javax.persistence.AssociationOverride;
+import static com.backend.ehealthspringboot.enumeration.Role.ROLE_DOCTOR;
+import static com.backend.ehealthspringboot.enumeration.Role.ROLE_VISITOR;
+import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.springframework.http.MediaType.*;
 import static com.backend.ehealthspringboot.constant.UserImplConstant.*;
 import static com.backend.ehealthspringboot.constant.FileConstant.*;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static com.backend.ehealthspringboot.enumeration.Role.*;
+
 @Service
 @Transactional
 @Qualifier("userDetailsService")
@@ -51,16 +53,13 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
     private BCryptPasswordEncoder passwordEncoder;
     private LoginAttemptService loginAttemptService;
     private EmailService emailService;
-    private StudentRepository studentRepository;
-    private CourseRepository courseRepository;
+
     private UserRepository userRepository;
     private DoctorRepository doctorRepository;
     private VisitorRepository visitorRepository;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
-                           CourseRepository courseRepository,
-                           StudentRepository studentRepository,
                            DoctorRepository doctorRepository,
                            VisitorRepository visitorRepository,
                            BCryptPasswordEncoder passwordEncoder,
@@ -70,43 +69,37 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
         this.emailService = emailService;
-        this.studentRepository = studentRepository;
-        this.courseRepository = courseRepository;
         this.userRepository = userRepository;
         this.doctorRepository = doctorRepository;
         this.visitorRepository = visitorRepository;
     }
+
+//  all users
     @Override
     public List<User> getUsers() {
         return userRepository.findAll();
     }
 
-    @Override
-    public List<Student> getStudents() {
-        return studentRepository.findAll();
-    }
-    @Override
-    public List<Course> getCourses() {
-        return courseRepository.findAll();
-    }
-
-//    doctors
+//  doctors
     @Override
     public List<Doctor> getDoctors() {
         return doctorRepository.findAll();
     }
 
     @Override
-    public Doctor findDoctorByUsername(String theDoctorUsername){
-        return doctorRepository.findDoctorByUsername(theDoctorUsername);
+    public List<Doctor> searchDoctors(String speciality,String state){
+        return doctorRepository.findBySpecialityNameAndAddressState(speciality,state);
+    }
+    @Override
+    public Doctor findDoctorbyUsername(String username){
+        return doctorRepository.findDoctorByUsername(username);
     }
 
-// visitors
+    //  visitors
     @Override
     public List<Visitor> getVisitors() {
         return visitorRepository.findAll();
     }
-
 
     @Override
     public User findUserByUsername(String username) {
@@ -135,30 +128,47 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
         }
 	}
 
-	@Override
-	public User register(String firstName, String lastName, String username, String email) throws UsernameExistException, EmailExistException, MessagingException, UserNotFoundException {
-		validateNewUsernameAndEmail(EMPTY, username, email);
-        Visitor user = new Visitor();
-        user.setUserId(generateUserId());
+
+	private User userRegister(User theUser) throws UsernameExistException, EmailExistException, MessagingException, UserNotFoundException {
+		validateNewUsernameAndEmail(EMPTY, theUser.getUsername(), theUser.getEmail());
+        theUser.setUserId(generateUserId());
         String password = generatePassword();
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setUsername(username);
-        user.setEmail(email);
-        user.setJoinDate(new Date());
-        user.setPassword(encodePassword(password));
-        user.setActive(true);
-        user.setNotLocked(true);
-        user.setRole(ROLE_USER.name());
-        user.setAuthorities(ROLE_USER.getAuthorities());
-        user.setQuestion("haifa");
-//        set a default image for user
-        user.setProfileImageUrl(getTemporaryProfileImageUrl(username));
-        userRepository.save(user);
-        LOGGER.info("New user password: " + password);
+        theUser.setJoinDate(new Date());
+        theUser.setPassword(encodePassword(password));
+        theUser.setActive(true);
+        theUser.setNotLocked(true);
 //        emailService.sendNewPasswordEmail(firstName, password, email);
-        return user;
+//        set a default image for user
+        theUser.setProfileImageUrl(getTemporaryProfileImageUrl(theUser.getUsername()));
+        LOGGER.info("New user password: " + password);
+        LOGGER.info("user" +theUser);
+        return theUser;
 	}
+
+
+//    @Override
+//    public void register(User user) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
+//        LOGGER.info("user"+ user);
+//
+//    }
+
+    @Override
+    public Doctor register(Doctor doctor) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
+        doctor = (Doctor) userRegister(doctor);
+        doctor.setRole(ROLE_DOCTOR.name());
+        doctor.setAuthorities(ROLE_DOCTOR.getAuthorities());
+        doctorRepository.save(doctor);
+        return doctor;
+    }
+
+    @Override
+    public Visitor register(Visitor visitor) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
+        visitor = (Visitor) userRegister(visitor);
+        visitor.setRole(ROLE_VISITOR.name());
+        visitor.setAuthorities(ROLE_VISITOR.getAuthorities());
+        visitorRepository.save(visitor);
+        return visitor;
+    }
 
 //    @Override
 //    public User addNewUser(String firstName, String lastName, String username, String email,
@@ -230,11 +240,6 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
     }
 
 
-
-
-
-
-
 //    private methods
     private void validateLoginAttempt(User user) {
         if(user.isNotLocked()) {
@@ -251,12 +256,10 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
 
 
 	private User validateNewUsernameAndEmail(String currentUsername, String newUsername, String newEmail) throws UserNotFoundException, UsernameExistException, EmailExistException {
-        
 		User userByNewUsername = findUserByUsername(newUsername);
         User userByNewEmail = findUserByEmail(newEmail);
 //      updating case
         if(StringUtils.isNotBlank(currentUsername)) {
-
 //            get current user info from DB
             User currentUser = findUserByUsername(currentUsername);
             if(currentUser == null) {

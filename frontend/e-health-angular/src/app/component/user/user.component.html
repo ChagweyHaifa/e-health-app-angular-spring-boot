@@ -4,7 +4,7 @@
         <div class="col-md-4">
             <h5>Find a doctor neer you</h5>
             <small *ngIf="titleAction$ | async as title">{{ title }}</small>
-            <!-- <small>{{ title }}</small> -->
+
         </div>
         <div class="col-md-4"></div>
     </div>
@@ -44,7 +44,7 @@
                         <i class="fa fa-plus"></i> New User
                     </button>
                 </div>
-                <!-- refreshing -->
+                <!-- refreshing button-->
                 <div class="btn-group">
                     <button type="button" (click)="getUsers(true)" class="btn btn-info">
                         <i *ngIf="refreshing" class="fas fa-sync fa-spin"></i><i *ngIf="!refreshing"

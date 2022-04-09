@@ -1,0 +1,62 @@
+<div class="container">
+
+    <div class="header">
+        <div class="header-text">
+            <h1 class="mb-4">Quickly find the right doctor near you!</h1>
+            <p>Optimize your time and easily find the nearest and the right doctor. </p>
+        </div>
+        <div class="header-img">
+            <img src="../../assets/doctor-desk.jpg" alt="" class="ml-5">
+        </div>
+
+
+    </div>
+
+
+    <form #DoctorSearchForm="ngForm" class="search-form" (ngSubmit)="onSearchDoctor(DoctorSearchForm)">
+        <div class=" row">
+            <div class="col p-0">
+                <input type="search" class="form-control " name="firstName" ngModel placeholder="firstName">
+            </div>
+            <div class="col p-0">
+                <input type="search" class="form-control" name="lastName" ngModel placeholder="lastName">
+            </div>
+            <div class="col p-0">
+                <select class="form-control" name="speciality" ngModel>
+                    <option value="">Speciality</option>
+                    <option *ngFor="let tempSpeciality of specialities" [ngValue]="tempSpeciality">
+                        {{tempSpeciality.name}}</option>
+                </select>
+            </div>
+
+            <div class="col p-0">
+                <select class="form-control " name="country" ngModel
+                    (change)="getStates(DoctorSearchForm.value.country)">
+                    <option value="">Country</option>
+                    <option *ngFor="let tempCountry of countries">{{tempCountry.name}}
+                    </option>
+                </select>
+            </div>
+            <div class="col p-0">
+                <select class="form-control " name="state" ngModel (change)="getCities(DoctorSearchForm.value.state)">
+                    <option value="">State</option>
+                    <option *ngFor="let tempState of states">{{tempState.name}}
+                    </option>
+                </select>
+            </div>
+            <div class="col p-0">
+                <select class="form-control " name="city" ngModel>
+                    <option value="">City</option>
+                    <option *ngFor="let tempCity of cities">{{tempCity.name}}
+                    </option>
+                </select>
+            </div>
+            <div class="col p-0">
+                <button type="submit" class="btn btn-danger wrn-btn">Search</button>
+            </div>
+
+        </div>
+
+
+    </form>
+</div>

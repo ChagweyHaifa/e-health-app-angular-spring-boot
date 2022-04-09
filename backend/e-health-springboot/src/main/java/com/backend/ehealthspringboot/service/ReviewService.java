@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface ReviewService {
 
-    List<Review> getReviews();
+    List<Review> getDoctorReviews(String username);
+    Review addReview(Review review);
 }

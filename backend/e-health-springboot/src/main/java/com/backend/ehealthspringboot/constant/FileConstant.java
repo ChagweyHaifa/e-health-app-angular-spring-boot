@@ -3,7 +3,7 @@ package com.backend.ehealthspringboot.constant;
 public class FileConstant {
 	public static final String USER_IMAGE_PATH = "/api/image/";
 	public static final String DEFAULT_USER_IMAGE_PATH = "/api/image/profile/";
-	public static final String USER_FOLDER = System.getProperty("user.home") + "/OneDrive/Desktop/Angular/e-health-app-angular-spring-boot/img/";
+	public static final String USER_FOLDER = System.getProperty("user.home") + "/OneDrive/Desktop/Angular/e-health-app-angular-spring-boot/img/users";
 	public static final String JPG_EXTENSION = "jpg";
 	public static final String DOT = ".";
 	public static final String FORWARD_SLASH = "/";

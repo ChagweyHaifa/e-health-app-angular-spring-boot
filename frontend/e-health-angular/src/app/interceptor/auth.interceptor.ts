@@ -32,15 +32,53 @@ export class AuthInterceptor implements HttpInterceptor {
 
     if (
       httpRequest.url.includes(
-        `${this.authenticationService.host}/user/management`
+        `${this.authenticationService.host}/specialities`
       )
     ) {
       return httpHandler.handle(httpRequest);
     }
+
+    if (
+      httpRequest.url.includes(`${this.authenticationService.host}/countries`)
+    ) {
+      return httpHandler.handle(httpRequest);
+    }
+
+    if (httpRequest.url.includes(`${this.authenticationService.host}/states`)) {
+      return httpHandler.handle(httpRequest);
+    }
+    if (
+      httpRequest.url.includes(
+        `${this.authenticationService.host}/cities/search/findByStateName`
+      )
+    ) {
+      return httpHandler.handle(httpRequest);
+    }
+
+    if (
+      httpRequest.url.includes(
+        `${this.authenticationService.host}/specialities`
+      )
+    ) {
+      return httpHandler.handle(httpRequest);
+    }
+    if (
+      httpRequest.url.includes(
+        `${this.authenticationService.host}/users/doctors`
+      )
+    ) {
+      return httpHandler.handle(httpRequest);
+    }
+    if (
+      httpRequest.url.includes(`${this.authenticationService.host}/reviews`)
+    ) {
+      return httpHandler.handle(httpRequest);
+    }
+
     // if (httpRequest.url.includes(`${this.authenticationService.host}/resetpassword`)) {
     //   return httpHandler.handle(httpRequest);
     // }
-    this.authenticationService.loadToken();
+    this.authenticationService.getToken();
     const token = this.authenticationService.getToken();
     // the httpRequest (original request) is mutable we can't modify it, we have to make a clone of it
     const request = httpRequest.clone({
