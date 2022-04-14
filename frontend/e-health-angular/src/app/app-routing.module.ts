@@ -15,7 +15,7 @@ const routes: Routes = [
   { path: 'find-a-doctor/:username', component: DoctorProfileComponent },
   { path: 'find-a-doctor', component: DoctorsComponent },
   { path: 'ask-a-question', component: QuestionsComponent },
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: '', redirectTo: '/find-a-doctor', pathMatch: 'full' },
 ];
 
 @NgModule({

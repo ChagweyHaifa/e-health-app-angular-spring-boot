@@ -1,6 +1,7 @@
 package com.backend.ehealthspringboot.domain;
 import javax.persistence.*;
 
+import com.backend.ehealthspringboot.enumeration.Gender;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -46,8 +47,10 @@ public class User  {
     @Column(name="phone_number")
     private String phoneNumber;
 
-  @Column(name="profile_image_url")
-  private String profileImageUrl;
+
+
+  @Column(name="gender")
+  private String gender;
 
   @Column(name="last_login_date")
   private Date lastLoginDate;

@@ -267,7 +267,7 @@ export class UserComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.userService.updateProfileImage(formData).subscribe(
         (event: HttpEvent<any>) => {
-          this.reportUploadProgress(event);
+          // this.reportUploadProgress(event);
         },
         (errorResponse: HttpErrorResponse) => {
           this.sendNotification(
@@ -331,37 +331,37 @@ export class UserComponent implements OnInit, OnDestroy {
     }
   }
 
-  private reportUploadProgress(event: HttpEvent<any>): void {
-    switch (event.type) {
-      case HttpEventType.UploadProgress:
-        this.fileStatus.percentage = Math.round(
-          (100 * event.loaded) / event.total
-        );
-        this.fileStatus.status = 'progress';
-        break;
-      case HttpEventType.Response:
-        if (event.status === 200) {
-          this.loggedInUser.profileImageUrl = `${
-            event.body.profileImageUrl
-          }?time=${new Date().getTime()}`;
-          this.sendNotification(
-            NotificationType.SUCCESS,
-            `${event.body.firstName}\'s profile image updated successfully`
-          );
-          this.fileStatus.status = 'done';
-          this.getUsers(false);
-          break;
-        } else {
-          this.sendNotification(
-            NotificationType.ERROR,
-            `Unable to upload image. Please try again`
-          );
-          break;
-        }
-      default:
-        `Finished all processes`;
-    }
-  }
+  // private reportUploadProgress(event: HttpEvent<any>): void {
+  //   switch (event.type) {
+  //     case HttpEventType.UploadProgress:
+  //       this.fileStatus.percentage = Math.round(
+  //         (100 * event.loaded) / event.total
+  //       );
+  //       this.fileStatus.status = 'progress';
+  //       break;
+  //     case HttpEventType.Response:
+  //       if (event.status === 200) {
+  //         this.loggedInUser.profileImageUrl = `${
+  //           event.body.profileImageUrl
+  //         }?time=${new Date().getTime()}`;
+  //         this.sendNotification(
+  //           NotificationType.SUCCESS,
+  //           `${event.body.firstName}\'s profile image updated successfully`
+  //         );
+  //         this.fileStatus.status = 'done';
+  //         this.getUsers(false);
+  //         break;
+  //       } else {
+  //         this.sendNotification(
+  //           NotificationType.ERROR,
+  //           `Unable to upload image. Please try again`
+  //         );
+  //         break;
+  //       }
+  //     default:
+  //       `Finished all processes`;
+  //   }
+  // }
 
   private getUserRole(): string {
     return this.authenticationService.getUserFromLocalCache().role;

@@ -1,4 +1,5 @@
 @import "~angular-notifier/styles";
+
 body {
   /* font-family: "Noto Serif", serif; */
   font-family: "Patrick Hand", cursive;
@@ -92,7 +93,7 @@ html {
   width: 100%;
   color: #2e8fcc;
   border: #2e8fcc solid 1px;
-  border-radius: 0.6rem;
+  border-radius: 0.5rem;
 }
 .login_btn:hover{
   background-color:#2e8fcc; 
@@ -118,7 +119,7 @@ html {
 }
 
 .login-form input, .login-form select {
-  border-radius: 0.6rem;
+  border-radius: 0.5rem;
 }
 
 /* .login-form input, .login-form select {
@@ -127,7 +128,7 @@ html {
 
 a {
   color: #2e8fcc;
- /* text-decoration: none; */
+ text-decoration: none;
 }
 
 /* find doctors */

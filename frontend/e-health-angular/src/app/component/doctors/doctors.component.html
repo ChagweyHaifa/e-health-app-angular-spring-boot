@@ -15,16 +15,16 @@
 
     <form #DoctorSearchForm="ngForm" class="search-form" (ngSubmit)="onSearchDoctor(DoctorSearchForm)">
         <div class=" row">
-            <div class="col p-0">
+            <!-- <div class="p-0">
                 <input type="search" class="form-control " name="firstName" ngModel placeholder="firstName">
-            </div>
-            <div class="col p-0">
+            </div> 
+            <div class=" p-0">
                 <input type="search" class="form-control" name="lastName" ngModel placeholder="lastName">
-            </div>
-            <div class="col p-0">
-                <select class="form-control" name="speciality" ngModel>
+            </div> -->
+            <div class="p-0">
+                <select class="form-control" name="specialityName" ngModel>
                     <option value="">Speciality</option>
-                    <option *ngFor="let tempSpeciality of specialities" [ngValue]="tempSpeciality">
+                    <option *ngFor="let tempSpeciality of specialities">
                         {{tempSpeciality.name}}</option>
                 </select>
             </div>
@@ -51,12 +51,48 @@
                     </option>
                 </select>
             </div>
-            <div class="col p-0">
-                <button type="submit" class="btn btn-danger wrn-btn">Search</button>
+            <div class=" p-0">
+                <button type="submit" class="btn btn-danger wrn-btn"><i class="fa fa-search" aria-hidden="true"></i>
+                </button>
+            </div>
+
+        </div>
+    </form>
+
+
+    <div class="people-nearby my-5">
+
+        <div class="nearby-user my-3" *ngFor="let tempDoctor of doctors">
+
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="row" (click)="getDoctorProfile(tempDoctor.username)">
+                        <div class="col-2">
+                            <img src="{{tempDoctor.profileImageUrl}}" alt="user" class="profile-photo-lg">
+                        </div>
+                        <div class="col">
+                            <h4>{{tempDoctor.firstName}} {{tempDoctor.lastName}} </h4>
+                            <span> {{tempDoctor.nbOfReviews}} Reviews </span>
+                            <p>{{tempDoctor.speciality.name}}</p>
+                            <p>{{tempDoctor.address.city}}
+                                {{tempDoctor.address.state}} {{tempDoctor.address.country}}</p>
+
+
+                        </div>
+
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div (click)="getDoctorProfile(tempDoctor.username)">
+                        <h5 class="card-title">Special title treatment</h5>
+                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                    </div>
+                    <a href="#" class="btn btn-primary">Send Message</a>
+                </div>
             </div>
 
         </div>
 
-
-    </form>
+    </div>
 </div>

@@ -14,4 +14,7 @@ export class ReviewService {
   public getDoctorReviews(username: string): Observable<Review[]> {
     return this.http.get<Review[]>(`${this.host}/reviews/${username}`);
   }
+  public addReview(review: Review): Observable<Review[]> {
+    return this.http.post<Review[]>(`${this.host}/reviews`, review);
+  }
 }

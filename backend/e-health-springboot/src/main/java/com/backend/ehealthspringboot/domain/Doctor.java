@@ -13,6 +13,9 @@ import java.util.List;
 @DiscriminatorValue(value="doctor")
 public class Doctor extends User {
 
+    @Column(name="profile_image_url")
+    private String profileImageUrl;
+
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "speciality_id" )
     private Speciality speciality;

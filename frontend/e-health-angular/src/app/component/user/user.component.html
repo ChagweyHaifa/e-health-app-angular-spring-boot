@@ -69,8 +69,7 @@
                 <tbody *ngFor="let appUser of users">
                     <tr class="text-center">
                         <td (click)="onSelectUser(appUser)">
-                            <img height="40" width="40" src="{{appUser?.profileImageUrl}}"
-                                class="rounded-circle img-fluid img-thumbnail" alt="" />
+                            <img height="40" width="40" src="" class="rounded-circle img-fluid img-thumbnail" alt="" />
                         </td>
                         <td (click)="onSelectUser(appUser)">{{appUser?.userId}}</td>
                         <td (click)="onSelectUser(appUser)">{{appUser?.firstName}}</td>
@@ -131,8 +130,8 @@
                                                     <div class="mx-auto" style="width: 120px;">
                                                         <div
                                                             class="d-flex justify-content-center align-items-center rounded">
-                                                            <img class="rounded" height="135" width="135"
-                                                                src="{{loggedInUser?.profileImageUrl}}" alt="">
+                                                            <!-- <img class="rounded" height="135" width="135"
+                                                                src="{{loggedInUser?.profileImageUrl}}" alt=""> -->
                                                         </div>
                                                         <div class="progress mt-1">
                                                             <div class="progress-bar bg-info" role="progressbar"
@@ -337,8 +336,7 @@
                                     <div class="col-12 col-sm-auto">
                                         <div class="mx-auto" style="width: 120px;">
                                             <div class="d-flex justify-content-center align-items-center rounded">
-                                                <img class="rounded" height="120" width="120"
-                                                    src="{{selectedUser?.profileImageUrl}}"
+                                                <img class="rounded" height="120" width="120" src=""
                                                     alt="{{selectedUser?.firstName}}">
                                             </div>
                                         </div>

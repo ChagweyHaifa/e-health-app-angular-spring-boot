@@ -74,11 +74,7 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
         this.visitorRepository = visitorRepository;
     }
 
-//  all users
-    @Override
-    public List<User> getUsers() {
-        return userRepository.findAll();
-    }
+
 
 //  doctors
     @Override
@@ -87,18 +83,32 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
     }
 
     @Override
-    public List<Doctor> searchDoctors(String speciality,String state){
-        return doctorRepository.findBySpecialityNameAndAddressState(speciality,state);
+    public List<Doctor> searchDoctors(Doctor doctor){
+//        LOGGER.info("speciality name"+ doctor.getSpeciality().getName().isEmpty());
+//        LOGGER.info("address country"+ doctor.getAddress().getCountry().isEmpty());
+        return doctorRepository.findBySpecialityNameAndAddressCountryAndAddressStateAndAddressCity
+                (doctor.getSpeciality().getName(),
+                doctor.getAddress().getCountry(),
+                doctor.getAddress().getState(),
+                doctor.getAddress().getCity());
     }
+
     @Override
-    public Doctor findDoctorbyUsername(String username){
+    public Doctor findDoctorByUsername(String username) {
         return doctorRepository.findDoctorByUsername(username);
     }
+
 
     //  visitors
     @Override
     public List<Visitor> getVisitors() {
         return visitorRepository.findAll();
+    }
+
+    //  all users
+    @Override
+    public List<User> getUsers() {
+        return userRepository.findAll();
     }
 
     @Override
@@ -129,41 +139,37 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
 	}
 
 
-	private User userRegister(User theUser) throws UsernameExistException, EmailExistException, MessagingException, UserNotFoundException {
-		validateNewUsernameAndEmail(EMPTY, theUser.getUsername(), theUser.getEmail());
-        theUser.setUserId(generateUserId());
-        String password = generatePassword();
-        theUser.setJoinDate(new Date());
-        theUser.setPassword(encodePassword(password));
-        theUser.setActive(true);
-        theUser.setNotLocked(true);
-//        emailService.sendNewPasswordEmail(firstName, password, email);
-//        set a default image for user
-        theUser.setProfileImageUrl(getTemporaryProfileImageUrl(theUser.getUsername()));
-        LOGGER.info("New user password: " + password);
-        LOGGER.info("user" +theUser);
-        return theUser;
-	}
-
-
-//    @Override
-//    public void register(User user) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
-//        LOGGER.info("user"+ user);
-//
-//    }
-
     @Override
     public Doctor register(Doctor doctor) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
-        doctor = (Doctor) userRegister(doctor);
+        validateNewUsernameAndEmail(EMPTY, doctor.getUsername(), doctor.getEmail());
+        doctor.setUserId(generateUserId());
+        String password = generatePassword();
+        doctor.setJoinDate(new Date());
+        doctor.setPassword(encodePassword(password));
+        doctor.setActive(true);
+        doctor.setNotLocked(true);
+//        emailService.sendNewPasswordEmail(firstName, password, email);
+//        set a default image for user
+        LOGGER.info("New user password: " + password);
         doctor.setRole(ROLE_DOCTOR.name());
         doctor.setAuthorities(ROLE_DOCTOR.getAuthorities());
+        doctor.setProfileImageUrl(getTemporaryProfileImageUrl(doctor.getGender()));
         doctorRepository.save(doctor);
         return doctor;
     }
 
     @Override
     public Visitor register(Visitor visitor) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
-        visitor = (Visitor) userRegister(visitor);
+        validateNewUsernameAndEmail(EMPTY, visitor.getUsername(), visitor.getEmail());
+        visitor.setUserId(generateUserId());
+        String password = generatePassword();
+        visitor.setJoinDate(new Date());
+        visitor.setPassword(encodePassword(password));
+        visitor.setActive(true);
+        visitor.setNotLocked(true);
+//        emailService.sendNewPasswordEmail(firstName, password, email);
+//        set a default image for user
+        LOGGER.info("New user password: " + password);
         visitor.setRole(ROLE_VISITOR.name());
         visitor.setAuthorities(ROLE_VISITOR.getAuthorities());
         visitorRepository.save(visitor);
@@ -207,7 +213,7 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
         currentUser.setRole(getRoleEnumName(role).name());
         currentUser.setAuthorities(getRoleEnumName(role).getAuthorities());
         userRepository.save(currentUser);
-        saveProfileImage(currentUser, profileImage);
+//        saveProfileImage(currentUser, profileImage);
         return currentUser;
     }
 
@@ -234,9 +240,10 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
 
     @Override
     public User updateProfileImage(String username, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException, NotAnImageFileException {
-        User user = validateNewUsernameAndEmail(username, null, null);
-        saveProfileImage(user, profileImage);
-        return user;
+//        User user = validateNewUsernameAndEmail(username, null, null);
+        Doctor doctor = doctorRepository.findDoctorByUsername(username);
+        saveProfileImage(doctor, profileImage);
+        return doctor;
     }
 
 
@@ -303,26 +310,26 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
         return Role.valueOf(role.toUpperCase());
     }
 
-    private String getTemporaryProfileImageUrl(String username) {
-        return ServletUriComponentsBuilder.fromCurrentContextPath().path(DEFAULT_USER_IMAGE_PATH + username).toUriString();
+    private String getTemporaryProfileImageUrl(String gender) {
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path(DEFAULT_USER_IMAGE_PATH + gender).toUriString();
     }
 
-    private void saveProfileImage(User user, MultipartFile profileImage) throws IOException, NotAnImageFileException {
+    private void saveProfileImage(Doctor doctor , MultipartFile profileImage) throws IOException, NotAnImageFileException {
         if (profileImage != null) {
             if(!Arrays.asList(IMAGE_JPEG_VALUE, IMAGE_PNG_VALUE, IMAGE_GIF_VALUE).contains(profileImage.getContentType())) {
                 throw new NotAnImageFileException(profileImage.getOriginalFilename() + NOT_AN_IMAGE_FILE);
             }
 
-            Path userFolder = Paths.get(USER_FOLDER + user.getUsername()).toAbsolutePath().normalize();
+            Path userFolder = Paths.get(USER_FOLDER + doctor.getUsername()).toAbsolutePath().normalize();
 //            if the user directory does not exist
             if(!Files.exists(userFolder)) {
                 Files.createDirectories(userFolder);
                 LOGGER.info(DIRECTORY_CREATED + userFolder);
             }
-            Files.deleteIfExists(Paths.get(userFolder + user.getUsername() + DOT + JPG_EXTENSION));
-            Files.copy(profileImage.getInputStream(), userFolder.resolve(user.getUsername() + DOT + JPG_EXTENSION), REPLACE_EXISTING);
-            user.setProfileImageUrl(setProfileImageUrl(user.getUsername()));
-            userRepository.save(user);
+            Files.deleteIfExists(Paths.get(userFolder + doctor.getUsername() + DOT + JPG_EXTENSION));
+            Files.copy(profileImage.getInputStream(), userFolder.resolve(doctor.getUsername() + DOT + JPG_EXTENSION), REPLACE_EXISTING);
+            doctor.setProfileImageUrl(setProfileImageUrl(doctor.getUsername()));
+            userRepository.save(doctor);
             LOGGER.info(FILE_SAVED_IN_FILE_SYSTEM + profileImage.getOriginalFilename());
         }
     }

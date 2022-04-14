@@ -7,6 +7,7 @@ import { map } from 'rxjs/operators';
 import { NotificationType } from 'src/app/enum/notification-type.enum';
 import { Address } from 'src/app/model/address';
 import { City } from 'src/app/model/city';
+import { Country } from 'src/app/model/country';
 import { Doctor } from 'src/app/model/doctor';
 import { Speciality } from 'src/app/model/speciality';
 import { State } from 'src/app/model/state';
@@ -25,6 +26,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
   showLoading: boolean = false;
   private subscriptions: Subscription[] = [];
   specialities: Speciality[];
+  defaultCountry: string = 'Tunisie';
+  countries: Country[];
   states: State[];
   cities: City[];
 
@@ -37,11 +40,13 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.getSpecialities();
+    this.getCountries();
 
     if (this.authenticationService.isUserLoggedIn()) {
       this.router.navigateByUrl('/user/management');
     }
   }
+
   getSpecialities() {
     this.subscriptions.push(
       this.formService.getSpecialities().subscribe(
@@ -58,9 +63,25 @@ export class RegisterComponent implements OnInit, OnDestroy {
     );
   }
 
+  getCountries() {
+    this.subscriptions.push(
+      this.formService.getCountries().subscribe(
+        (response: Country[]) => {
+          this.countries = response;
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendNotification(
+            NotificationType.ERROR,
+            errorResponse.error.message
+          );
+        }
+      )
+    );
+  }
+
   getStates(countryName: string) {
     this.subscriptions.push(
-      this.formService.getStates('tunisie').subscribe(
+      this.formService.getStates(countryName).subscribe(
         (response: State[]) => {
           this.states = response;
         },
@@ -103,6 +124,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
             `A new account was created for ${response.firstName}.
           Please check your email for password to log in.`
           );
+          this.router.navigateByUrl('/login');
         },
         (errorResponse: HttpErrorResponse) => {
           this.showLoading = false;

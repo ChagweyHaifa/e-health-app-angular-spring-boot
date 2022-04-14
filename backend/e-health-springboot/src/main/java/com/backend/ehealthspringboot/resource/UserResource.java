@@ -70,16 +70,24 @@ public class UserResource extends ExceptionHandling {
 
     @GetMapping("/users/doctors/{username}")
     public ResponseEntity<Doctor> findDoctorByUsername(@PathVariable("username") String username) {
-        Doctor doctor = userService.findDoctorbyUsername(username);
+        Doctor doctor = userService.findDoctorByUsername(username);
         return new ResponseEntity(doctor, OK);
     }
 
-    @GetMapping("/users/doctors/search")
-    public ResponseEntity<List<Doctor>> searchDoctors(@RequestParam("speciality") String speciality,
-                                                      @RequestParam("state") String state) {
-        List<Doctor> doctors = userService.searchDoctors(speciality,state);
+    @PostMapping("/users/doctors/search/findDoctorsByAllParameters")
+    public ResponseEntity<List<Doctor>> searchDoctors(@RequestBody Doctor doctor){
+        List<Doctor> doctors = userService.searchDoctors(doctor);
         return new ResponseEntity(doctors, OK);
     }
+
+//    @GetMapping("/users/doctors/search/findByFirstNameOrLastName")
+//    public ResponseEntity<List<Doctor>> searchDoctors(@RequestParam("name") String name){
+//        List<Doctor> doctors = userService.findByFirstNameOrLastName(name);
+//        return new ResponseEntity(doctors, OK);
+//    } {
+
+
+//
 
     @GetMapping("/users/visitors")
     public ResponseEntity<List<Visitor>> getAllVisitors() {
@@ -182,23 +190,26 @@ public class UserResource extends ExceptionHandling {
         return new ResponseEntity<>(user, OK);
     }
 
+// get uers images
     @GetMapping(path = "/image/{username}/{fileName}", produces = IMAGE_JPEG_VALUE)
     public byte[] getProfileImage(@PathVariable("username") String username, @PathVariable("fileName") String fileName) throws IOException {
         return Files.readAllBytes(Paths.get(USER_FOLDER + username + FORWARD_SLASH + fileName));
     }
 
-    @GetMapping(path = "/image/profile/{username}", produces = IMAGE_JPEG_VALUE)
-    public byte[] getTempProfileImage(@PathVariable("username") String username) throws IOException {
-        URL url = new URL(TEMP_PROFILE_IMAGE_BASE_URL + username);
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        try (InputStream inputStream = url.openStream()) {
-            int bytesRead;
-            byte[] chunk = new byte[1024];
-            while((bytesRead = inputStream.read(chunk)) > 0) {
-                byteArrayOutputStream.write(chunk, 0, bytesRead);
-            }
-        }
-        return byteArrayOutputStream.toByteArray();
+    @GetMapping(path = "/image/default/{gender}", produces = IMAGE_JPEG_VALUE)
+    public byte[] getTempProfileImage(@PathVariable("gender") String gender) throws IOException {
+
+        return Files.readAllBytes(Paths.get(TEMP_PROFILE_IMAGE_BASE_URL  + FORWARD_SLASH + gender + ".jpg"));
+//        URL url = new URL(TEMP_PROFILE_IMAGE_BASE_URL + gender+".jpg");
+//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//        try (InputStream inputStream = url.openStream()) {
+//            int bytesRead;
+//            byte[] chunk = new byte[1024];
+//            while((bytesRead = inputStream.read(chunk)) > 0) {
+//                byteArrayOutputStream.write(chunk, 0, bytesRead);
+//            }
+//        }
+//        return byteArrayOutputStream.toByteArray();
     }
 //  private methods
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

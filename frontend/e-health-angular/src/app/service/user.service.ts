@@ -36,6 +36,13 @@ export class UserService {
     return this.http.get<Doctor>(`${this.host}/users/doctors/${username}`);
   }
 
+  public searchForDoctors(doctor: Doctor): Observable<Doctor[]> {
+    return this.http.post<Doctor[]>(
+      `${this.host}/users/doctors/search/findDoctorsByAllParameters `,
+      doctor
+    );
+  }
+
   public resetPassword(email: string): Observable<CustomHttpRespone> {
     return this.http.get<CustomHttpRespone>(
       `${this.host}/resetpassword/${email}`

@@ -35,8 +35,16 @@ public interface UserService {
 
     List<User> getUsers();
     List<Doctor> getDoctors();
-    List<Doctor> searchDoctors(String speciality,String state);
-    Doctor findDoctorbyUsername(String username);
+    List<Doctor> searchDoctors(Doctor doctor);
+//    List<Doctor> findByFirstNameOrLastName(String name);
+    Doctor findDoctorByUsername(String username);
+
+
+
+
+
+
+
     List<Visitor> getVisitors();
 
 
