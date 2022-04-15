@@ -55,12 +55,26 @@ public class UserResource extends ExceptionHandling {
 	    this.jwtTokenProvider = jwtTokenProvider;
 	}
 
-    @GetMapping("/users")
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.getUsers();
-        return new ResponseEntity<>(users, OK);
+    @PostMapping("/login")
+    public ResponseEntity<User> login(@RequestBody User user) {
+        authenticate(user.getUsername(), user.getPassword());
+        User loginUser = userService.findUserByUsername(user.getUsername());
+        UserPrincipal userPrincipal = new UserPrincipal(loginUser);
+        HttpHeaders jwtHeader = getJwtHeader(userPrincipal);
+        return new ResponseEntity<>(loginUser, jwtHeader, OK);
     }
 
+    @PostMapping("/registerDoctor")
+    public ResponseEntity<Doctor> registerDoctor(@RequestBody Doctor doctor ) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
+        Doctor newDoctor = userService.register(doctor);
+        return new ResponseEntity<>(newDoctor, OK);
+    }
+
+    @PostMapping("/registerVisitor")
+    public ResponseEntity<Visitor> registerVisitor(@RequestBody Visitor visitor) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
+        Visitor newVisitor = userService.register(visitor);
+        return new ResponseEntity<>(newVisitor, OK);
+    }
 
     @GetMapping("/users/doctors")
     public ResponseEntity<List<Doctor>> getAllDoctors() {
@@ -68,7 +82,7 @@ public class UserResource extends ExceptionHandling {
         return new ResponseEntity(doctors, OK);
     }
 
-    @GetMapping("/users/doctors/{username}")
+    @GetMapping("/users/doctors/search/findByUsername/{username}")
     public ResponseEntity<Doctor> findDoctorByUsername(@PathVariable("username") String username) {
         Doctor doctor = userService.findDoctorByUsername(username);
         return new ResponseEntity(doctor, OK);
@@ -80,14 +94,6 @@ public class UserResource extends ExceptionHandling {
         return new ResponseEntity(doctors, OK);
     }
 
-//    @GetMapping("/users/doctors/search/findByFirstNameOrLastName")
-//    public ResponseEntity<List<Doctor>> searchDoctors(@RequestParam("name") String name){
-//        List<Doctor> doctors = userService.findByFirstNameOrLastName(name);
-//        return new ResponseEntity(doctors, OK);
-//    } {
-
-
-//
 
     @GetMapping("/users/visitors")
     public ResponseEntity<List<Visitor>> getAllVisitors() {
@@ -95,30 +101,7 @@ public class UserResource extends ExceptionHandling {
         return new ResponseEntity<>(visitors, OK);
     }
 
-	@PostMapping("/login")
-	public ResponseEntity<User> login(@RequestBody User user) {
-	    authenticate(user.getUsername(), user.getPassword());
-	    User loginUser = userService.findUserByUsername(user.getUsername());
-	    UserPrincipal userPrincipal = new UserPrincipal(loginUser);
-	    HttpHeaders jwtHeader = getJwtHeader(userPrincipal);
-	    return new ResponseEntity<>(loginUser, jwtHeader, OK);
-	}
-//    @PostMapping("/register")
-//    public void registerDoctor(@RequestBody User user) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
-//        userService.register(user);
-//    }
 
-	@PostMapping("/registerDoctor")
-    public ResponseEntity<Doctor> registerDoctor(@RequestBody Doctor doctor ) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
-        Doctor newDoctor = userService.register(doctor);
-        return new ResponseEntity<>(newDoctor, OK);
-    }
-
-    @PostMapping("/registerVisitor")
-    public ResponseEntity<Visitor> registerVisitor(@RequestBody Visitor visitor) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
-        Visitor newVisitor = userService.register(visitor);
-        return new ResponseEntity<>(newVisitor, OK);
-    }
 
 //    @PostMapping("/users")
 //    @PreAuthorize("hasAnyAuthority('user:create')")
@@ -198,19 +181,9 @@ public class UserResource extends ExceptionHandling {
 
     @GetMapping(path = "/image/default/{gender}", produces = IMAGE_JPEG_VALUE)
     public byte[] getTempProfileImage(@PathVariable("gender") String gender) throws IOException {
-
         return Files.readAllBytes(Paths.get(TEMP_PROFILE_IMAGE_BASE_URL  + FORWARD_SLASH + gender + ".jpg"));
-//        URL url = new URL(TEMP_PROFILE_IMAGE_BASE_URL + gender+".jpg");
-//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//        try (InputStream inputStream = url.openStream()) {
-//            int bytesRead;
-//            byte[] chunk = new byte[1024];
-//            while((bytesRead = inputStream.read(chunk)) > 0) {
-//                byteArrayOutputStream.write(chunk, 0, bytesRead);
-//            }
-//        }
-//        return byteArrayOutputStream.toByteArray();
     }
+
 //  private methods
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
         return new ResponseEntity<>(new HttpResponse(httpStatus.value(), httpStatus, httpStatus.getReasonPhrase().toUpperCase(),

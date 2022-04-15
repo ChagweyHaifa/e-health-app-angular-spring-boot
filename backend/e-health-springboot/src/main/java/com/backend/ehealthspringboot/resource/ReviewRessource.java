@@ -26,7 +26,7 @@ public class ReviewRessource extends ExceptionHandling {
         this.reviewService = reviewService;
     }
 
-    @GetMapping("/{username}")
+    @GetMapping("/search/findByDoctorUsername/{username}")
     public ResponseEntity<List<Review>> getDoctorReviews(@PathVariable("username") String username) {
         List<Review> reviews = reviewService.getDoctorReviews(username);
         return new ResponseEntity<>(reviews, OK);

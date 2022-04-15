@@ -8,11 +8,13 @@ import { Review } from '../model/review';
   providedIn: 'root',
 })
 export class ReviewService {
-  private host = environment.apiUrl;
+  host = environment.apiUrl;
   constructor(private http: HttpClient) {}
 
   public getDoctorReviews(username: string): Observable<Review[]> {
-    return this.http.get<Review[]>(`${this.host}/reviews/${username}`);
+    return this.http.get<Review[]>(
+      `${this.host}/reviews/search/findByDoctorUsername/${username}`
+    );
   }
   public addReview(review: Review): Observable<Review[]> {
     return this.http.post<Review[]>(`${this.host}/reviews`, review);

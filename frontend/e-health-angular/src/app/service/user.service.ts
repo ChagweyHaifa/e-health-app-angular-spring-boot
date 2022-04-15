@@ -10,7 +10,7 @@ import { Doctor } from '../model/doctor';
   providedIn: 'root',
 })
 export class UserService {
-  private host = environment.apiUrl;
+  host = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
@@ -33,7 +33,9 @@ export class UserService {
   }
 
   public getDoctorInfo(username: string): Observable<Doctor> {
-    return this.http.get<Doctor>(`${this.host}/users/doctors/${username}`);
+    return this.http.get<Doctor>(
+      `${this.host}/users/doctors/search/findByUsername/${username}`
+    );
   }
 
   public searchForDoctors(doctor: Doctor): Observable<Doctor[]> {

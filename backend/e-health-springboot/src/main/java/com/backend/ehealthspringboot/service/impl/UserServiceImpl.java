@@ -122,6 +122,7 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
     }
 
 	@Override
+//    this funtion is executed when the user trys to log in
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		User user = userRepository.findUserByUsername(username);
         if (user == null) {

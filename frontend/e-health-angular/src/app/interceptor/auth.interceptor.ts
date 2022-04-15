@@ -7,13 +7,21 @@ import {
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthenticationService } from '../service/authentication.service';
+import { FormService } from '../service/form.service';
+import { UserService } from '../service/user.service';
+import { ReviewService } from '../service/review.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   // intercept the request and change it
   // it will intercept some particular routes to add the JWT
 
-  constructor(private authenticationService: AuthenticationService) {}
+  constructor(
+    private authenticationService: AuthenticationService,
+    private formService: FormService,
+    private userService: UserService,
+    private reviewService: ReviewService
+  ) {}
 
   intercept(
     httpRequest: HttpRequest<any>,
@@ -30,48 +38,32 @@ export class AuthInterceptor implements HttpInterceptor {
       return httpHandler.handle(httpRequest);
     }
 
+    if (httpRequest.url.includes(`${this.formService.host}/specialities`)) {
+      return httpHandler.handle(httpRequest);
+    }
+
+    if (httpRequest.url.includes(`${this.formService.host}/countries`)) {
+      return httpHandler.handle(httpRequest);
+    }
+
+    if (httpRequest.url.includes(`${this.formService.host}/states`)) {
+      return httpHandler.handle(httpRequest);
+    }
     if (
       httpRequest.url.includes(
-        `${this.authenticationService.host}/specialities`
+        `${this.formService.host}/cities/search/findByStateName`
       )
     ) {
       return httpHandler.handle(httpRequest);
     }
 
     if (
-      httpRequest.url.includes(`${this.authenticationService.host}/countries`)
+      httpRequest.url.includes(`${this.userService.host}/users/doctors/search`)
     ) {
       return httpHandler.handle(httpRequest);
     }
 
-    if (httpRequest.url.includes(`${this.authenticationService.host}/states`)) {
-      return httpHandler.handle(httpRequest);
-    }
-    if (
-      httpRequest.url.includes(
-        `${this.authenticationService.host}/cities/search/findByStateName`
-      )
-    ) {
-      return httpHandler.handle(httpRequest);
-    }
-
-    if (
-      httpRequest.url.includes(
-        `${this.authenticationService.host}/specialities`
-      )
-    ) {
-      return httpHandler.handle(httpRequest);
-    }
-    if (
-      httpRequest.url.includes(
-        `${this.authenticationService.host}/users/doctors`
-      )
-    ) {
-      return httpHandler.handle(httpRequest);
-    }
-    if (
-      httpRequest.url.includes(`${this.authenticationService.host}/reviews`)
-    ) {
+    if (httpRequest.url.includes(`${this.reviewService.host}/reviews/search`)) {
       return httpHandler.handle(httpRequest);
     }
 

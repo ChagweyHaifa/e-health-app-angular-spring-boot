@@ -12,7 +12,7 @@ import { Country } from '../model/country';
   providedIn: 'root',
 })
 export class FormService {
-  private host = environment.apiUrl;
+  host = environment.apiUrl;
   constructor(private http: HttpClient) {}
 
   public getSpecialities(): Observable<Speciality[]> {
