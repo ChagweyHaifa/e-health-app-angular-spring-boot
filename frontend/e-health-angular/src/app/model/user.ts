@@ -8,6 +8,7 @@ export class User {
   public email: string;
   public address: Address;
   public phoneNumber: string;
+  public gender: string;
   public lastLoginDate: Date;
   public lastLoginDateDisplay: Date;
   public joinDate: Date;
@@ -22,7 +23,9 @@ export class User {
     this.lastName = '';
     this.username = '';
     this.email = '';
-    this.address = null;
+    this.address = new Address();
+    this.phoneNumber = '';
+    this.gender = '';
     this.lastLoginDate = null;
     this.lastLoginDateDisplay = null;
     this.joinDate = null;

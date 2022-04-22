@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpEvent } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpResponse } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 import { User } from '../model/user';
@@ -40,9 +40,15 @@ export class UserService {
 
   public searchForDoctors(doctor: Doctor): Observable<Doctor[]> {
     return this.http.post<Doctor[]>(
-      `${this.host}/users/doctors/search/findDoctorsByAllParameters `,
+      `${this.host}/users/doctors/search/findByAllParameters `,
       doctor
     );
+  }
+
+  public updateDoctor(doctor: Doctor): Observable<HttpResponse<Doctor>> {
+    return this.http.put<Doctor>(`${this.host}/users/doctors`, doctor, {
+      observe: 'response',
+    });
   }
 
   public resetPassword(email: string): Observable<CustomHttpRespone> {
@@ -52,10 +58,14 @@ export class UserService {
   }
 
   public updateProfileImage(formData: FormData): Observable<HttpEvent<User>> {
-    return this.http.post<User>(`${this.host}/updateProfileImage`, formData, {
-      reportProgress: true,
-      observe: 'events',
-    });
+    return this.http.post<User>(
+      `${this.host}/users/doctors/updateProfileImage`,
+      formData,
+      {
+        reportProgress: true,
+        observe: 'events',
+      }
+    );
   }
 
   public addUsersToLocalCache(users: User[]): void {

@@ -35,11 +35,17 @@ export class AuthenticationService {
   // by default it just get the body
 
   public registerVisitor(visitor: Visitor): Observable<Visitor> {
-    return this.http.post<Visitor>(`${this.host}/registerVisitor`, visitor);
+    return this.http.post<Visitor>(
+      `${this.host}/users/visitors/register`,
+      visitor
+    );
   }
 
   public registerDoctor(doctor: Doctor): Observable<Doctor> {
-    return this.http.post<Doctor>(`${this.host}/registerDoctor`, doctor);
+    return this.http.post<Doctor>(
+      `${this.host}/users/doctors/register`,
+      doctor
+    );
   }
 
   public logOut() {

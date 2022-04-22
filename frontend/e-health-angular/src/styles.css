@@ -40,6 +40,51 @@ td {
 .m-heading {
   color: #2e8fcc;
 }
+
+/* .bright-blue-btn{
+  background-color: #35BBCA;
+}
+.blue-btn{
+  background-color: #0191B4;
+  color: #fff;
+}
+.yellow-btn{
+  background-color: #F8D90F;
+}
+.green-btn{
+  background-color: #D3DD18;
+}
+.orange-btn{
+  background-color: #FE7A15;
+} */
+
+.bright-blue-btn{
+  background-color: #7BD5F5;
+  color: #fff;
+}
+.purple-btn{
+  background-color: #787FF6;
+  color: #fff;
+  cursor:grab;
+}
+.purple-btn:hover{
+  background-color:#fff ;
+  color:#787FF6 ;
+  border: 1px solid #787FF6;
+}
+.yellow-btn{
+  background-color: #4ADEDE;
+  color: #fff;
+}
+.green-btn{
+  background-color: #1CA7EC;
+  color: #fff;
+}
+.orange-btn{
+  background-color: #1F2F98;
+  color: #fff;
+}
+
 /* .l-heading{} */
 
 /* login / register */

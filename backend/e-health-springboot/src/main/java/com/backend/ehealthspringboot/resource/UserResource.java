@@ -1,5 +1,4 @@
 package com.backend.ehealthspringboot.resource;
-
 import com.backend.ehealthspringboot.domain.*;
 import com.backend.ehealthspringboot.exception.domain.*;
 import org.slf4j.Logger;
@@ -11,27 +10,15 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
-
 import com.backend.ehealthspringboot.exception.ExceptionHandling;
 import com.backend.ehealthspringboot.service.UserService;
 import com.backend.ehealthspringboot.utility.JWTTokenProvider;
-
-import static com.backend.ehealthspringboot.constant.FileConstant.*;
-import static com.backend.ehealthspringboot.constant.UserImplConstant.FOUND_USER_BY_USERNAME;
 import static org.springframework.http.HttpStatus.*;
 import static com.backend.ehealthspringboot.constant.SecurityConstant.*;
-import static org.springframework.http.MediaType.IMAGE_JPEG_VALUE;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.mail.MessagingException;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 
 
@@ -45,7 +32,6 @@ public class UserResource extends ExceptionHandling {
     private UserService userService;
 	private AuthenticationManager authenticationManager;
 	private JWTTokenProvider jwtTokenProvider;
-
     private Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	@Autowired
@@ -59,49 +45,24 @@ public class UserResource extends ExceptionHandling {
     public ResponseEntity<User> login(@RequestBody User user) {
         authenticate(user.getUsername(), user.getPassword());
         User loginUser = userService.findUserByUsername(user.getUsername());
+//        LOGGER.info("user" + user);
         UserPrincipal userPrincipal = new UserPrincipal(loginUser);
         HttpHeaders jwtHeader = getJwtHeader(userPrincipal);
         return new ResponseEntity<>(loginUser, jwtHeader, OK);
     }
 
-    @PostMapping("/registerDoctor")
-    public ResponseEntity<Doctor> registerDoctor(@RequestBody Doctor doctor ) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
-        Doctor newDoctor = userService.register(doctor);
-        return new ResponseEntity<>(newDoctor, OK);
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userService.getUsers();
+        return new ResponseEntity<>(users, OK);
     }
 
-    @PostMapping("/registerVisitor")
-    public ResponseEntity<Visitor> registerVisitor(@RequestBody Visitor visitor) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
-        Visitor newVisitor = userService.register(visitor);
-        return new ResponseEntity<>(newVisitor, OK);
-    }
-
-    @GetMapping("/users/doctors")
-    public ResponseEntity<List<Doctor>> getAllDoctors() {
-        List<Doctor> doctors = userService.getDoctors();
-        return new ResponseEntity(doctors, OK);
-    }
-
-    @GetMapping("/users/doctors/search/findByUsername/{username}")
-    public ResponseEntity<Doctor> findDoctorByUsername(@PathVariable("username") String username) {
-        Doctor doctor = userService.findDoctorByUsername(username);
-        return new ResponseEntity(doctor, OK);
-    }
-
-    @PostMapping("/users/doctors/search/findDoctorsByAllParameters")
-    public ResponseEntity<List<Doctor>> searchDoctors(@RequestBody Doctor doctor){
-        List<Doctor> doctors = userService.searchDoctors(doctor);
-        return new ResponseEntity(doctors, OK);
-    }
-
-
-    @GetMapping("/users/visitors")
-    public ResponseEntity<List<Visitor>> getAllVisitors() {
-        List<Visitor> visitors = userService.getVisitors();
-        return new ResponseEntity<>(visitors, OK);
-    }
-
-
+//    @PostMapping("/users")
+//    public ResponseEntity<User> addNewUser(@RequestBody User user){
+//        User newUser = userService.addNewUser(user);
+//        return new ResponseEntity(newUser,OK);
+//
+//    }
 
 //    @PostMapping("/users")
 //    @PreAuthorize("hasAnyAuthority('user:create')")
@@ -126,22 +87,22 @@ public class UserResource extends ExceptionHandling {
 //        return new ResponseEntity<>(newUser, OK);
 //    }
 
-    @PutMapping("/users")
-//    @PreAuthorize("hasAnyAuthority('user:update')")
-    //   => only manager, admin and super_admin are authorized
-    public ResponseEntity<User> update(@RequestParam("currentUsername") String currentUsername,
-                                       @RequestParam("firstName") String firstName,
-                                       @RequestParam("lastName") String lastName,
-                                       @RequestParam("username") String username,
-                                       @RequestParam("email") String email,
-                                       @RequestParam("role") String role,
-                                       @RequestParam("isActive") String isActive,
-                                       @RequestParam("isNonLocked") String isNonLocked,
-                                       @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException, NotAnImageFileException {
-        User updatedUser = userService.updateUser(currentUsername, firstName, lastName, username,email, role, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
-        return new ResponseEntity<>(updatedUser, OK);
-//                 ResponseEntity<>(User object, HttpStatus object)
-    }
+//    @PutMapping("/users")
+////    @PreAuthorize("hasAnyAuthority('user:update')")
+//    //   => only manager, admin and super_admin are authorized
+//    public ResponseEntity<User> update(@RequestParam("currentUsername") String currentUsername,
+//                                       @RequestParam("firstName") String firstName,
+//                                       @RequestParam("lastName") String lastName,
+//                                       @RequestParam("username") String username,
+//                                       @RequestParam("email") String email,
+//                                       @RequestParam("role") String role,
+//                                       @RequestParam("isActive") String isActive,
+//                                       @RequestParam("isNonLocked") String isNonLocked,
+//                                       @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException, NotAnImageFileException {
+//        User updatedUser = userService.updateUser(currentUsername, firstName, lastName, username,email, role, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
+//        return new ResponseEntity<>(updatedUser, OK);
+////                 ResponseEntity<>(User object, HttpStatus object)
+//    }
 
     @DeleteMapping("/users/{username}")
     @PreAuthorize("hasAnyAuthority('user:delete')")
@@ -165,23 +126,6 @@ public class UserResource extends ExceptionHandling {
     public ResponseEntity<HttpResponse> resetPassword(@PathVariable("email") String email) throws MessagingException, EmailNotFoundException {
         userService.resetPassword(email);
         return response(OK, EMAIL_SENT + email);
-    }
-
-    @PostMapping("/updateProfileImage")
-    public ResponseEntity<User> updateProfileImage(@RequestParam("username") String username, @RequestParam(value = "profileImage") MultipartFile profileImage) throws UserNotFoundException, EmailExistException, IOException, UsernameExistException, NotAnImageFileException {
-        User user = userService.updateProfileImage(username, profileImage);
-        return new ResponseEntity<>(user, OK);
-    }
-
-// get uers images
-    @GetMapping(path = "/image/{username}/{fileName}", produces = IMAGE_JPEG_VALUE)
-    public byte[] getProfileImage(@PathVariable("username") String username, @PathVariable("fileName") String fileName) throws IOException {
-        return Files.readAllBytes(Paths.get(USER_FOLDER + username + FORWARD_SLASH + fileName));
-    }
-
-    @GetMapping(path = "/image/default/{gender}", produces = IMAGE_JPEG_VALUE)
-    public byte[] getTempProfileImage(@PathVariable("gender") String gender) throws IOException {
-        return Files.readAllBytes(Paths.get(TEMP_PROFILE_IMAGE_BASE_URL  + FORWARD_SLASH + gender + ".jpg"));
     }
 
 //  private methods

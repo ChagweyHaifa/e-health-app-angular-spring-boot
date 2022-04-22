@@ -1,4 +1,4 @@
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -11,30 +11,51 @@ import { UserService } from 'src/app/service/user.service';
 import { faCoffee, faCalendar } from '@fortawesome/free-solid-svg-icons';
 import { AuthenticationService } from 'src/app/service/authentication.service';
 import { Visitor } from 'src/app/model/visitor';
+import { Role } from 'src/app/enum/role.enum';
+import { CustomHttpRespone } from 'src/app/model/custom-http-response';
+import { User } from 'src/app/model/user';
+import { Speciality } from 'src/app/model/speciality';
+import { City } from 'src/app/model/city';
+import { Country } from 'src/app/model/country';
+import { State } from 'src/app/model/state';
+import { FormService } from 'src/app/service/form.service';
+import { NgForm } from '@angular/forms';
+import { Address } from 'src/app/model/address';
+import { HeaderType } from 'src/app/enum/header-type.enum';
 @Component({
   selector: 'app-doctor-profile',
   templateUrl: './doctor-profile.component.html',
   styleUrls: ['./doctor-profile.component.css'],
 })
 export class DoctorProfileComponent implements OnInit {
-  // faCoffee = faCoffee;
-  // faCalendar = faCalendar;
   private subscriptions: Subscription[] = [];
-  doctor: Doctor;
+  loggedInUser = this.authenticationService.getUserFromLocalCache();
+  doctor: Doctor = new Doctor();
   reviews: Review[];
   doctorUsername: string;
+  nbOfReviews: number;
+
+  showLoading: boolean = false;
+  specialities: Speciality[];
+  countries: Country[];
+  states: State[];
+  cities: City[];
+
+  currentRating = 3;
+
   constructor(
     private route: ActivatedRoute,
     private notificationService: NotificationService,
     private userService: UserService,
     private reviewService: ReviewService,
-    private authenticationService: AuthenticationService
+    private authenticationService: AuthenticationService,
+    private formService: FormService
   ) {}
 
   ngOnInit(): void {
+    // console.log(this.isLoggedIn);
     this.route.paramMap.subscribe(() => {
       this.doctorUsername = this.route.snapshot.paramMap.get('username');
-      // console.log(doctorUsername);
       this.getDoctorInfo();
       this.getDoctorReviews();
     });
@@ -45,7 +66,8 @@ export class DoctorProfileComponent implements OnInit {
       this.userService.getDoctorInfo(this.doctorUsername).subscribe(
         (response: Doctor) => {
           this.doctor = response;
-          // console.log(this.doctor);
+
+          this.nbOfReviews = this.doctor.nbOfReviews;
         },
         (errorResponse: HttpErrorResponse) => {
           // console.log(errorResponse);
@@ -76,22 +98,20 @@ export class DoctorProfileComponent implements OnInit {
     );
   }
 
-  addReview(reviewContent: string) {
+  addReview(reviewContent: any) {
     const review = new Review();
+    review.content = reviewContent.value;
     const doctor = new Doctor();
     doctor.username = this.doctorUsername;
     review.doctor = doctor;
-    const visitor = new Visitor();
-    visitor.username =
-      this.authenticationService.getUserFromLocalCache().username;
-    review.visitor = visitor;
-    review.content = reviewContent;
-    console.log(review);
+
+    // console.log(review);
     this.subscriptions.push(
       this.reviewService.addReview(review).subscribe(
-        (response: Review[]) => {
+        (response: number) => {
           console.log(response);
           this.getDoctorReviews();
+          this.nbOfReviews = response;
         },
         (errorResponse: HttpErrorResponse) => {
           // console.log(errorResponse);
@@ -102,6 +122,138 @@ export class DoctorProfileComponent implements OnInit {
         }
       )
     );
+  }
+
+  deleteReview(review: Review) {
+    console.log(review.id);
+    this.subscriptions.push(
+      this.reviewService.deleteReview(review.id).subscribe(
+        (response: number) => {
+          console.log(response);
+          this.getDoctorReviews();
+          this.nbOfReviews = response;
+        },
+        (errorResponse: HttpErrorResponse) => {
+          // console.log(errorResponse);
+          this.sendErrorNotification(
+            NotificationType.ERROR,
+            errorResponse.error.message
+          );
+        }
+      )
+    );
+  }
+
+  getSpecialities() {
+    this.subscriptions.push(
+      this.formService.getSpecialities().subscribe(
+        (response: Speciality[]) => {
+          this.specialities = response;
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendErrorNotification(
+            NotificationType.ERROR,
+            errorResponse.error.message
+          );
+        }
+      )
+    );
+  }
+
+  getCountries() {
+    this.subscriptions.push(
+      this.formService.getCountries().subscribe(
+        (response: Country[]) => {
+          this.countries = response;
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendErrorNotification(
+            NotificationType.ERROR,
+            errorResponse.error.message
+          );
+        }
+      )
+    );
+  }
+
+  getStates(countryName: string) {
+    this.subscriptions.push(
+      this.formService.getStates(countryName).subscribe(
+        (response: State[]) => {
+          this.states = response;
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendErrorNotification(
+            NotificationType.ERROR,
+            errorResponse.error.message
+          );
+        }
+      )
+    );
+  }
+
+  getCities(stateName: string) {
+    this.subscriptions.push(
+      this.formService.getCities(stateName).subscribe(
+        (response: City[]) => {
+          this.cities = response;
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendErrorNotification(
+            NotificationType.ERROR,
+            errorResponse.error.message
+          );
+        }
+      )
+    );
+  }
+
+  onEditDoctorProfile() {
+    this.getSpecialities();
+    this.getCountries();
+    this.getStates(this.doctor.address.country);
+    this.getCities(this.doctor.address.state);
+  }
+
+  clickDoctorProfileSubmitBtn() {
+    this.clickButton('edit-doctor-profile-submit-btn');
+  }
+
+  editDoctorProfile() {
+    // console.log(this.doctor);
+    this.showLoading = true;
+
+    this.subscriptions.push(
+      this.userService.updateDoctor(this.doctor).subscribe(
+        (response: HttpResponse<Doctor>) => {
+          this.showLoading = false;
+          const token = response.headers.get(HeaderType.JWT_TOKEN);
+          this.authenticationService.saveToken(token);
+          this.clickButton('edit-doctor-profile-close-btn');
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.showLoading = false;
+          this.sendErrorNotification(
+            NotificationType.ERROR,
+            errorResponse.error.message
+          );
+        }
+      )
+    );
+  }
+
+  get isLoggedIn(): boolean {
+    return this.authenticationService.isUserLoggedIn();
+  }
+
+  public get isVisitor(): boolean {
+    if (!this.isLoggedIn) return false;
+    else return this.getUserRole() === Role.VISITOR;
+  }
+
+  public get isDoctor(): boolean {
+    if (!this.isLoggedIn) return false;
+    else return this.getUserRole() === Role.DOCTOR;
   }
 
   private sendErrorNotification(
@@ -117,5 +269,13 @@ export class DoctorProfileComponent implements OnInit {
         'An error occurred. Please try again.'
       );
     }
+  }
+
+  private getUserRole(): string {
+    return this.authenticationService.getUserFromLocalCache().role;
+  }
+
+  private clickButton(buttonId: string) {
+    document.getElementById(buttonId).click();
   }
 }

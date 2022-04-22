@@ -20,8 +20,8 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return stream(this.user.getAuthorities()).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-//        return stream(getRoleEnumName(this.user.getRole()).getAuthorities()).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+//        return stream(this.user.getAuthorities()).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+        return stream(getRoleEnumName(this.user.getRole()).getAuthorities()).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
     }
 
     @Override

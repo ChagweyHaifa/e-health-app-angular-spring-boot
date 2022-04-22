@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,4 +30,11 @@ public class Visitor extends User{
     @JsonIgnore
     @OneToMany(mappedBy = "visitor")
     List<Review> reviews;
+
+    public void addReview(Review review){
+        if (this.reviews == null) {
+            this.reviews = new ArrayList<>();
+        }
+        this.reviews.add(review);
+    }
 }

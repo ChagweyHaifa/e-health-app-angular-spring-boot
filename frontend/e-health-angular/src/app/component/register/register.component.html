@@ -178,7 +178,18 @@
                                     placeholder="Address (Street, Floor, Center)" required ngModel
                                     #streetInput="ngModel">
                                 <span class="help-block" *ngIf="streetInput.invalid && streetInput.touched"
-                                    style="color:red;">Please enter your street</span>
+                                    style="color:red;">Please enter a street</span>
+                            </div>
+                            <div class=" my-2">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="gender" ngModel value="man"
+                                        required>
+                                    <label class="form-check-label" for="inlineRadio1">Man</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="gender" ngModel value="woman">
+                                    <label class="form-check-label" for="inlineRadio2">Woman</label>
+                                </div>
                             </div>
 
 

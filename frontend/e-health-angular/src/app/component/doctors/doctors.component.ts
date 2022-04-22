@@ -106,18 +106,18 @@ export class DoctorsComponent implements OnInit {
 
   onSearchDoctor(searchForm: NgForm) {
     // console.log(searchForm.value);
-
     const doctor = new Doctor();
-    // if (searchForm.value.specialityName !== '') {
+
     const speciality = new Speciality();
     speciality.name = searchForm.value.specialityName;
     doctor.speciality = speciality;
-    // }
+
     const address = new Address();
     address.country = searchForm.value.country;
     address.state = searchForm.value.state;
     address.city = searchForm.value.city;
     doctor.address = address;
+
     console.log(doctor);
     this.subscriptions.push(
       this.userService.searchForDoctors(doctor).subscribe(

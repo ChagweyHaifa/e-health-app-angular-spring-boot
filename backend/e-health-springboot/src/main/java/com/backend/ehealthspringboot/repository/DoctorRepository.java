@@ -13,7 +13,10 @@ import java.util.List;
 
 //@RepositoryRestResource(exported = false)
 public interface DoctorRepository extends JpaRepository<Doctor,Long> {
+
     Doctor findDoctorByUsername(String username);
+
+    Doctor findDoctorByEmail(String username);
 //    @Query("SELECT c FROM Doctor c WHERE (:specialityName is null or :specialityName is empty or c.speciality.name = :specialityName) and (:addressState is null "
 //            + "or :addressState is empty or c.address.state = :addressState)")
 
@@ -23,5 +26,6 @@ public interface DoctorRepository extends JpaRepository<Doctor,Long> {
             "(:addressCity = '' or :addressCity is null or c.address.city = :addressCity)")
     List<Doctor> findBySpecialityNameAndAddressCountryAndAddressStateAndAddressCity(
             String specialityName,  String addressCountry,  String addressState, String addressCity);
+
 
 }

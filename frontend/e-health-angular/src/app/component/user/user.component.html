@@ -63,7 +63,7 @@
                         <th>Username</th>
                         <th>Email</th>
                         <th>Status</th>
-                        <th *ngIf="isManager">Actions</th>
+                        <!-- <th *ngIf="isManager">Actions</th> -->
                     </tr>
                 </thead>
                 <tbody *ngFor="let appUser of users">
@@ -82,8 +82,8 @@
                         </td>
                         <td>
                             <div class="btn-group">
-                                <button *ngIf="isManager" (click)="onEditUser(appUser)" class="btn btn-outline-info"><i
-                                        class="fas fa-edit"></i></button>
+                                <!-- <button *ngIf="isManager" (click)="onEditUser(appUser)" class="btn btn-outline-info"><i -->
+                                <!-- class="fas fa-edit"></i></button> -->
                                 <button *ngIf="isAdmin" (click)="onDeleteUser(appUser.username)"
                                     class="btn btn-outline-danger"><i class="fas fa-trash"></i></button>
                             </div>

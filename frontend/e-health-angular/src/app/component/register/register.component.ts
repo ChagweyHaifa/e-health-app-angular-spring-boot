@@ -144,13 +144,14 @@ export class RegisterComponent implements OnInit, OnDestroy {
     newDoctor.lastName = form.value.lastName;
     newDoctor.email = form.value.email;
     newDoctor.phoneNumber = form.value.phoneNumber;
+    newDoctor.gender = form.value.gender;
     newDoctor.speciality = form.value.speciality;
     let address = new Address();
     address.state = form.value.state;
     address.city = form.value.city;
     address.street = form.value.street;
     newDoctor.address = address;
-
+    // console.log(newDoctor);
     this.showLoading = true;
     this.subscriptions.push(
       this.authenticationService.registerDoctor(newDoctor).subscribe(

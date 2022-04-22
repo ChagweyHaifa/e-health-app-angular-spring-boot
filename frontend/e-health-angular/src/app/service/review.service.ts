@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { CustomHttpRespone } from '../model/custom-http-response';
 import { Review } from '../model/review';
 
 @Injectable({
@@ -16,7 +17,10 @@ export class ReviewService {
       `${this.host}/reviews/search/findByDoctorUsername/${username}`
     );
   }
-  public addReview(review: Review): Observable<Review[]> {
-    return this.http.post<Review[]>(`${this.host}/reviews`, review);
+  public addReview(review: Review): Observable<number> {
+    return this.http.post<number>(`${this.host}/reviews`, review);
+  }
+  public deleteReview(reviewId: bigint): Observable<number> {
+    return this.http.delete<number>(`${this.host}/reviews/${reviewId}`);
   }
 }

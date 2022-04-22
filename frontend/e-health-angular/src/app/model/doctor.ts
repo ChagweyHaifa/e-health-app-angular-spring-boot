@@ -8,7 +8,7 @@ export class Doctor extends User {
   public profileImageUrl: string;
   constructor() {
     super();
-    this.speciality = null;
+    this.speciality = new Speciality();
     this.nbOfRecommendations = 0;
     this.nbOfReviews = 0;
     this.profileImageUrl = '';

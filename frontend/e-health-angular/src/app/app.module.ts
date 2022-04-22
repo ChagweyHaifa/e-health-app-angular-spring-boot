@@ -40,6 +40,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     NotificationModule,
     FormsModule,
     FontAwesomeModule,
+    // NgbModule,
   ],
   providers: [
     AuthenticationGuard,
