@@ -1,7 +1,6 @@
 @import "~angular-notifier/styles";
 
 body {
-  /* font-family: "Noto Serif", serif; */
   font-family: "Patrick Hand", cursive;
 }
 
@@ -58,31 +57,43 @@ td {
   background-color: #FE7A15;
 } */
 
-.bright-blue-btn{
-  background-color: #7BD5F5;
+.bright-blue-btn {
+  background-color: #7bd5f5;
+  color: #fff;
+  cursor: grab;
+}
+.bright-blue-btn:hover {
+  background-color: #fff;
+  color: #7bd5f5;
+  border: #7bd5f5 solid #7bd5f5;
+}
+.purple-btn {
+  background-color: #787ff6;
+  color: #fff;
+  cursor: grab;
+}
+.purple-btn:hover {
+  background-color: #fff;
+  color: #787ff6;
+  border: 1px solid #787ff6;
+}
+.yellow-btn {
+  background-color: #4adede;
   color: #fff;
 }
-.purple-btn{
-  background-color: #787FF6;
-  color: #fff;
-  cursor:grab;
-}
-.purple-btn:hover{
-  background-color:#fff ;
-  color:#787FF6 ;
-  border: 1px solid #787FF6;
-}
-.yellow-btn{
-  background-color: #4ADEDE;
+.green-btn {
+  background-color: #1ca7ec;
   color: #fff;
 }
-.green-btn{
-  background-color: #1CA7EC;
+.orange-btn {
+  background-color: #1f2f98;
   color: #fff;
 }
-.orange-btn{
-  background-color: #1F2F98;
-  color: #fff;
+.purple-text {
+  color: #787ff6;
+}
+.purple-text:hover {
+  color: #787ff6;
 }
 
 /* .l-heading{} */
@@ -140,8 +151,8 @@ html {
   border: #2e8fcc solid 1px;
   border-radius: 0.5rem;
 }
-.login_btn:hover{
-  background-color:#2e8fcc; 
+.login_btn:hover {
+  background-color: #2e8fcc;
   color: #fff;
 }
 /* .login_btn:focus {
@@ -163,7 +174,8 @@ html {
   background-color: #2e8fcc !important;
 }
 
-.login-form input, .login-form select {
+.login-form input,
+.login-form select {
   border-radius: 0.5rem;
 }
 
@@ -173,7 +185,7 @@ html {
 
 a {
   color: #2e8fcc;
- text-decoration: none;
+  text-decoration: none;
 }
 
 /* find doctors */
@@ -200,3 +212,17 @@ a {
   width: 100%;
   text-align: center;
 } */
+input.star ~ label.star {
+  padding-left: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  /* height: 20px; */
+}
+input.star ~ label.star:before {
+  font-size: 18px;
+  padding-left: 0px;
+  /* margin-bottom: 1rem; */
+}
+.stars {
+  margin-top: -15px;
+}

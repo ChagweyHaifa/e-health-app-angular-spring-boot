@@ -260,24 +260,32 @@ export class UserComponent implements OnInit, OnDestroy {
     this.clickButton('profile-image-input');
   }
 
+  public onProfileImageChange(event: Event): void {
+    // console.log(event);
+    this.profileImage = (<HTMLInputElement>event.target).files[0];
+    this.fileName = this.profileImage.name;
+    // console.log(this.profileImage);
+    // console.log("filename:" + this.fileName);
+  }
+
   onUpdateProfileImage() {
-    const formData = new FormData();
-    formData.append('username', this.loggedInUser.username);
-    formData.append('profileImage', this.profileImage);
-    this.subscriptions.push(
-      this.userService.updateProfileImage(formData).subscribe(
-        (event: HttpEvent<any>) => {
-          // this.reportUploadProgress(event);
-        },
-        (errorResponse: HttpErrorResponse) => {
-          this.sendNotification(
-            NotificationType.ERROR,
-            errorResponse.error.message
-          );
-          this.fileStatus.status = 'done';
-        }
-      )
-    );
+    // const formData = new FormData();
+    // formData.append('username', this.loggedInUser.username);
+    // formData.append('profileImage', this.profileImage);
+    // this.subscriptions.push(
+    //   this.userService.updateProfileImage(formData).subscribe(
+    //     (event: HttpEvent<any>) => {
+    //       // this.reportUploadProgress(event);
+    //     },
+    //     (errorResponse: HttpErrorResponse) => {
+    //       this.sendNotification(
+    //         NotificationType.ERROR,
+    //         errorResponse.error.message
+    //       );
+    //       this.fileStatus.status = 'done';
+    //     }
+    //   )
+    // );
   }
 
   onLogOut(): void {
@@ -305,14 +313,6 @@ export class UserComponent implements OnInit, OnDestroy {
   // private methods
   private clickButton(buttonId: string) {
     document.getElementById(buttonId).click();
-  }
-
-  public onProfileImageChange(event: Event): void {
-    // console.log(event);
-    this.profileImage = (<HTMLInputElement>event.target).files[0];
-    this.fileName = this.profileImage.name;
-    // console.log(this.profileImage);
-    // console.log("filename:" + this.fileName);
   }
 
   private sendNotification(

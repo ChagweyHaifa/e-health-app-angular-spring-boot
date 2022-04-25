@@ -1,14 +1,15 @@
 package com.backend.ehealthspringboot.service.impl;
 
 import com.backend.ehealthspringboot.domain.Doctor;
+import com.backend.ehealthspringboot.domain.DoctorRating;
 import com.backend.ehealthspringboot.domain.User;
 import com.backend.ehealthspringboot.exception.domain.EmailExistException;
 import com.backend.ehealthspringboot.exception.domain.NotAnImageFileException;
 import com.backend.ehealthspringboot.exception.domain.UserNotFoundException;
 import com.backend.ehealthspringboot.exception.domain.UsernameExistException;
+import com.backend.ehealthspringboot.repository.DoctorRatingRepository;
 import com.backend.ehealthspringboot.repository.DoctorRepository;
 import com.backend.ehealthspringboot.repository.UserRepository;
-import com.backend.ehealthspringboot.repository.VisitorRepository;
 import com.backend.ehealthspringboot.service.DoctorService;
 import com.backend.ehealthspringboot.service.EmailService;
 import com.backend.ehealthspringboot.service.LoginAttemptService;
@@ -48,6 +49,7 @@ public class DoctorServiceImpl implements DoctorService {
     private DoctorRepository doctorRepository;
     private LoginAttemptService loginAttemptService;
     private EmailService emailService;
+    private DoctorRatingRepository doctorRatingRepository;
 
     @Autowired
     public DoctorServiceImpl(
@@ -55,12 +57,19 @@ public class DoctorServiceImpl implements DoctorService {
                            DoctorRepository doctorRepository,
                            BCryptPasswordEncoder passwordEncoder,
                            LoginAttemptService loginAttemptService,
-                           EmailService emailService) {
+                           EmailService emailService,
+            DoctorRatingRepository doctorRatingRepository) {
     this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
         this.emailService = emailService;
         this.doctorRepository = doctorRepository;
+        this.doctorRatingRepository = doctorRatingRepository;
+
+    }
+    @Override
+    public List<DoctorRating> getDoctorRating(){
+        return doctorRatingRepository.findAll();
 
     }
     @Override
@@ -88,6 +97,20 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Override
+    public Doctor findDoctorByUsername(String username) {
+        return doctorRepository.findDoctorByUsername(username);
+    }
+
+    @Override
+    public List<Doctor> findDoctorsByAllParameters(Doctor doctor){
+        return doctorRepository.findBySpecialityNameAndAddressCountryAndAddressStateAndAddressCity
+                (doctor.getSpeciality().getName(),
+                        doctor.getAddress().getCountry(),
+                        doctor.getAddress().getState(),
+                        doctor.getAddress().getCity());
+    }
+
+    @Override
     public Doctor updateDoctor(String doctorUsername, Doctor doctor) throws UserNotFoundException, EmailExistException, UsernameExistException {
         Doctor newDoctor = validateNewUsernameAndEmail(doctorUsername,doctor.getUsername(),doctor.getEmail());
         newDoctor.setFirstName(doctor.getFirstName());
@@ -103,24 +126,8 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Override
-    public List<Doctor> findDoctorsByAllParameters(Doctor doctor){
-        return doctorRepository.findBySpecialityNameAndAddressCountryAndAddressStateAndAddressCity
-                (doctor.getSpeciality().getName(),
-                        doctor.getAddress().getCountry(),
-                        doctor.getAddress().getState(),
-                        doctor.getAddress().getCity());
-    }
-
-    @Override
-    public Doctor findDoctorByUsername(String username) {
-        return doctorRepository.findDoctorByUsername(username);
-    }
-
-
-    @Override
-    public User updateProfileImage(String username, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException, NotAnImageFileException {
-//        User user = validateNewUsernameAndEmail(username, null, null);
-        Doctor doctor = doctorRepository.findDoctorByUsername(username);
+    public Doctor updateProfileImage(String doctorUsername, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException, NotAnImageFileException {
+        Doctor doctor = validateNewUsernameAndEmail(doctorUsername, null, null);
         saveProfileImage(doctor, profileImage);
         return doctor;
     }
@@ -161,8 +168,7 @@ public class DoctorServiceImpl implements DoctorService {
             if(!Arrays.asList(IMAGE_JPEG_VALUE, IMAGE_PNG_VALUE, IMAGE_GIF_VALUE).contains(profileImage.getContentType())) {
                 throw new NotAnImageFileException(profileImage.getOriginalFilename() + NOT_AN_IMAGE_FILE);
             }
-
-            Path userFolder = Paths.get(USER_FOLDER + doctor.getUsername()).toAbsolutePath().normalize();
+            Path userFolder = Paths.get(USER_FOLDER + FORWARD_SLASH + doctor.getUsername()).toAbsolutePath().normalize();
 //            if the user directory does not exist
             if(!Files.exists(userFolder)) {
                 Files.createDirectories(userFolder);
@@ -171,9 +177,13 @@ public class DoctorServiceImpl implements DoctorService {
             Files.deleteIfExists(Paths.get(userFolder + doctor.getUsername() + DOT + JPG_EXTENSION));
             Files.copy(profileImage.getInputStream(), userFolder.resolve(doctor.getUsername() + DOT + JPG_EXTENSION), REPLACE_EXISTING);
             doctor.setProfileImageUrl(setProfileImageUrl(doctor.getUsername()));
-            userRepository.save(doctor);
+            doctorRepository.save(doctor);
             LOGGER.info(FILE_SAVED_IN_FILE_SYSTEM + profileImage.getOriginalFilename());
         }
+    }
+
+    private String getTemporaryProfileImageUrl(String gender) {
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path(DEFAULT_USER_IMAGE_PATH + gender).toUriString();
     }
 
     private String setProfileImageUrl(String username) {
@@ -193,13 +203,12 @@ public class DoctorServiceImpl implements DoctorService {
         return passwordEncoder.encode(password);
     }
 
-    private String getTemporaryProfileImageUrl(String gender) {
-        return ServletUriComponentsBuilder.fromCurrentContextPath().path(DEFAULT_USER_IMAGE_PATH + gender).toUriString();
-    }
+
 
     public User findUserByUsername(String username) {
         return userRepository.findUserByUsername(username);
     }
+
     public User findUserByEmail(String email) {
         return userRepository.findUserByEmail(email);
     }

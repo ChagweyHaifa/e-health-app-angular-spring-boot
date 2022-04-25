@@ -14,7 +14,7 @@ public class SecurityConstant {
     public static final String OPTIONS_HTTP_METHOD = "OPTIONS";
     public static final String[] PUBLIC_URLS = { "/api/login", "/api/users/doctors/register","/api/users/visitors/register", "/api/users/doctors/image/**" ,
             "/api/specialities","/api/countries","/api/states/**","/api/cities/**",
-                                            "/api/users/doctors/search/**",
+                                            "/api/users/doctors/search/**","/api/users/doctors/ratings",
                                                 "/api/reviews/search/**"};
 //    public static final String[] PUBLIC_URLS = {"**"};
 

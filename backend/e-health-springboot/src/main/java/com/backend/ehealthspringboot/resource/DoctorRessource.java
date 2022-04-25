@@ -1,6 +1,7 @@
 package com.backend.ehealthspringboot.resource;
 
 import com.backend.ehealthspringboot.domain.Doctor;
+import com.backend.ehealthspringboot.domain.DoctorRating;
 import com.backend.ehealthspringboot.domain.User;
 import com.backend.ehealthspringboot.domain.UserPrincipal;
 import com.backend.ehealthspringboot.exception.ExceptionHandling;
@@ -11,6 +12,8 @@ import com.backend.ehealthspringboot.exception.domain.UsernameExistException;
 import com.backend.ehealthspringboot.service.DoctorService;
 import com.backend.ehealthspringboot.service.UserService;
 import com.backend.ehealthspringboot.utility.JWTTokenProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +29,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 
 import static com.backend.ehealthspringboot.constant.FileConstant.*;
 import static com.backend.ehealthspringboot.constant.FileConstant.FORWARD_SLASH;
@@ -41,12 +45,19 @@ public class DoctorRessource extends ExceptionHandling {
 
     private DoctorService doctorService;
     private JWTTokenProvider jwtTokenProvider;
+    private Logger LOGGER = LoggerFactory.getLogger(getClass());
 
     @Autowired
     public DoctorRessource(DoctorService doctorService, JWTTokenProvider jwtTokenProvider ) {
        this.doctorService = doctorService;
        this.jwtTokenProvider = jwtTokenProvider;
     }
+    @GetMapping("ratings")
+    public ResponseEntity<List<DoctorRating>> getAllDoctorRatings() {
+        List<DoctorRating> doctorRatings = doctorService.getDoctorRating();
+        return new ResponseEntity(doctorRatings, OK);
+    }
+
 
     @PostMapping("/register")
     public ResponseEntity<Doctor> register(@RequestBody Doctor doctor ) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
@@ -83,14 +94,17 @@ public class DoctorRessource extends ExceptionHandling {
     }
 
     @PostMapping("/updateProfileImage")
-    public ResponseEntity<User> updateProfileImage(@RequestParam("username") String username, @RequestParam(value = "profileImage") MultipartFile profileImage) throws UserNotFoundException, EmailExistException, IOException, UsernameExistException, NotAnImageFileException {
-        User user = doctorService.updateProfileImage(username, profileImage);
-        return new ResponseEntity<>(user, OK);
+    public ResponseEntity<Doctor> updateProfileImage(HttpServletRequest request, @RequestParam("profileImage") MultipartFile profileImage) throws UserNotFoundException, EmailExistException, IOException, UsernameExistException, NotAnImageFileException {
+        String loggedInDoctorUsername = getUsernameFromJWTToken(request);
+        LOGGER.info("loggedInUsername"+ loggedInDoctorUsername);
+        LOGGER.info("profileImage" + profileImage);
+        Doctor doctor = doctorService.updateProfileImage(loggedInDoctorUsername, profileImage);
+        return new ResponseEntity<>(doctor, OK);
     }
 
     @GetMapping(path = "/image/{username}/{fileName}", produces = IMAGE_JPEG_VALUE)
     public byte[] getProfileImage(@PathVariable("username") String username, @PathVariable("fileName") String fileName) throws IOException {
-        return Files.readAllBytes(Paths.get(USER_FOLDER + username + FORWARD_SLASH + fileName));
+        return Files.readAllBytes(Paths.get(USER_FOLDER + FORWARD_SLASH + username + FORWARD_SLASH + fileName));
     }
 
     @GetMapping(path = "/image/default/{gender}", produces = IMAGE_JPEG_VALUE)

@@ -19,7 +19,7 @@ import { City } from 'src/app/model/city';
 import { Country } from 'src/app/model/country';
 import { State } from 'src/app/model/state';
 import { FormService } from 'src/app/service/form.service';
-import { NgForm } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Address } from 'src/app/model/address';
 import { HeaderType } from 'src/app/enum/header-type.enum';
 @Component({
@@ -33,7 +33,7 @@ export class DoctorProfileComponent implements OnInit {
   doctor: Doctor = new Doctor();
   reviews: Review[];
   doctorUsername: string;
-  nbOfReviews: number;
+  nbOfReviews: number = 0;
 
   showLoading: boolean = false;
   specialities: Speciality[];
@@ -41,7 +41,27 @@ export class DoctorProfileComponent implements OnInit {
   states: State[];
   cities: City[];
 
-  currentRating = 3;
+  fileName: string;
+  profileImage: File;
+
+  rating = {
+    value: 1.5,
+    count: this.nbOfReviews,
+  };
+
+  ratingStyle = {
+    starsStyle: { height: '22px', width: '22px' },
+    ratingStyle: { 'font-size': '18px' },
+    countStyle: { 'font-size': '14px' },
+  };
+
+  reviewStyle = {
+    starsStyle: { 'font-size': '20px' },
+  };
+
+  public form: FormGroup;
+
+  rating1 = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -222,7 +242,6 @@ export class DoctorProfileComponent implements OnInit {
   editDoctorProfile() {
     // console.log(this.doctor);
     this.showLoading = true;
-
     this.subscriptions.push(
       this.userService.updateDoctor(this.doctor).subscribe(
         (response: HttpResponse<Doctor>) => {
@@ -233,6 +252,40 @@ export class DoctorProfileComponent implements OnInit {
         },
         (errorResponse: HttpErrorResponse) => {
           this.showLoading = false;
+          this.sendErrorNotification(
+            NotificationType.ERROR,
+            errorResponse.error.message
+          );
+        }
+      )
+    );
+  }
+
+  clickProfileImageBtn() {
+    this.clickButton('profile-image-input');
+  }
+
+  public onProfileImageChange(event: Event): void {
+    // console.log(event);
+    this.profileImage = (<HTMLInputElement>event.target).files[0];
+    this.fileName = this.profileImage.name;
+    console.log(this.profileImage);
+    console.log('filename:' + this.fileName);
+  }
+
+  onUpdateProfileImage() {
+    // console.log(this.profileImage);
+
+    const formData = new FormData();
+    formData.append('profileImage', this.profileImage);
+    this.subscriptions.push(
+      this.userService.updateProfileImage(formData).subscribe(
+        (response: Doctor) => {
+          this.doctor.profileImageUrl = `${
+            response.profileImageUrl
+          }?time=${new Date().getTime()}`;
+        },
+        (errorResponse: HttpErrorResponse) => {
           this.sendErrorNotification(
             NotificationType.ERROR,
             errorResponse.error.message

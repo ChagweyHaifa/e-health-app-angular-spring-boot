@@ -57,14 +57,20 @@ export class UserService {
     );
   }
 
-  public updateProfileImage(formData: FormData): Observable<HttpEvent<User>> {
-    return this.http.post<User>(
+  // public updateProfileImage(formData: FormData): Observable<HttpEvent<User>> {
+  //   return this.http.post<User>(
+  //     `${this.host}/users/doctors/updateProfileImage`,
+  //     formData,
+  //     {
+  //       reportProgress: true,
+  //       observe: 'events',
+  //     }
+  //   );
+  // }
+  public updateProfileImage(formData: FormData): Observable<Doctor> {
+    return this.http.post<Doctor>(
       `${this.host}/users/doctors/updateProfileImage`,
-      formData,
-      {
-        reportProgress: true,
-        observe: 'events',
-      }
+      formData
     );
   }
 

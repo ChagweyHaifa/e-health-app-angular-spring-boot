@@ -1,7 +1,7 @@
 package com.backend.ehealthspringboot.service;
 
 import com.backend.ehealthspringboot.domain.Doctor;
-import com.backend.ehealthspringboot.domain.User;
+import com.backend.ehealthspringboot.domain.DoctorRating;
 import com.backend.ehealthspringboot.exception.domain.EmailExistException;
 import com.backend.ehealthspringboot.exception.domain.NotAnImageFileException;
 import com.backend.ehealthspringboot.exception.domain.UserNotFoundException;
@@ -14,6 +14,8 @@ import java.util.List;
 
 public interface DoctorService {
 
+    List<DoctorRating> getDoctorRating();
+
     Doctor register(Doctor doctor) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException;
 
     List<Doctor> getDoctors();
@@ -24,7 +26,7 @@ public interface DoctorService {
 
     Doctor updateDoctor(String doctorUsername,Doctor doctor) throws UserNotFoundException, EmailExistException, UsernameExistException;
 
-    User updateProfileImage(String username, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException, NotAnImageFileException;
+    Doctor updateProfileImage(String doctorUsername, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException, NotAnImageFileException;
 
 
 

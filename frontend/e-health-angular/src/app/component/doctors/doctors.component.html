@@ -22,7 +22,7 @@
                 <input type="search" class="form-control" name="lastName" ngModel placeholder="lastName">
             </div> -->
             <div class="col p-0">
-                <select class="form-control" name="specialityName" ngModel>
+                <select class="form-select" name="specialityName" ngModel>
                     <option value="">Speciality</option>
                     <option *ngFor="let tempSpeciality of specialities">
                         {{tempSpeciality.name}}</option>
@@ -30,29 +30,28 @@
             </div>
 
             <div class="col p-0">
-                <select class="form-control " name="country" ngModel
-                    (change)="getStates(DoctorSearchForm.value.country)">
+                <select class="form-select" name="country" ngModel (change)="getStates(DoctorSearchForm.value.country)">
                     <option value="">Country</option>
                     <option *ngFor="let tempCountry of countries">{{tempCountry.name}}
                     </option>
                 </select>
             </div>
             <div class="col p-0">
-                <select class="form-control " name="state" ngModel (change)="getCities(DoctorSearchForm.value.state)">
+                <select class="form-select" name="state" ngModel (change)="getCities(DoctorSearchForm.value.state)">
                     <option value="">State</option>
                     <option *ngFor="let tempState of states">{{tempState.name}}
                     </option>
                 </select>
             </div>
             <div class="col p-0">
-                <select class="form-control " name="city" ngModel>
+                <select class="form-select" name="city" ngModel>
                     <option value="">City</option>
                     <option *ngFor="let tempCity of cities">{{tempCity.name}}
                     </option>
                 </select>
             </div>
-            <div class=" p-0">
-                <button type="submit" class="btn btn-danger wrn-btn"><i class="fa fa-search" aria-hidden="true"></i>
+            <div class="col-1 p-0">
+                <button type="submit" class="btn purple-btn"><i class="fa fa-search" aria-hidden="true"></i>
                 </button>
             </div>
 

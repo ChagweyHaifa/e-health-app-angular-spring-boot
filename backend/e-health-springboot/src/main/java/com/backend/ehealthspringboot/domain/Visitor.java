@@ -19,13 +19,9 @@ public class Visitor extends User{
     @Column(name="question")
     private String question;
 
-    //    the list of doctors recommended by this visitor
-
     @JsonIgnore
-    @ManyToMany(fetch=FetchType.LAZY,
-            cascade= {CascadeType.PERSIST, CascadeType.MERGE,
-                    CascadeType.DETACH, CascadeType.REFRESH}, mappedBy = "recommendations")
-    List<Doctor> recommendedDoctors;
+    @OneToMany(mappedBy = "visitor")
+    Set<DoctorRating> ratings;
 
     @JsonIgnore
     @OneToMany(mappedBy = "visitor")

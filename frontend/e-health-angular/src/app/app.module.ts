@@ -14,13 +14,15 @@ import { NotificationService } from './service/notification.service';
 import { LoginComponent } from './component/login/login.component';
 import { RegisterComponent } from './component/register/register.component';
 import { UserComponent } from './component/user/user.component';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 import { QuestionsComponent } from './component/questions/questions.component';
 import { NavBarComponent } from './component/nav-bar/nav-bar.component';
 import { DoctorsComponent } from './component/doctors/doctors.component';
 import { DoctorProfileComponent } from './component/doctor-profile/doctor-profile.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { NgxRatingStarsModule } from 'ngx-rating-stars';
+import { NgxStarRatingModule } from 'ngx-star-rating';
 
 @NgModule({
   declarations: [
@@ -39,8 +41,10 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     HttpClientModule,
     NotificationModule,
     FormsModule,
+    ReactiveFormsModule,
     FontAwesomeModule,
-    // NgbModule,
+    NgxRatingStarsModule,
+    NgxStarRatingModule,
   ],
   providers: [
     AuthenticationGuard,
