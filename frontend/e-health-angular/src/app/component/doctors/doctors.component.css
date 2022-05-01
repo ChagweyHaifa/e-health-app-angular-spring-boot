@@ -12,3 +12,6 @@ img.profile-photo-lg{
   width: 100%;
   border-radius: 50%;
 }
+.doctor-info i {
+  color: rgb(243, 243, 89);
+}

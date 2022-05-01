@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -21,18 +22,58 @@ public class Doctor extends User {
     @JoinColumn(name = "speciality_id" )
     private Speciality speciality;
 
-//    @JsonIgnore
-    @OneToMany(mappedBy = "doctor")
-    Set<DoctorRating> ratings;
-
-    @Column(name = "nb_of_reviews",columnDefinition = "integer default 0")
-    private Integer nbOfReviews ;
-
     @JsonIgnore
     @OneToMany(mappedBy = "doctor")
-    List<Review> reviews;
+    List<DoctorRating> ratings;
+
+    @Column(name = "nb_of_ratings",columnDefinition = "integer default 0")
+    private Integer nbOfRatings ;
+
+    @Column(name = "average_of_ratings",columnDefinition = "float default 0")
+    private float averageOfRatings ;
 
     // convenience methods
+    public Integer incrementNbOfRatings(){
+        this.nbOfRatings = this.nbOfRatings + 1;
+        return this.nbOfRatings;
+    }
+
+    public Integer decrementNbOfRatings(){
+        this.nbOfRatings = this.nbOfRatings - 1;
+        return  this.nbOfRatings;
+    }
+
+
+//    public void addRating(DoctorRating rating){
+//        if (rating!= null){
+//            if(ratings == null){
+//                ratings = new ArrayList<>();
+//            }
+//            this.ratings.add(rating);
+//            this.nbOfRatings = this.nbOfRatings + 1;
+//
+//        }
+//
+//    }
+    public void calculateAverageOfRating(){
+
+        if(this.ratings==null){
+            this.ratings = new ArrayList<>();
+        }
+
+        if(this.ratings.size() != 0){
+            float sum = 0;
+            for (int i = 0; i < this.ratings.size(); i++){
+                sum = sum + this.ratings.get(i).getRating();
+            }
+            this.averageOfRatings = sum/this.ratings.size();
+        }
+        else{
+            this.averageOfRatings = 0;
+        }
+
+
+    }
 
 
 

@@ -14,7 +14,7 @@ import java.util.List;
 
 public interface DoctorService {
 
-    List<DoctorRating> getDoctorRating();
+
 
     Doctor register(Doctor doctor) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException;
 

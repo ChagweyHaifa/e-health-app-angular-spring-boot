@@ -90,10 +90,12 @@ public class ExceptionHandling implements ErrorController {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
-    @ExceptionHandler(ReviewNotFoundException.class)
-    public ResponseEntity<HttpResponse> reviewNotFoundException(ReviewNotFoundException exception) {
+    @ExceptionHandler(RatingExistExeption.class)
+    public ResponseEntity<HttpResponse> ratingExistException(RatingExistExeption exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
+
+
 
 //    @ExceptionHandler(NoHandlerFoundException.class)
 //    public ResponseEntity<HttpResponse> noHandlerFoundException(NoHandlerFoundException e) {

@@ -1,13 +1,16 @@
 package com.backend.ehealthspringboot.domain;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 
-@Data
+@Getter
+@Setter
 @Embeddable
 public class DoctorRatingKey implements Serializable {
 

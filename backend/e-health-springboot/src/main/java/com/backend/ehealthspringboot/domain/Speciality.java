@@ -24,6 +24,10 @@ public class Speciality {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "speciality",targetEntity = Doctor.class)
     private Set<Doctor> doctors;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "speciality")
+    private Set<Question> questions;
+
 
 
 

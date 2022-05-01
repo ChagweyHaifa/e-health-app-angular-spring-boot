@@ -52,11 +52,7 @@ public class DoctorRessource extends ExceptionHandling {
        this.doctorService = doctorService;
        this.jwtTokenProvider = jwtTokenProvider;
     }
-    @GetMapping("ratings")
-    public ResponseEntity<List<DoctorRating>> getAllDoctorRatings() {
-        List<DoctorRating> doctorRatings = doctorService.getDoctorRating();
-        return new ResponseEntity(doctorRatings, OK);
-    }
+
 
 
     @PostMapping("/register")

@@ -4,24 +4,20 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { NotificationType } from 'src/app/enum/notification-type.enum';
 import { Doctor } from 'src/app/model/doctor';
-import { Review } from 'src/app/model/review';
 import { NotificationService } from 'src/app/service/notification.service';
-import { ReviewService } from 'src/app/service/review.service';
 import { UserService } from 'src/app/service/user.service';
-import { faCoffee, faCalendar } from '@fortawesome/free-solid-svg-icons';
 import { AuthenticationService } from 'src/app/service/authentication.service';
-import { Visitor } from 'src/app/model/visitor';
 import { Role } from 'src/app/enum/role.enum';
-import { CustomHttpRespone } from 'src/app/model/custom-http-response';
-import { User } from 'src/app/model/user';
 import { Speciality } from 'src/app/model/speciality';
 import { City } from 'src/app/model/city';
 import { Country } from 'src/app/model/country';
 import { State } from 'src/app/model/state';
 import { FormService } from 'src/app/service/form.service';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Address } from 'src/app/model/address';
-import { HeaderType } from 'src/app/enum/header-type.enum';
+
+import { RatingService } from 'src/app/service/rating.service';
+import { Rating } from 'src/app/model/rating';
+import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
+
 @Component({
   selector: 'app-doctor-profile',
   templateUrl: './doctor-profile.component.html',
@@ -29,55 +25,49 @@ import { HeaderType } from 'src/app/enum/header-type.enum';
 })
 export class DoctorProfileComponent implements OnInit {
   private subscriptions: Subscription[] = [];
+  showLoading: boolean = false;
+
   loggedInUser = this.authenticationService.getUserFromLocalCache();
   doctor: Doctor = new Doctor();
-  reviews: Review[];
+  ratings: Rating[];
   doctorUsername: string;
-  nbOfReviews: number = 0;
 
-  showLoading: boolean = false;
   specialities: Speciality[];
   countries: Country[];
   states: State[];
   cities: City[];
-
-  fileName: string;
   profileImage: File;
 
-  rating = {
-    value: 1.5,
-    count: this.nbOfReviews,
-  };
-
-  ratingStyle = {
-    starsStyle: { height: '22px', width: '22px' },
-    ratingStyle: { 'font-size': '18px' },
-    countStyle: { 'font-size': '14px' },
-  };
-
-  reviewStyle = {
-    starsStyle: { 'font-size': '20px' },
-  };
-
-  public form: FormGroup;
-
-  rating1 = 0;
+  public editRatingForm: FormGroup;
+  public addRatingForm: FormGroup;
+  myRating: Rating;
 
   constructor(
     private route: ActivatedRoute,
     private notificationService: NotificationService,
     private userService: UserService,
-    private reviewService: ReviewService,
+    private ratingService: RatingService,
     private authenticationService: AuthenticationService,
-    private formService: FormService
-  ) {}
+    private formService: FormService,
+    private formBuilder: FormBuilder
+  ) {
+    this.addRatingForm = this.formBuilder.group({
+      rating: ['', Validators.required],
+      review: '',
+    });
+
+    this.editRatingForm = this.formBuilder.group({
+      rating: ['', Validators.required],
+      review: '',
+    });
+  }
 
   ngOnInit(): void {
     // console.log(this.isLoggedIn);
     this.route.paramMap.subscribe(() => {
       this.doctorUsername = this.route.snapshot.paramMap.get('username');
       this.getDoctorInfo();
-      this.getDoctorReviews();
+      this.getDoctorRatings();
     });
   }
 
@@ -86,12 +76,9 @@ export class DoctorProfileComponent implements OnInit {
       this.userService.getDoctorInfo(this.doctorUsername).subscribe(
         (response: Doctor) => {
           this.doctor = response;
-
-          this.nbOfReviews = this.doctor.nbOfReviews;
         },
         (errorResponse: HttpErrorResponse) => {
-          // console.log(errorResponse);
-          this.sendErrorNotification(
+          this.sendNotification(
             NotificationType.ERROR,
             errorResponse.error.message
           );
@@ -100,16 +87,14 @@ export class DoctorProfileComponent implements OnInit {
     );
   }
 
-  getDoctorReviews() {
+  getDoctorRatings() {
     this.subscriptions.push(
-      this.reviewService.getDoctorReviews(this.doctorUsername).subscribe(
-        (response: Review[]) => {
-          this.reviews = response;
-          // console.log(this.reviews);
+      this.ratingService.getDoctorRatings(this.doctorUsername).subscribe(
+        (response: Rating[]) => {
+          this.ratings = response;
         },
         (errorResponse: HttpErrorResponse) => {
-          // console.log(errorResponse);
-          this.sendErrorNotification(
+          this.sendNotification(
             NotificationType.ERROR,
             errorResponse.error.message
           );
@@ -118,24 +103,40 @@ export class DoctorProfileComponent implements OnInit {
     );
   }
 
-  addReview(reviewContent: any) {
-    const review = new Review();
-    review.content = reviewContent.value;
-    const doctor = new Doctor();
-    doctor.username = this.doctorUsername;
-    review.doctor = doctor;
+  addOrEditDoctorRating() {
+    for (let rating of this.ratings) {
+      if (rating.visitor.username == this.loggedInUser.username) {
+        this.myRating = rating;
+        this.editRatingForm.patchValue({
+          rating: rating.rating,
+          review: rating.review,
+        });
+        this.clickButton('edit-doctor-rating-btn');
+        return;
+      }
+    }
+    this.clickButton('add-doctor-rating-btn');
+  }
 
-    // console.log(review);
+  addRating() {
+    const rating = new Rating();
+    rating.rating = this.addRatingForm.value.rating;
+    rating.review = this.addRatingForm.value.review;
+    rating.doctor.username = this.doctorUsername;
     this.subscriptions.push(
-      this.reviewService.addReview(review).subscribe(
-        (response: number) => {
-          console.log(response);
-          this.getDoctorReviews();
-          this.nbOfReviews = response;
+      this.ratingService.addRating(rating).subscribe(
+        (response: Doctor) => {
+          this.getDoctorRatings();
+          this.doctor = response;
+          this.clickButton('add-rating-modal-close-btn');
+          this.addRatingForm.reset();
+          this.sendNotification(
+            NotificationType.SUCCESS,
+            'You have successfully rated this doctor'
+          );
         },
         (errorResponse: HttpErrorResponse) => {
-          // console.log(errorResponse);
-          this.sendErrorNotification(
+          this.sendNotification(
             NotificationType.ERROR,
             errorResponse.error.message
           );
@@ -144,18 +145,25 @@ export class DoctorProfileComponent implements OnInit {
     );
   }
 
-  deleteReview(review: Review) {
-    console.log(review.id);
+  editRating() {
+    // const myRating = new Rating();
+    this.myRating.rating = this.editRatingForm.value.rating;
+    this.myRating.review = this.editRatingForm.value.review;
+    this.myRating.doctor.username = this.doctorUsername;
     this.subscriptions.push(
-      this.reviewService.deleteReview(review.id).subscribe(
-        (response: number) => {
-          console.log(response);
-          this.getDoctorReviews();
-          this.nbOfReviews = response;
+      this.ratingService.editRating(this.myRating).subscribe(
+        (response: Doctor) => {
+          // this.getDoctorRatings();
+          this.doctor = response;
+          this.clickButton('edit-rating-modal-close-btn');
+          this.editRatingForm.reset();
+          this.sendNotification(
+            NotificationType.SUCCESS,
+            'You have successfully edited your rating'
+          );
         },
         (errorResponse: HttpErrorResponse) => {
-          // console.log(errorResponse);
-          this.sendErrorNotification(
+          this.sendNotification(
             NotificationType.ERROR,
             errorResponse.error.message
           );
@@ -164,6 +172,30 @@ export class DoctorProfileComponent implements OnInit {
     );
   }
 
+  deleteRating() {
+    this.subscriptions.push(
+      this.ratingService.deleteRating(this.doctorUsername).subscribe(
+        (response: Doctor) => {
+          this.doctor = response;
+          this.getDoctorRatings();
+          this.clickButton('edit-rating-modal-close-btn');
+          this.sendNotification(
+            NotificationType.SUCCESS,
+            'You have deleted you rating successfully'
+          );
+        },
+        (errorResponse: HttpErrorResponse) => {
+          // console.log(errorResponse);
+          this.sendNotification(
+            NotificationType.ERROR,
+            errorResponse.error.message
+          );
+        }
+      )
+    );
+  }
+
+  // edit doctor profile
   getSpecialities() {
     this.subscriptions.push(
       this.formService.getSpecialities().subscribe(
@@ -171,7 +203,7 @@ export class DoctorProfileComponent implements OnInit {
           this.specialities = response;
         },
         (errorResponse: HttpErrorResponse) => {
-          this.sendErrorNotification(
+          this.sendNotification(
             NotificationType.ERROR,
             errorResponse.error.message
           );
@@ -187,7 +219,7 @@ export class DoctorProfileComponent implements OnInit {
           this.countries = response;
         },
         (errorResponse: HttpErrorResponse) => {
-          this.sendErrorNotification(
+          this.sendNotification(
             NotificationType.ERROR,
             errorResponse.error.message
           );
@@ -203,7 +235,7 @@ export class DoctorProfileComponent implements OnInit {
           this.states = response;
         },
         (errorResponse: HttpErrorResponse) => {
-          this.sendErrorNotification(
+          this.sendNotification(
             NotificationType.ERROR,
             errorResponse.error.message
           );
@@ -219,7 +251,7 @@ export class DoctorProfileComponent implements OnInit {
           this.cities = response;
         },
         (errorResponse: HttpErrorResponse) => {
-          this.sendErrorNotification(
+          this.sendNotification(
             NotificationType.ERROR,
             errorResponse.error.message
           );
@@ -239,43 +271,43 @@ export class DoctorProfileComponent implements OnInit {
     this.clickButton('edit-doctor-profile-submit-btn');
   }
 
-  editDoctorProfile() {
+  editDoctorProfile(form: NgForm) {
+    console.log(form.value);
     // console.log(this.doctor);
-    this.showLoading = true;
-    this.subscriptions.push(
-      this.userService.updateDoctor(this.doctor).subscribe(
-        (response: HttpResponse<Doctor>) => {
-          this.showLoading = false;
-          const token = response.headers.get(HeaderType.JWT_TOKEN);
-          this.authenticationService.saveToken(token);
-          this.clickButton('edit-doctor-profile-close-btn');
-        },
-        (errorResponse: HttpErrorResponse) => {
-          this.showLoading = false;
-          this.sendErrorNotification(
-            NotificationType.ERROR,
-            errorResponse.error.message
-          );
-        }
-      )
-    );
+    // this.showLoading = true;
+    // this.subscriptions.push(
+    //   this.userService.updateDoctor(this.doctor).subscribe(
+    //     (response: HttpResponse<Doctor>) => {
+    //       this.showLoading = false;
+    //       const token = response.headers.get(HeaderType.JWT_TOKEN);
+    //       this.authenticationService.saveToken(token);
+    //       this.clickButton('edit-doctor-profile-close-btn');
+    //       this.sendNotification(
+    //         NotificationType.SUCCESS,
+    //         'you have successfully updated your profile'
+    //       );
+    //     },
+    //     (errorResponse: HttpErrorResponse) => {
+    //       this.showLoading = false;
+    //       this.sendNotification(
+    //         NotificationType.ERROR,
+    //         errorResponse.error.message
+    //       );
+    //     }
+    //   )
+    // );
   }
+  // update profile image
 
   clickProfileImageBtn() {
     this.clickButton('profile-image-input');
   }
 
-  public onProfileImageChange(event: Event): void {
-    // console.log(event);
+  public onUpdateProfileImage(event: Event): void {
     this.profileImage = (<HTMLInputElement>event.target).files[0];
-    this.fileName = this.profileImage.name;
-    console.log(this.profileImage);
-    console.log('filename:' + this.fileName);
   }
 
-  onUpdateProfileImage() {
-    // console.log(this.profileImage);
-
+  updateProfileImage() {
     const formData = new FormData();
     formData.append('profileImage', this.profileImage);
     this.subscriptions.push(
@@ -286,7 +318,7 @@ export class DoctorProfileComponent implements OnInit {
           }?time=${new Date().getTime()}`;
         },
         (errorResponse: HttpErrorResponse) => {
-          this.sendErrorNotification(
+          this.sendNotification(
             NotificationType.ERROR,
             errorResponse.error.message
           );
@@ -309,7 +341,7 @@ export class DoctorProfileComponent implements OnInit {
     else return this.getUserRole() === Role.DOCTOR;
   }
 
-  private sendErrorNotification(
+  private sendNotification(
     notificationType: NotificationType,
     message: string
   ): void {

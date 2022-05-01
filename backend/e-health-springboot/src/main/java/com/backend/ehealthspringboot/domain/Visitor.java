@@ -23,14 +23,5 @@ public class Visitor extends User{
     @OneToMany(mappedBy = "visitor")
     Set<DoctorRating> ratings;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "visitor")
-    List<Review> reviews;
 
-    public void addReview(Review review){
-        if (this.reviews == null) {
-            this.reviews = new ArrayList<>();
-        }
-        this.reviews.add(review);
-    }
 }

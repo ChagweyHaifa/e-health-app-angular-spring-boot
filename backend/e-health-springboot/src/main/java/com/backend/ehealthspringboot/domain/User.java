@@ -7,6 +7,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 @Data
 @Entity
@@ -44,10 +45,8 @@ public class User  {
   @JoinColumn(name = "address", referencedColumnName = "id")
   private Address address;
 
-    @Column(name="phone_number")
-    private String phoneNumber;
-
-
+  @Column(name="phone_number")
+  private String phoneNumber;
 
   @Column(name="gender")
   private String gender;
@@ -73,6 +72,8 @@ public class User  {
   @Column(name="is_not_locked")
   private boolean isNotLocked;
 
+  @OneToMany(mappedBy = "user")
+  Set<Question> questions;
 
 
 }

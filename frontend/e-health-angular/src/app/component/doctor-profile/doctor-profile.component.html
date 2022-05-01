@@ -10,9 +10,10 @@
                     <img src="{{doctor.profileImageUrl}}" class="profile-image" alt="doctor">
                     <div class="change-profile-image-btn" (click)="clickProfileImageBtn()">
                         <i class=" fa fa-camera " aria-hidden=" true"></i>
+
                     </div>
                     <form style=" display: none" enctype="multipart/form-data">
-                        <input type="file" accept="*" (change)="onProfileImageChange($event); onUpdateProfileImage()"
+                        <input type="file" accept="*" (change)="onUpdateProfileImage($event); updateProfileImage()"
                             name="profile-image-input" id="profile-image-input" placeholder="file" />
                     </form>
                 </div>
@@ -22,7 +23,7 @@
                         <li class="nav-item " role="presentation">
                             <button class="nav-link active " id="home-tab" data-bs-toggle="tab" data-bs-target="#about"
                                 type="button" role="tab" aria-controls="About" aria-selected="true">
-                                <!-- <i class="fa fa-user-md" aria-hidden="true"></i> -->
+
                                 About
                             </button>
                         </li>
@@ -30,7 +31,7 @@
                             <button class="nav-link " id="contact-tab" data-bs-toggle="tab" style="color: #212529 ;"
                                 data-bs-target="#contact" type="button" role="tab" aria-controls="contact"
                                 aria-selected="false">
-                                <!-- <i class="fa fa-envelope" aria-hidden="true"></i> -->
+
 
                                 Contact
                             </button>
@@ -39,7 +40,7 @@
                             <button class="nav-link " id="profile-tab" data-bs-toggle="tab" style="color: #212529;"
                                 data-bs-target="#reviews" type="button" role="tab" aria-controls="profile"
                                 aria-selected="false">
-                                <!-- <i class="fa fa-star" aria-hidden="true"></i> -->
+
 
                                 Reviews
                             </button>
@@ -48,7 +49,7 @@
                             <button class="nav-link " id="profile-tab" data-bs-toggle="tab" style="color: #212529;"
                                 data-bs-target="#questions" type="button" role="tab" aria-controls="profile"
                                 aria-selected="false">
-                                <!-- <i class="fa fa-question-circle" aria-hidden="true"></i> -->
+
 
                                 Questions
                             </button>
@@ -69,13 +70,14 @@
                     <!-- Begin user profile -->
                     <div class="text-center">
                         <ul class="list-group my-3">
-                            <li class="list-group-item">
+                            <li class="list-group-item" id="main-doctor-info">
                                 <h4>{{doctor.firstName}} <span>{{doctor.lastName}}</span></h4>
-                                <h6>{{doctor.speciality.name}}</h6>
+                                <h6>{{doctor.speciality.name}}
+                                    <i class="fa fa-star" aria-hidden="true"></i>
+                                    {{doctor.averageOfRatings}}
+                                    <small>({{doctor.nbOfRatings}})</small>
+                                </h6>
 
-                                <ngx-rating-stars [rating]="rating" [style]="ratingStyle"
-                                    [showRatingInNumericFormat]="true">
-                                </ngx-rating-stars>
                             </li>
                         </ul>
                         <!-- begin .user-button -->
@@ -121,31 +123,37 @@
                                 <!-- Button trigger modal -->
                                 <div class="row justify-content-between align-items-center ">
 
-                                    <div class="col-auto">{{nbOfReviews}} Reviews </div>
+                                    <div class="col-auto"> {{doctor.nbOfRatings}} Reviews</div>
 
-                                    <button type="button" class="btn purple-btn col-auto" data-bs-toggle="modal"
-                                        data-bs-target="#review-modal">
+                                    <button type="button" class="btn purple-btn col-auto"
+                                        (click)="addOrEditDoctorRating()">
                                         <i class="fa fa-star" aria-hidden="true"></i>
                                         Rate this doctor
                                     </button>
                                 </div>
-                                <div class="card my-3" *ngFor="let tempReview of reviews">
+                                <div class="card my-3" *ngFor="let tempRating of ratings">
 
-                                    <div class="card-body">
-                                        <small>{{tempReview.visitor.firstName}} {{tempReview.visitor.lastName}}</small>
-                                        <p class="card-text">{{tempReview.content}}</p>
-                                    </div>
-                                    <div class="card-footer text-muted ">
-                                        <div class="row justify-content-between ">
-                                            <div class="col-6">
-                                                <i class=" fa fa-clock-o "> {{tempReview.creationDate|
-                                                    date:'medium'}}</i>
+                                    <div class=" card-body">
+                                        <div class="row">
+                                            <div class="col-auto">
+                                                {{tempRating.visitor.firstName}}
+                                                {{tempRating.visitor.lastName}}
                                             </div>
-                                            <div class=" col-1" style=" text-align: right;">
-                                                <i class="fa fa-trash-o " aria-hidden="true" style="cursor:pointer"
-                                                    (click)="deleteReview(tempReview)"></i>
+                                            <div class="col-auto" style="margin-top: -20px;">
+                                                <ngx-star-rating [disabled]="true" [(ngModel)]="tempRating.rating"
+                                                    [id]="'rating1'">
+                                                </ngx-star-rating>
                                             </div>
                                         </div>
+
+                                        <p class=" card-text">{{tempRating.review}}</p>
+                                    </div>
+                                    <div class="card-footer text-muted ">
+
+                                        <i class=" fa fa-clock-o "> {{tempRating.creationDate|
+                                            date:'medium'}}</i>
+
+
                                     </div>
                                 </div>
 
@@ -176,6 +184,7 @@
 </div>
 
 
+
 <!--Edit Doctor Profile Modal -->
 <div class="modal fade" id="editDoctorProfileModal" tabindex="-1" aria-labelledby="exampleModalLabel"
     aria-hidden="true">
@@ -187,7 +196,8 @@
             </div>
             <div class="modal-body">
 
-                <form #editDoctorProfileForm="ngForm" (ngSubmit)="editDoctorProfile()" class="login-form">
+                <form #editDoctorProfileForm="ngForm" (ngSubmit)="editDoctorProfile(editDoctorProfileForm)"
+                    class="login-form">
                     <!-- doctor username -->
                     <div class="my-2">
                         <input type="text" class="form-control" name="username" placeholder="Username" required
@@ -227,10 +237,10 @@
 
 
                     <div class=" my-2">
-                        <select class="form-control" name="speciality" [(ngModel)]="doctor.speciality" required
+                        <select class="form-select" name="speciality" [(ngModel)]="doctor.speciality" required
                             #specialityInput="ngModel">
                             <option value="">Speciality</option>
-                            <option *ngFor="let tempSpeciality of specialities" [value]="tempSpeciality">
+                            <option *ngFor="let tempSpeciality of specialities">
                                 {{tempSpeciality.name}}</option>
                         </select>
                         <span class="help-block" *ngIf="specialityInput.invalid && specialityInput.touched"
@@ -327,10 +337,13 @@
     </div>
 </div>
 
+<!-- add doctor rating -->
 
+<button [hidden]="true" id="add-doctor-rating-btn" data-bs-toggle="modal"
+    data-bs-target="#add-doctor-rating-modal"></button>
 
-<!--Rate & Review Modal -->
-<div class="modal fade" id="review-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="add-doctor-rating-modal" tabindex="-1" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -338,27 +351,67 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-
-                <div class="rating">
-                    <label>Rating: </label>
-                    <div class="stars" style=" width: 152px;">
-                        <ngx-star-rating [style]="reviewStyle" [(ngModel)]="rating1"></ngx-star-rating>
+                <form [formGroup]="addRatingForm">
+                    <div class="rating">
+                        <label>Rating: </label>
+                        <div class="stars" style=" width: 152px;">
+                            <ngx-star-rating formControlName="rating" [id]="'rating2'"></ngx-star-rating>
+                        </div>
                     </div>
-                </div>
-
-
-                <div class="review">
-                    <label class="my-2">Review:</label>
-                    <div class="">
-                        <textarea #myInput class="form-control" id="message" rows="3"></textarea>
+                    <div class="review">
+                        <label class="my-2">Review:</label>
+                        <div class="">
+                            <textarea formControlName="review" class="form-control" id="message" rows="3"></textarea>
+                        </div>
                     </div>
-                </div>
-
-
+                </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn purple-btn" (click)="addReview(myInput)">Submit</button>
+                <button type="button" id="add-rating-modal-close-btn" class="btn btn-secondary"
+                    data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn purple-btn" [disabled]="addRatingForm.invalid"
+                    (click)="addRating()">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- edit doctor rating -->
+
+<button [hidden]="true" id="edit-doctor-rating-btn" data-bs-toggle="modal"
+    data-bs-target="#edit-doctor-rating-modal"></button>
+
+<div class="modal fade" id="edit-doctor-rating-modal" tabindex="-1" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="exampleModalLabel">Rate & Review</h4>
+                <button type="button" id="edit-rating-modal-close-btn" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="editRatingForm">
+                    <div class="rating">
+                        <label>Rating: </label>
+                        <div class="stars" style=" width: 152px;">
+                            <ngx-star-rating formControlName="rating" [id]="'rating3'"></ngx-star-rating>
+                        </div>
+                    </div>
+                    <div class="review">
+                        <label class="my-2">Review:</label>
+                        <div class="">
+                            <textarea formControlName="review" class="form-control" id="message" rows="3"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="rating-form-close-btn" class="btn btn-secondary" data-bs-dismiss="modal"
+                    (click)="deleteRating()">Delete</button>
+                <button type="button" class="btn purple-btn" [disabled]="editRatingForm.invalid"
+                    (click)="editRating()">Save
+                    changes</button>
             </div>
         </div>
     </div>

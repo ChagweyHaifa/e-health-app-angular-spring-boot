@@ -6,6 +6,8 @@ export class Doctor extends User {
   nbOfRecommendations: number;
   nbOfReviews: number;
   public profileImageUrl: string;
+  nbOfRatings: number;
+  averageOfRatings: number;
   constructor() {
     super();
     this.speciality = new Speciality();

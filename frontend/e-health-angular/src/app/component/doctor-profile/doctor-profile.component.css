@@ -32,6 +32,10 @@
   cursor: pointer;
 }
 
+#main-doctor-info i {
+  color: yellow;
+}
+
 .user-button button {
   width: 100%;
   margin-bottom: 0.5rem;

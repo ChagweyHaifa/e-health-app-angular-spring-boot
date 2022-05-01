@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { NotificationType } from 'src/app/enum/notification-type.enum';
 import { Role } from 'src/app/enum/role.enum';
-import { CustomHttpRespone } from 'src/app/model/custom-http-response';
+import { CustomHttpResponse } from 'src/app/model/custom-http-response';
 import { FileUploadStatus } from 'src/app/model/file-upload-status';
 import { User } from 'src/app/model/user';
 import { AuthenticationService } from 'src/app/service/authentication.service';
@@ -190,7 +190,7 @@ export class UserComponent implements OnInit, OnDestroy {
   public onDeleteUser(username: string): void {
     this.subscriptions.push(
       this.userService.deleteUser(username).subscribe(
-        (response: CustomHttpRespone) => {
+        (response: CustomHttpResponse) => {
           this.sendNotification(NotificationType.SUCCESS, response.message);
           this.getUsers(false);
         },
@@ -206,7 +206,7 @@ export class UserComponent implements OnInit, OnDestroy {
     const emailAddress = emailForm.value['reset-password-email'];
     this.subscriptions.push(
       this.userService.resetPassword(emailAddress).subscribe(
-        (response: CustomHttpRespone) => {
+        (response: CustomHttpResponse) => {
           this.sendNotification(NotificationType.SUCCESS, response.message);
           this.refreshing = false;
         },

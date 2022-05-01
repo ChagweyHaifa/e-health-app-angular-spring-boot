@@ -49,7 +49,7 @@ public class DoctorServiceImpl implements DoctorService {
     private DoctorRepository doctorRepository;
     private LoginAttemptService loginAttemptService;
     private EmailService emailService;
-    private DoctorRatingRepository doctorRatingRepository;
+
 
     @Autowired
     public DoctorServiceImpl(
@@ -57,21 +57,17 @@ public class DoctorServiceImpl implements DoctorService {
                            DoctorRepository doctorRepository,
                            BCryptPasswordEncoder passwordEncoder,
                            LoginAttemptService loginAttemptService,
-                           EmailService emailService,
-            DoctorRatingRepository doctorRatingRepository) {
+                           EmailService emailService
+          ) {
     this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
         this.emailService = emailService;
         this.doctorRepository = doctorRepository;
-        this.doctorRatingRepository = doctorRatingRepository;
+
 
     }
-    @Override
-    public List<DoctorRating> getDoctorRating(){
-        return doctorRatingRepository.findAll();
 
-    }
     @Override
     public Doctor register(Doctor doctor) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
         validateNewUsernameAndEmail(EMPTY, doctor.getUsername(), doctor.getEmail());

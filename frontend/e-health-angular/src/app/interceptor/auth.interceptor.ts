@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 import { AuthenticationService } from '../service/authentication.service';
 import { FormService } from '../service/form.service';
 import { UserService } from '../service/user.service';
-import { ReviewService } from '../service/review.service';
+import { RatingService } from '../service/rating.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -20,7 +20,7 @@ export class AuthInterceptor implements HttpInterceptor {
     private authenticationService: AuthenticationService,
     private formService: FormService,
     private userService: UserService,
-    private reviewService: ReviewService
+    private ratingService: RatingService
   ) {}
 
   intercept(
@@ -73,7 +73,7 @@ export class AuthInterceptor implements HttpInterceptor {
       return httpHandler.handle(httpRequest);
     }
 
-    if (httpRequest.url.includes(`${this.reviewService.host}/reviews/search`)) {
+    if (httpRequest.url.includes(`${this.ratingService.host}/ratings/search`)) {
       return httpHandler.handle(httpRequest);
     }
 
