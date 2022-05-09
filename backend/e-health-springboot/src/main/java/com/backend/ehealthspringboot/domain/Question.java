@@ -14,19 +14,39 @@ public class Question {
     @Column(name="id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "speciality_id" )
+    private Speciality speciality;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id" )
+    private User user;
+
     @Column(name="title")
     private String title;
 
     @Column(name="question")
     private String question;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id" )
-    private User user;
+    @Column(name="current_treatment")
+    private String currentTreatment;
 
-    @ManyToOne
-    @JoinColumn(name = "speciality_id" )
-    private Speciality speciality;
+    @Column(name="medical_history")
+    private String medicalHistory;
+
+    @Column(name="questioner_height")
+    private int questionerHeight;
+
+    @Column(name="questioner_weight")
+    private int questionerWeight;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "response_id", referencedColumnName = "id")
+    private QuestionResponse response;
+
+
+
+
 
 
 }

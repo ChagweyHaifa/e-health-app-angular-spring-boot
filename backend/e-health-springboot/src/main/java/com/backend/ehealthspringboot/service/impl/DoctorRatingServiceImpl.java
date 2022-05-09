@@ -75,7 +75,7 @@ public class DoctorRatingServiceImpl implements DoctorRatingService {
     public Doctor updateRating(String loggedInVisitorUsername, String doctorUsername, Integer rating, String review) throws RatingNotFoundException {
         DoctorRating theRating = doctorRatingRepository.findByVisitorUsernameAndDoctorUsername(loggedInVisitorUsername, doctorUsername);
         if (theRating == null){
-            throw new RatingNotFoundException(NO_Rating_FOUND);
+            throw new RatingNotFoundException(NO_RATING_FOUND);
         }
         theRating.setRating(rating);
         theRating.setReview(review);
@@ -91,7 +91,7 @@ public class DoctorRatingServiceImpl implements DoctorRatingService {
     public Doctor deleteRating(String loggedInVisitorUsername, String doctorUsername) throws RatingNotFoundException {
         DoctorRating theRating = doctorRatingRepository.findByVisitorUsernameAndDoctorUsername(loggedInVisitorUsername, doctorUsername);
         if (theRating == null){
-            throw new RatingNotFoundException(NO_Rating_FOUND);
+            throw new RatingNotFoundException(NO_RATING_FOUND);
         }
 
         Doctor doctor = theRating.getDoctor();

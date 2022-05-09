@@ -2,6 +2,7 @@ package com.backend.ehealthspringboot.domain;
 import javax.persistence.*;
 
 import com.backend.ehealthspringboot.enumeration.Gender;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -72,6 +73,7 @@ public class User  {
   @Column(name="is_not_locked")
   private boolean isNotLocked;
 
+  @JsonIgnore
   @OneToMany(mappedBy = "user")
   Set<Question> questions;
 

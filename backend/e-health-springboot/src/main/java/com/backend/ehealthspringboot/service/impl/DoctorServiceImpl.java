@@ -172,6 +172,7 @@ public class DoctorServiceImpl implements DoctorService {
             }
             Files.deleteIfExists(Paths.get(userFolder + doctor.getUsername() + DOT + JPG_EXTENSION));
             Files.copy(profileImage.getInputStream(), userFolder.resolve(doctor.getUsername() + DOT + JPG_EXTENSION), REPLACE_EXISTING);
+
             doctor.setProfileImageUrl(setProfileImageUrl(doctor.getUsername()));
             doctorRepository.save(doctor);
             LOGGER.info(FILE_SAVED_IN_FILE_SYSTEM + profileImage.getOriginalFilename());
@@ -179,11 +180,11 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     private String getTemporaryProfileImageUrl(String gender) {
-        return ServletUriComponentsBuilder.fromCurrentContextPath().path(DEFAULT_USER_IMAGE_PATH + gender).toUriString();
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path(DEFAULT_USER_IMAGE_PATH+FORWARD_SLASH + gender).toUriString();
     }
 
     private String setProfileImageUrl(String username) {
-        return ServletUriComponentsBuilder.fromCurrentContextPath().path(USER_IMAGE_PATH + username + FORWARD_SLASH
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path(USER_IMAGE_PATH + FORWARD_SLASH+ username + FORWARD_SLASH
                 + username + DOT + JPG_EXTENSION).toUriString();
     }
 

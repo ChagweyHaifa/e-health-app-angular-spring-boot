@@ -12,20 +12,113 @@
                 </div>
             </div>
 
-            <div class="row">
-                <div class="search-input col-4">
-                    <input type="search" class="form-control" placeholder="Key words">
+
+
+            <div class="row justify-content-end">
+                <div class="col-6">
+                    <div id="search-questions-bar">
+                        <div class="row">
+                            <input type="text" class=" col" placeholder="Key words">
+                            <div class="col-1">
+                                <i class="fa fa-search" aria-hidden="true"></i>
+                            </div>
+
+
+                        </div>
+                    </div>
                 </div>
-                <div class="col-auto">
-                    <button type="button" class="btn purple-btn">Search</button>
-                </div>
-                <div class="col-auto">
-                    <button class="btn purple-btn" type="button" id="openUserEdit" data-bs-toggle="modal"
-                        data-bs-target="#askQustionModal">
-                        Ask a question
-                    </button>
-                </div>
+
             </div>
+
+
+            <div class="questions-container">
+                <div class="row my-4">
+                    <aside class="col-auto">
+                        <div class="mb-3">
+                            <button class="btn purple-btn" type="button" id="openUserEdit" data-bs-toggle="modal"
+                                data-bs-target="#askQustionModal" style="width: 100%;">
+                                Ask a question
+                            </button>
+                        </div>
+
+                        <div class="list-group">
+                            <button type="button" *ngFor="let tempSpeciality of specialities"
+                                (click)="getQuestionsBySpeciality( tempSpeciality.name)"
+                                class="list-group-item list-group-item-action " aria-current="true">
+                                {{tempSpeciality.name}}
+                            </button>
+                        </div>
+
+                    </aside>
+                    <div class="col" id="questions">
+                        <div class="card mb-3" *ngFor="let tempQuestion of questions">
+
+                            <div class="card-header">
+                                <div class="row justify-content-between">
+                                    <h5 class="card-title col-auto">{{tempQuestion.title}}</h5>
+                                    <div class=" col-auto">
+                                        <button class="btn">
+                                            <i class="fa fa-pencil-square-o" aria-hidden="true"
+                                                (click)="launchEditQuestionModal(tempQuestion)"></i>
+                                        </button>
+                                        <button class="btn">
+                                            <i class="fa fa-trash-o" aria-hidden="true"
+                                                (click)="deleteQuestion(tempQuestion.id)" style="cursor: pointer;"></i>
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class=" card-body">
+                                <p class="card-text">{{tempQuestion.question}}.</p>
+                                <p *ngIf="tempQuestion.currentTreatment"><span>Current Treatment:</span>
+                                    {{tempQuestion.currentTreatment}}</p>
+                                <p *ngIf="tempQuestion.medicalHistory">}<span>Medical
+                                        History</span>{{tempQuestion.medicalHistory}</p>
+                                <p *ngIf="tempQuestion.questionerWeight != 0">
+                                    <span>Weight: </span>{{tempQuestion.questionerWeight}}
+                                </p>
+                                <p *ngIf="tempQuestion.questionerHeight != 0">
+                                    <span>Height: </span>{{tempQuestion.questionerHeight}}
+                                </p>
+                                <div class="my-2" style="text-align: right;">
+
+                                    <button *ngIf="!tempQuestion.response" class="btn purple-btn"
+                                        (click)="launchRespondToQuestionModal(tempQuestion)">respond</button>
+                                </div>
+
+                                <div *ngIf="tempQuestion.response" class="question-response pt-2">
+                                    <div class="row justify-content-between">
+                                        <div class=" col-auto">
+                                            Dr <b> {{tempQuestion.response.doctor.firstName}}
+                                                {{tempQuestion.response.doctor.lastName}} </b>
+                                            <small>({{tempQuestion.response.doctor.speciality.name}})</small>
+                                        </div>
+                                        <div class=" col-auto">
+                                            <button class="btn" (click)=" onEditQuestionResponse(tempQuestion)">
+                                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                            </button>
+                                            <button class="btn" (click)="deleteQuestionResponse(tempQuestion.id)">
+                                                <i class="fa fa-trash-o" aria-hidden="true"
+                                                    style=" cursor: pointer;"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <p>{{tempQuestion.response.content}}</p>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
 
         </div>
     </div>
@@ -33,7 +126,7 @@
 
 <!-- Modal -->
 <div class="modal fade" id="askQustionModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
 
             <div class="modal-header">
@@ -46,11 +139,11 @@
                 <form [formGroup]="myQuestionForm">
 
                     <div class="mb-3">
-                        <label for="speciality" class="form-label">Speciality </label>
+                        <label for="speciality" class="form-label">Speciality (required) </label>
 
                         <select class="form-select" formControlName="speciality">
                             <option value="">Speciality</option>
-                            <option *ngFor="let tempSpeciality of specialities" [ngValue]="tempSpeciality">
+                            <option *ngFor="let tempSpeciality of specialities" [ngValue]="tempSpeciality.name">
                                 {{tempSpeciality.name}}</option>
                         </select>
 
@@ -58,7 +151,7 @@
 
                     <div class="mb-3">
                         <div class="mb-2">
-                            <label for="question-title" class="form-label">Question </label>
+                            <label for="question-title" class="form-label">Question (required) </label>
                             <input type="text" formControlName="questionTitle" class="form-control" id="question-title"
                                 placeholder="Question title">
                         </div>
@@ -66,15 +159,116 @@
                             placeholder="Question (Remember to give as much information as possible so that the doctors' response is as relevant as possible)"></textarea>
                     </div>
 
+                    <div class="mb-3">
+                        <label for="question-title" class="form-label">Current treatment </label>
+                        <textarea class="form-control" formControlName="currentTreatment" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3"><label for="question-title" class="form-label">Medical history </label>
+                        <textarea class="form-control" formControlName="medicalHistory" rows="3"></textarea>
+                    </div>
+
                     <div class="mb-3 row">
+
+
+
                         <div class="col">
-                            <label for="height" class="form-label">Height</label>
-                            <input type="text" formControlName="height" id="height" class="form-control"
+                            <label for="height" class="form-label">Height(cm)</label>
+                            <input type="number" formControlName="height" id="height" class="form-control"
                                 aria-label="height">
                         </div>
                         <div class="col">
-                            <label for="width" class="form-label">Weight</label>
-                            <input type="text" formControlName="weight" id="width" class="form-control"
+                            <label for="width" class="form-label">Weight(Kg)</label>
+                            <input type="number" formControlName="weight" id="width" class="form-control"
+                                aria-label="width">
+                        </div>
+                    </div>
+
+
+
+                    <div class="mb-3">
+                        <label class="form-label">Attachments</label>
+                        <input class="form-control" formControlName="files" type="file" multiple
+                            (change)="uploadMyQuestionFormFiles($event)">
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" id="my-question-form-close-btn" class="btn btn-secondary"
+                    data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn purple-btn" [disabled]="myQuestionForm.invalid">
+                    <i *ngIf="showLoading" class="fas fa-spinner fa-spin"></i>&nbsp;&nbsp;
+                    <span *ngIf="showLoading">Loading...</span>
+                    <span *ngIf="!showLoading" (click)="addQuestion()">Submit</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+<!-- edit question modal -->
+<!-- Button trigger modal -->
+<button type="button" [hidden]="true" id="edit-question-modal-trigger-btn" class="btn btn-primary"
+    data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+    Launch static backdrop modal
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Edit Question</h5>
+                <button type="button" id="edit-my-question-form-close-btn" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="editMyQuestionForm">
+
+                    <div class="mb-3">
+                        <label for="speciality" class="form-label">Speciality (required) </label>
+
+                        <select class="form-select" formControlName="speciality">
+                            <option value="">Speciality</option>
+                            <option *ngFor="let tempSpeciality of specialities" [ngValue]="tempSpeciality.name">
+                                {{tempSpeciality.name}}</option>
+                        </select>
+
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="mb-2">
+                            <label for="question-title" class="form-label">Question (required) </label>
+                            <input type="text" formControlName="questionTitle" class="form-control" id="question-title"
+                                placeholder="Question title">
+                        </div>
+                        <textarea class="form-control" formControlName="question" id="question" rows="3"
+                            placeholder="Question (Remember to give as much information as possible so that the doctors' response is as relevant as possible)"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="question-title" class="form-label">Current treatment </label>
+                        <textarea class="form-control" formControlName="currentTreatment" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3"><label for="question-title" class="form-label">Medical history </label>
+                        <textarea class="form-control" formControlName="medicalHistory" rows="3"></textarea>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <div class="col">
+                            <label for="height" class="form-label">Height(cm)</label>
+                            <input type="number" formControlName="height" id="height" class="form-control"
+                                aria-label="height">
+                        </div>
+                        <div class="col">
+                            <label for="width" class="form-label">Weight(Kg)</label>
+                            <input type="number" formControlName="weight" id="width" class="form-control"
                                 aria-label="width">
                         </div>
                     </div>
@@ -87,14 +281,48 @@
 
                 </form>
             </div>
-
             <div class="modal-footer">
-                <button type="button" id="edit-user-close" class="btn btn-secondary"
-                    data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn purple-btn" [disabled]="myQuestionForm.invalid"
-                    (click)="addQuestion()">Submit</button>
+                <button type="button" class="btn btn-secondary">Delete</button>
+                <button type="button" class="btn purple-btn" (click)="editMyQuestion()">Saves changes</button>
             </div>
         </div>
     </div>
+</div>
 
+<!-- Button trigger modal -->
+<button [hidden]="true" type="button" id="add-response-modal-trigger-btn" class="btn btn-primary" data-bs-toggle="modal"
+    data-bs-target="#exampleModal">
+    Launch demo modal
+</button>
+
+<!--Respond to question modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog  modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel" [innerHtml]="questionTitleToAdd">Response</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div [innerHtml]="questionDetailsToAdd"> </div>
+                <form [formGroup]="respondToQuestionForm">
+                    <div class="my-3">
+                        <label class="form-label">Response</label>
+                        <textarea formControlName="questionResponse" required class="form-control" id=""
+                            rows="3"></textarea>
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <button id="respond-to-question-modal-close-btn" type="button" class="btn btn-secondary"
+                        data-bs-dismiss="modal">Close</button>
+                    <button *ngIf="isAddQuestionResponse" [disabled]="respondToQuestionForm.invalid" type="button"
+                        class="btn purple-btn" (click)="respondToQuestion()">Submit</button>
+                    <button *ngIf="isEditQuestionResponse" [disabled]="respondToQuestionForm.invalid" type="button"
+                        class="btn purple-btn" (click)="editQuestionResponse()">Save changes</button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
 </div>

@@ -49,7 +49,6 @@ public class DoctorRatingRessource {
     }
 
     @PostMapping("")
-    @PreAuthorize("hasAnyAuthority('rating:create')")
     public ResponseEntity<Doctor> addRating(HttpServletRequest request , @RequestBody DoctorRating theRating) throws UserNotFoundException, RatingExistExeption {
         String loggedInVisitorUsername = getUsernameFromJWTToken(request);
         Doctor doctor = doctorRatingService.addRating(
@@ -62,7 +61,6 @@ public class DoctorRatingRessource {
     }
 
     @PutMapping("")
-    @PreAuthorize("hasAnyAuthority('rating:update')")
     public ResponseEntity<Doctor> updateRating(HttpServletRequest request , @RequestBody DoctorRating theRating) throws RatingNotFoundException  {
         String loggedInVisitorUsername = getUsernameFromJWTToken(request);
         Doctor doctor = doctorRatingService.updateRating(
@@ -76,7 +74,6 @@ public class DoctorRatingRessource {
 
 
     @DeleteMapping("")
-    @PreAuthorize("hasAnyAuthority('rating:delete')")
     public ResponseEntity<Doctor> deleteRating(HttpServletRequest request , @RequestParam("doctorUsername") String doctorUsername) throws RatingNotFoundException {
         String loggedInVisitorUsername = getUsernameFromJWTToken(request);
         Doctor doctor = doctorRatingService.deleteRating(loggedInVisitorUsername, doctorUsername);

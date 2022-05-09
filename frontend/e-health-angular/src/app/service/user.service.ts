@@ -14,8 +14,12 @@ export class UserService {
 
   constructor(private http: HttpClient) {}
 
-  public getUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.host}/users`);
+  public getUsersByRole(role: string): Observable<any> {
+    return this.http.get<any>(`${this.host}/users?role=${role}`);
+  }
+
+  getAllDoctors(): Observable<Doctor[]> {
+    return this.http.get<Doctor[]>(`${this.host}/users/doctors`);
   }
 
   public addUser(formData: FormData): Observable<User> {

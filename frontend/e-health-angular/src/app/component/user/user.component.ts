@@ -10,9 +10,12 @@ import { BehaviorSubject, Subscription } from 'rxjs';
 import { NotificationType } from 'src/app/enum/notification-type.enum';
 import { Role } from 'src/app/enum/role.enum';
 import { CustomHttpResponse } from 'src/app/model/custom-http-response';
+import { Doctor } from 'src/app/model/doctor';
 import { FileUploadStatus } from 'src/app/model/file-upload-status';
+import { Speciality } from 'src/app/model/speciality';
 import { User } from 'src/app/model/user';
 import { AuthenticationService } from 'src/app/service/authentication.service';
+import { FormService } from 'src/app/service/form.service';
 import { NotificationService } from 'src/app/service/notification.service';
 import { UserService } from 'src/app/service/user.service';
 
@@ -26,7 +29,6 @@ export class UserComponent implements OnInit, OnDestroy {
   // a listener , an observable that will get notified if titleSubject value has been changed
   public titleAction$ = this.titleSubject.asObservable();
 
-  public users: User[];
   public loggedInUser: User;
 
   public selectedUser: User;
@@ -41,46 +43,76 @@ export class UserComponent implements OnInit, OnDestroy {
   public fileStatus = new FileUploadStatus();
 
   private subscriptions: Subscription[] = [];
+  selectedDoctor: Doctor;
+  public users: any;
+  doctors: Doctor[];
+  specialities: Speciality[];
   constructor(
     private userService: UserService,
     private notificationService: NotificationService,
     private authenticationService: AuthenticationService,
+    private formService: FormService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.getUsers(true);
     this.loggedInUser = this.authenticationService.getUserFromLocalCache();
+    this.getDoctors();
+    this.getSpecialities();
   }
 
-  public changeTitle(title: string): void {
-    this.titleSubject.next(title);
-  }
-
-  public getUsers(showNotification: boolean): void {
-    this.refreshing = true;
+  public getDoctors(): void {
     this.subscriptions.push(
-      this.userService.getUsers().subscribe(
-        (response: User[]) => {
-          this.userService.addUsersToLocalCache(response);
-          this.users = response;
-          this.refreshing = false;
-          if (showNotification) {
-            this.sendNotification(
-              NotificationType.SUCCESS,
-              `${response.length} user(s) loaded successfully.`
-            );
-          }
+      this.userService.getAllDoctors().subscribe(
+        (response: Doctor[]) => {
+          this.doctors = response;
         },
         (errorResponse: HttpErrorResponse) => {
           this.sendNotification(
             NotificationType.ERROR,
             errorResponse.error.message
           );
-          this.refreshing = false;
         }
       )
     );
+  }
+
+  public getUsers(role: string): void {
+    this.subscriptions.push(
+      this.userService.getUsersByRole(role).subscribe(
+        (response: any) => {
+          this.users = response;
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendNotification(
+            NotificationType.ERROR,
+            errorResponse.error.message
+          );
+        }
+      )
+    );
+  }
+
+  getSpecialities() {
+    this.subscriptions.push(
+      this.formService.getSpecialities().subscribe(
+        (response: Speciality[]) => {
+          this.specialities = response;
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendNotification(
+            NotificationType.ERROR,
+            errorResponse.error.message
+          );
+        }
+      )
+    );
+  }
+
+  // ****display user info****
+  public viewDoctorInfo(selectedDoctor: Doctor): void {
+    this.selectedDoctor = selectedDoctor;
+    this.clickButton('openDoctorInfo');
   }
 
   // ****display user info****
@@ -107,7 +139,7 @@ export class UserComponent implements OnInit, OnDestroy {
         (response: User) => {
           this.clickButton('new-user-close');
           // make a call to the backend to get the new list of users
-          this.getUsers(false);
+
           this.fileName = null;
           this.profileImage = null;
           userForm.reset();
@@ -168,7 +200,7 @@ export class UserComponent implements OnInit, OnDestroy {
       this.userService.updateUser(formData).subscribe(
         (response: User) => {
           this.clickButton('edit-user-close');
-          this.getUsers(false);
+
           this.fileName = null;
           this.profileImage = null;
           this.sendNotification(
@@ -192,7 +224,6 @@ export class UserComponent implements OnInit, OnDestroy {
       this.userService.deleteUser(username).subscribe(
         (response: CustomHttpResponse) => {
           this.sendNotification(NotificationType.SUCCESS, response.message);
-          this.getUsers(false);
         },
         (error: HttpErrorResponse) => {
           this.sendNotification(NotificationType.ERROR, error.error.message);
@@ -236,7 +267,7 @@ export class UserComponent implements OnInit, OnDestroy {
           this.authenticationService.addUserToLocalCache(response);
           // to update authorities on the template
           // this.loggedInUser = response;
-          this.getUsers(false);
+
           this.fileName = null;
           this.profileImage = null;
           this.sendNotification(

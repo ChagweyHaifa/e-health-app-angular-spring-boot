@@ -80,6 +80,13 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
     }
 
     @Override
+    public List<User> getUsersByRole(String role) {
+        {
+            return userRepository.findByRole(role);
+        }
+    }
+
+    @Override
     public User findUserByUsername(String username) {
         return userRepository.findUserByUsername(username);
     }

@@ -26,11 +26,15 @@ public class Doctor extends User {
     @OneToMany(mappedBy = "doctor")
     List<DoctorRating> ratings;
 
-    @Column(name = "nb_of_ratings",columnDefinition = "integer default 0")
-    private Integer nbOfRatings ;
+    @Column(name = "nb_of_ratings",columnDefinition = "Integer default 0")
+    private Integer nbOfRatings = 0;
 
     @Column(name = "average_of_ratings",columnDefinition = "float default 0")
-    private float averageOfRatings ;
+    private float averageOfRatings = 0;;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "doctor")
+    private Set<QuestionResponse> responses;
 
     // convenience methods
     public Integer incrementNbOfRatings(){

@@ -51,9 +51,14 @@ public class UserResource extends ExceptionHandling {
         return new ResponseEntity<>(loginUser, jwtHeader, OK);
     }
 
+//    @GetMapping("/users")
+//    public ResponseEntity<List<User>> getAllUsers() {
+//        List<User> users = userService.getUsers();
+//        return new ResponseEntity<>(users, OK);
+//    }
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.getUsers();
+    public ResponseEntity<List<User>> getUsersByRole(@RequestParam("role")String role) {
+        List<User> users = userService.getUsersByRole(role);
         return new ResponseEntity<>(users, OK);
     }
 

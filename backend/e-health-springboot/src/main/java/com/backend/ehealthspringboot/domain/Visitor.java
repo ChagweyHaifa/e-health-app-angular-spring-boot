@@ -16,9 +16,6 @@ import java.util.Set;
 @DiscriminatorValue(value="visitor")
 public class Visitor extends User{
 
-    @Column(name="question")
-    private String question;
-
     @JsonIgnore
     @OneToMany(mappedBy = "visitor")
     Set<DoctorRating> ratings;

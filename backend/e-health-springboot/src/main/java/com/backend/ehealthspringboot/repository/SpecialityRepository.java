@@ -6,4 +6,6 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 
 public interface SpecialityRepository extends JpaRepository< Speciality,Long> {
+
+    Speciality findByName(String name);
 }
