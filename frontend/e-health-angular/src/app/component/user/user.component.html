@@ -42,20 +42,20 @@
                                 <img height="40" width="40" src="{{tempDoctor?.profileImageUrl}}"
                                     class="rounded-circle img-fluid img-thumbnail" alt="" />
                             </td>
-                            <td (click)=" viewDoctorInfo(tempDoctor)">{{tempDoctor?.userId}}</td>
-                            <td (click)=" viewDoctorInfo(tempDoctor)">{{tempDoctor?.firstName}}</td>
-                            <td (click)=" viewDoctorInfo(tempDoctor)">{{tempDoctor?.lastName}}</td>
-                            <td (click)=" viewDoctorInfo(tempDoctor)">{{tempDoctor?.speciality?.name}}</td>
+                            <td (click)=" launchEditDoctorModal(tempDoctor)">{{tempDoctor?.userId}}</td>
+                            <td (click)=" launchEditDoctorModal(tempDoctor)">{{tempDoctor?.firstName}}</td>
+                            <td (click)=" launchEditDoctorModal(tempDoctor)">{{tempDoctor?.lastName}}</td>
+                            <td (click)=" launchEditDoctorModal(tempDoctor)">{{tempDoctor?.speciality?.name}}</td>
 
-                            <td (click)=" viewDoctorInfo(tempDoctor)">{{tempDoctor?.email}}</td>
-                            <td (click)=" viewDoctorInfo(tempDoctor)">
+                            <td (click)=" launchEditDoctorModal(tempDoctor)">{{tempDoctor?.email}}</td>
+                            <td (click)=" launchEditDoctorModal(tempDoctor)">
                                 <span *ngIf="tempDoctor?.status=='VERIFIED'" class="badge bg-success">Verified</span>
                                 <span *ngIf="tempDoctor?.status=='NOT_VERIFIED'" class="badge bg-danger">Not
                                     verified</span>
                                 <span *ngIf="tempDoctor?.status=='UNDER_VERIFICATION'" class="badge bg-warning">Under
                                     verifiation</span>
                             </td>
-                            <td (click)=" viewDoctorInfo(tempDoctor)"><span [hidden]="tempDoctor?.notLocked">
+                            <td (click)=" launchEditDoctorModal(tempDoctor)"><span [hidden]="tempDoctor?.notLocked">
                                     <i class="fa fa-lock float-right" style="color: red;">
                                     </i>
                                     Locked
@@ -66,7 +66,7 @@
                                     Unlocked
                                 </span>
                             </td>
-                            <td (click)=" viewDoctorInfo(tempDoctor)">
+                            <td (click)=" launchEditDoctorModal(tempDoctor)">
                                 <span [hidden]="!tempDoctor?.active" class="badge bg-success">Active</span>
                                 <span [hidden]="tempDoctor?.active" class="badge bg-danger">Inactive</span>
                             </td>
@@ -186,133 +186,6 @@
         </div>
 
     </div>
-
-
-
-
-    <!-- ****view doctor info **** -->
-    <!-- Button trigger modal  -->
-    <button [hidden]="true" id="openDoctorInfo" type="button" data-bs-toggle="modal" data-bs-target="#viewUserModal">
-        OpenUserInfo
-    </button>
-    <!--  Modal  -->
-    <div class="modal fade" id="viewUserModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">{{selectedDoctor?.firstName}}
-                        {{selectedDoctor?.lastName}}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div>
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-12 col-sm-auto">
-                                        <div class="mx-auto" style="width: 120px;">
-                                            <div class="d-flex justify-content-center align-items-center rounded">
-                                                <img class="rounded" height="120" width="120"
-                                                    src="{{selectedDoctor?.profileImageUrl}}"
-                                                    alt="{{selectedDoctor?.firstName}}">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col d-flex flex-column flex-sm-row justify-content-between">
-                                        <div class=" text-sm-left mb-sm-0">
-                                            <p class="pt-sm-2 pb-1 mb-0 ">{{selectedDoctor?.firstName}}
-                                                {{selectedDoctor?.lastName}} (<span
-                                                    *ngIf="selectedDoctor?.role=='ROLE_DOCTOR'">Doctor</span>
-                                                <span *ngIf="selectedDoctor?.role=='ROLE_USER'">User</span>
-                                                <span *ngIf="selectedDoctor?.role=='ROLE_ADMIN'">Admin</span>)
-                                            </p>
-                                            <div class="">Active status:
-                                                <span [hidden]="!selectedDoctor?.active"
-                                                    class="badge bg-success">Active</span>
-                                                <span [hidden]="selectedDoctor?.active"
-                                                    class="badge bg-danger">Inactive</span>
-                                            </div>
-                                            <div *ngIf="selectedDoctor?.lastLoginDateDisplay" class="text-muted">
-                                                <small>Last Login: {{selectedDoctor?.lastLoginDateDisplay | date:
-                                                    'medium'}}</small>
-                                            </div>
-                                        </div>
-                                        <div class="text-center text-sm-right">
-                                            <div class="text-muted"><small>Joined {{selectedDoctor?.joinDate | date:
-                                                    'mediumDate'}}</small></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <ul class="list-group list-group-flush">
-
-                                <li class="list-group-item"><i class="fa fa-id-badge float-right"></i>
-                                    {{selectedDoctor?.userId}}
-                                </li>
-                                <li class="list-group-item"><i class="fa fa-user-md" aria-hidden="true"></i>
-
-                                    {{selectedDoctor?.speciality?.name}}
-
-                                </li>
-
-
-                                <li class="list-group-item">
-                                    <i class="fa fa-star" aria-hidden="true"></i>
-                                    {{selectedDoctor?.averageOfRatings}}
-                                    ({{selectedDoctor?.nbOfRatings}})
-                                </li>
-                                <li class="list-group-item"><i class="fa fa-mobile" aria-hidden="true"></i>
-                                    {{selectedDoctor?.phoneNumber}}
-                                </li>
-                                <li class="list-group-item">
-                                    <i class="fa fa-map-marker" aria-hidden="true"></i>
-                                    {{selectedDoctor?.address?.city}}
-                                    {{selectedDoctor?.address?.state}} {{selectedDoctor?.address?.country}}
-                                </li>
-
-
-                                <li class="list-group-item"><i class="fa fa-envelope float-right"></i>
-                                    {{selectedDoctor?.email}}
-                                </li>
-
-                                <li class="list-group-item">
-                                    <span [hidden]="selectedDoctor?.notLocked">
-                                        <i class="fa fa-lock float-right" style="color: red;">
-                                        </i>
-                                        Account Locked
-                                    </span>
-                                    <span [hidden]="!selectedDoctor?.notLocked">
-                                        <i class="fa fa-unlock float-right" style="color: green;">
-                                        </i>
-                                        Account Unlocked
-                                    </span>
-                                </li>
-                                <li class="list-group-item">
-                                    Status:
-                                    <span *ngIf="selectedDoctor?.status=='VERIFIED'"
-                                        class="badge bg-success">Verified</span>
-                                    <span *ngIf="selectedDoctor?.status=='NOT_VERIFIED'" class="badge bg-danger">Not
-                                        verified</span>
-                                    <span *ngIf="selectedDoctor?.status=='UNDER_VERIFICATION'"
-                                        class="badge bg-warning">Under
-                                        verifiation</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-
 
     <!-- ****add new user **** -->
     <!-- <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -463,67 +336,81 @@
                     </div>
                     <div class="edit-doctor-form-container">
                         <form [formGroup]="editDoctorForm">
-                            <div class="form-area mt-3 mb-4">
+                            <div class="form-area mt-3 mb-4" id="about-section">
                                 <div class="form-area-title">
                                     <span><i class="fa fa-user-md" aria-hidden="true"></i>
-
                                         About <i (click)="onEditDoctor('about')"
                                             class="fa fa-pencil-square-o edit-section-btn" style="cursor:pointer ;"
                                             aria-hidden="true"></i></span>
                                 </div>
-
-                                <div class="form-group my-2 row ">
-                                    <div class="col">
-                                        <label class="mb-1" for="firstName">First Name</label>
-                                        <input formControlName="firstName" type="text" class="form-control"
-                                            [readonly]="isEditAbout==false">
-                                        <!-- whenever we change smthg in template or the from , the controller will be updated automatically -->
+                                <div *ngIf="isEditAbout==false" class="mt-2" id="about-info">
+                                    <div class="row mb-2">
+                                        <div class="col"> <b>FirstName:</b> {{selectedDoctor?.firstName}}</div>
+                                        <div class="col"> <b> LastName:</b> {{selectedDoctor?.lastName}}</div>
                                     </div>
-                                    <div class="col">
-                                        <label class="mb-1">Last Name</label>
-                                        <input formControlName="lastName" type="text" class="form-control"
-                                            [readonly]="isEditAbout==false">
+
+                                    <div class="mb-2"><b>Username: </b>{{selectedDoctor?.username}}</div>
+                                    <div class="mb-2"><b>Role: </b><span
+                                            *ngIf="selectedDoctor?.role=='ROLE_DOCTOR'">Doctor</span>
+                                        <span *ngIf="selectedDoctor?.role=='ROLE_USER'">User</span>
+                                        <span *ngIf="selectedDoctor?.role=='ROLE_ADMIN'">Admin</span>
                                     </div>
+                                    <div class="mb-2"><b>Speciality: </b>{{selectedDoctor?.speciality?.name}}</div>
+                                    <div class="mb-2"><b>Gender: </b>{{selectedDoctor?.gender}}</div>
                                 </div>
-                                <div class="form-group my-2">
-                                    <label class="mb-1" for="username">Username</label>
-                                    <input formControlName="username" type="text" class="form-control"
-                                        [readonly]="isEditAbout==false">
-                                </div>
+                                <div *ngIf="!isEditAbout==false" class="about-form">
 
-                                <div class="form-group my-2">
-                                    <label class="mb-1" for="authority">Role</label>
-                                    <select formControlName="role" class=" form-select" name="role">
-                                        <option value="ROLE_USER">User</option>
-                                        <option value="ROLE_DOCTOR">Doctor</option>
-                                        <option value="ROLE_ADMIN">Admin</option>
 
-                                    </select>
-                                </div>
-
-                                <div formGroupName="speciality" class="form-group my-2">
-                                    <label class="mb-1">Speciality</label>
-                                    <select formControlName="name" class="form-select">
-                                        <option *ngFor="let tempSpeciality of specialities"
-                                            [ngValue]="tempSpeciality.name">
-                                            {{tempSpeciality.name}}</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group">
-                                    <div class="form-check ">
-                                        <input class="form-check-input" type="radio" id="flexRadioDefault1"
-                                            formControlName="gender" value="man">
-                                        <label class="form-check-label" for="flexRadioDefault1">
-                                            Man
-                                        </label>
+                                    <div class="form-group my-2 row ">
+                                        <div class="col">
+                                            <label class="mb-1" for="firstName">First Name</label>
+                                            <input formControlName="firstName" type="text" class="form-control">
+                                            <!-- whenever we change smthg in template or the from , the controller will be updated automatically -->
+                                        </div>
+                                        <div class="col">
+                                            <label class="mb-1">Last Name</label>
+                                            <input formControlName="lastName" type="text" class="form-control">
+                                        </div>
                                     </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" id="flexRadioDefault2"
-                                            formControlName="gender" value="woman">
-                                        <label class="form-check-label" for="flexRadioDefault2">
-                                            Woman
-                                        </label>
+                                    <div class="form-group my-2">
+                                        <label class="mb-1" for="username">Username</label>
+                                        <input formControlName="username" type="text" class="form-control">
+                                    </div>
+
+                                    <div class="form-group my-2">
+                                        <label class="mb-1" for="authority">Role</label>
+                                        <select formControlName="role" class=" form-select" name="role">
+                                            <option value="ROLE_USER">User</option>
+                                            <option value="ROLE_DOCTOR">Doctor</option>
+                                            <option value="ROLE_ADMIN">Admin</option>
+
+                                        </select>
+                                    </div>
+
+                                    <div formGroupName="speciality" class="form-group my-2">
+                                        <label class="mb-1">Speciality</label>
+                                        <select formControlName="name" class="form-select">
+                                            <option *ngFor="let tempSpeciality of specialities"
+                                                [ngValue]="tempSpeciality.name">
+                                                {{tempSpeciality.name}}</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="form-check ">
+                                            <input class="form-check-input" type="radio" id="flexRadioDefault1"
+                                                formControlName="gender" value="man">
+                                            <label class="form-check-label" for="flexRadioDefault1">
+                                                Man
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" id="flexRadioDefault2"
+                                                formControlName="gender" value="woman">
+                                            <label class="form-check-label" for="flexRadioDefault2">
+                                                Woman
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
@@ -532,7 +419,7 @@
                                     </button>
                                 </div>
                             </div>
-
+                            <!-- Contact section -->
                             <div class="form-area mt-3 mb-4">
                                 <div class=" form-area-title">
                                     <span><i class="fa fa-envelope" aria-hidden="true"></i> Contact <i
@@ -541,143 +428,207 @@
                                             aria-hidden="true"></i> </span>
                                 </div>
 
-                                <div class="form-group my-2">
-                                    <label class="mb-1" for="email">Email</label>
-                                    <input [readonly]="isEditContact==false" formControlName="email" type="email"
-                                        class=" form-control">
-                                </div>
-                                <div class="form-group my-2">
-                                    <label class="mb-1">Phone number</label>
-                                    <input [readonly]="isEditContact==false" type="number" formControlName="phoneNumber"
-                                        class="form-control">
-                                </div>
+                                <!-- contact info -->
+                                <div *ngIf="isEditContact==false" class="mt-2" id="contact-info">
+                                    <div class="row mb-2">
+                                        <div class="col"> <b>Email:</b> {{selectedDoctor?.email}}</div>
 
-                                <div formGroupName="address">
-                                    <div class="my-2 row">
-                                        <div class="col">
-                                            <label class="mb-1">Country</label>
-                                            <select formControlName="country" class="form-select"
-                                                (change)="getStates(editDoctorForm.controls['address'].value.country);resetAddress('country')">
-                                                <option *ngFor="let tempCountry of countries"
-                                                    [ngValue]="tempCountry.name">
-                                                    {{tempCountry.name}}
-                                                </option>
-                                            </select>
-                                        </div>
-                                        <div class="col">
-                                            <label class="mb-1">State</label>
-                                            <select formControlName="state" class="form-select"
-                                                (change)="getCities(editDoctorForm.controls['address'].value.state);resetAddress('state')">
-                                                <option *ngFor="let tempState of states" [ngValue]="tempState.name"
-                                                    (change)="getCities(editDoctorForm.value.state)">
-                                                    {{tempState.name}}
-                                                </option>
-                                            </select>
-                                        </div>
                                     </div>
-                                    <div class="my-2 row">
-                                        <div class="col">
-                                            <label class="mb-1">City</label>
-                                            <select formControlName="city" class="form-select"
-                                                (change)="resetAddress('city')">
-                                                <option *ngFor="let tempCity of cities" [ngValue]="tempCity.name">
-                                                    {{tempCity.name}}
-                                            </select>
-                                        </div>
-                                        <div class="col">
-                                            <label class="mb-1">Address</label>
-                                            <input formControlName="street" class="form-control" type="text"
-                                                [readonly]="isEditContact==false" placeholder="Address(street,center)">
-                                        </div>
+                                    <div class="row mb-2">
+                                        <div class="col"> <b> Phone Number:</b> {{selectedDoctor?.phoneNumber}}</div>
                                     </div>
+
+                                    <div class="mb-2"><b>Address: </b>{{selectedDoctor?.address?.street}}
+                                        {{selectedDoctor?.address?.city}} {{selectedDoctor?.address?.state}}
+                                        {{selectedDoctor?.address?.country}}</div>
                                 </div>
-                                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
-                                    <button *ngIf="!isEditContact==false" class="btn purple-btn save-doctor-info-btn"
-                                        type="button">Save
-                                    </button>
+                                <!-- Edit contact info -->
+                                <div *ngIf="!isEditContact==false" class="contact-form">
+                                    <div class="form-group my-2">
+                                        <label class="mb-1" for="email">Email</label>
+                                        <input formControlName="email" type="email" class=" form-control">
+                                    </div>
+                                    <div class="form-group my-2">
+                                        <label class="mb-1">Phone number</label>
+                                        <input type="number" formControlName="phoneNumber" class="form-control">
+                                    </div>
+
+                                    <div formGroupName="address">
+                                        <div class="my-2 row">
+                                            <div class="col">
+                                                <label class="mb-1">Country</label>
+                                                <select formControlName="country" class="form-select"
+                                                    (change)="getStates(editDoctorForm.controls['address'].value.country);resetAddress('country')">
+                                                    <option *ngFor="let tempCountry of countries"
+                                                        [ngValue]="tempCountry.name">
+                                                        {{tempCountry.name}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <div class="col">
+                                                <label class="mb-1">State</label>
+                                                <select formControlName="state" class="form-select"
+                                                    (change)="getCities(editDoctorForm.controls['address'].value.state);resetAddress('state')">
+                                                    <option *ngFor="let tempState of states" [ngValue]="tempState.name"
+                                                        (change)="getCities(editDoctorForm.value.state)">
+                                                        {{tempState.name}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="my-2 row">
+                                            <div class="col">
+                                                <label class="mb-1">City</label>
+                                                <select formControlName="city" class="form-select"
+                                                    (change)="resetAddress('city')">
+                                                    <option *ngFor="let tempCity of cities" [ngValue]="tempCity.name">
+                                                        {{tempCity.name}}
+                                                </select>
+                                            </div>
+                                            <div class="col">
+                                                <label class="mb-1">Address</label>
+                                                <input formControlName="street" class="form-control" type="text"
+                                                    placeholder="Address(street,center)">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                                        <button class="btn purple-btn save-doctor-info-btn" type="button">Save
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
+                            <!-- End contact section -->
+
+                            <!-- Account status section -->
 
                             <div class="form-area mt-3 mb-4">
 
                                 <div class=" form-area-title">
                                     <span><i class="fa fa-unlock-alt" aria-hidden="true"></i> Account status <i
-                                            (click)="onEditDoctor('account')"
+                                            (click)="onEditDoctor('accountStatus')"
                                             class="fa fa-pencil-square-o edit-section-btn" style="cursor:pointer ;"
                                             aria-hidden="true"></i></span>
                                 </div>
-                                <div class="row my-2">
-                                    <div class="col">
-                                        <div class="form-group">
-                                            <div class="form-check ">
-                                                <input class="form-check-input" type="radio" id="flexRadioDefault1"
-                                                    formControlName="status" value="VERIFIED"
-                                                    (change)="changeLockoutStatus()">
-                                                <label class="form-check-label" for="flexRadioDefault1">
-                                                    Verified
-                                                </label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" id="flexRadioDefault2"
-                                                    formControlName="status" value="UNDER_VERIFICATION"
-                                                    (change)="changeLockoutStatus()">
-                                                <label class="form-check-label" for="flexRadioDefault2">
-                                                    Under Verification
-                                                </label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" id="flexRadioDefault3"
-                                                    formControlName="status" value="NOT_VERIFIED"
-                                                    (change)="changeLockoutStatus()">
-                                                <label class="form-check-label" for="flexRadioDefault3">
-                                                    Not verified
-                                                </label>
-                                            </div>
+
+                                <!-- Account status info -->
+                                <div *ngIf="isEditAccountStatus==false" class="mt-2" id="account-status-info">
+                                    <div class="row mb-2">
+                                        <div class="col"> <b>Status: </b><span
+                                                *ngIf="selectedDoctor?.status=='VERIFIED'"
+                                                class="badge bg-success">Verified</span>
+                                            <span *ngIf="selectedDoctor?.status=='NOT_VERIFIED'"
+                                                class="badge bg-danger">Not
+                                                verified</span>
+                                            <span *ngIf="selectedDoctor?.status=='UNDER_VERIFICATION'"
+                                                class="badge bg-warning">Under
+                                                verifiation</span>
                                         </div>
 
-                                    </div>
-                                    <div class="col">
-                                        <div class="form-group">
 
-                                            <div class="form-check form-switch">
-                                                <input class="form-check-input" type="checkbox"
-                                                    formControlName="active">
-                                                <label class="form-check-label" for="">Active status</label>
+                                        <div class="col">
+                                            <div class="mb-2"> <b> Active status: </b> <span
+                                                    [hidden]="!selectedDoctor?.active"
+                                                    class="badge bg-success">Active</span>
+                                                <span [hidden]="selectedDoctor?.active" class="badge bg-danger">Inactive
+                                                </span>
                                             </div>
-                                            <div class="form-check form-switch">
-                                                <input class="form-check-input" type="checkbox"
-                                                    [readonly]="isEditAccount==false" formControlName="notLocked">
-                                                <label class="form-check-label" for="">Lockout status</label>
+                                            <div class="mb-2"> <b> Lockout status: </b> <span
+                                                    [hidden]="selectedDoctor?.notLocked">
+                                                    <i class="fa fa-lock float-right" style="color: red;">
+                                                    </i>
+                                                    Account Locked
+                                                </span>
+
+                                                <span [hidden]="!selectedDoctor?.notLocked">
+                                                    <i class="fa fa-unlock float-right" style="color: green;">
+                                                    </i>
+                                                    Account Unlocked
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
+
                                 </div>
-                                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
-                                    <button *ngIf="!isEditAccount==false" class="btn purple-btn save-doctor-info-btn"
-                                        type="button">Save
-                                    </button>
+                                <!-- Edit account status info -->
+                                <div *ngIf="!isEditAccountStatus==false" class="account-status-form">
+                                    <div class="row my-2">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <div class="form-check ">
+                                                    <input class="form-check-input" type="radio" id="flexRadioDefault1"
+                                                        formControlName="status" value="VERIFIED"
+                                                        (change)="changeLockoutStatus()">
+                                                    <label class="form-check-label" for="flexRadioDefault1">
+                                                        Verified
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" id="flexRadioDefault2"
+                                                        formControlName="status" value="UNDER_VERIFICATION"
+                                                        (change)="changeLockoutStatus()">
+                                                    <label class="form-check-label" for="flexRadioDefault2">
+                                                        Under Verification
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" id="flexRadioDefault3"
+                                                        formControlName="status" value="NOT_VERIFIED"
+                                                        (change)="changeLockoutStatus()">
+                                                    <label class="form-check-label" for="flexRadioDefault3">
+                                                        Not verified
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="col">
+                                            <div class="form-group">
+
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" type="checkbox"
+                                                        formControlName="active">
+                                                    <label class="form-check-label" for="">Active status</label>
+                                                </div>
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" type="checkbox"
+                                                        formControlName="notLocked">
+                                                    <label class="form-check-label" for="">Lockout status</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                                        <button class="btn purple-btn save-doctor-info-btn" type="button">Save
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
+                            <!-- End account status section -->
+
+
                             <div class="form-area mt-3 mb-1">
                                 <div class=" form-area-title">
                                     <span><i class="fa fa-key" aria-hidden="true"></i> Change Password <i
-                                            (click)="onEditDoctor('password')"
-                                            class="fa fa-pencil-square-o edit-section-btn"
-                                            aria-hidden="true"></i></span>
+                                            class="fa fa-pencil-square-o edit-section-btn" style="cursor: pointer;"
+                                            (click)="onEditDoctor('password')" aria-hidden="true"></i></span>
                                 </div>
-                                <div class="form-group my-2">
-                                    <label class="mb-1" for="password">Password</label>
-                                    <input id="password" formControlName="password" type="password"
-                                        class="form-control">
-                                </div>
-                                <div class="form-group my-2">
-                                    <label class="mb-1" for="password">Confirm password</label>
-                                    <input id="password" type="password" class="form-control">
-                                </div>
-                                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
-                                    <button *ngIf="!isEditPassword==false" class="btn purple-btn save-doctor-info-btn"
-                                        type="button">Save
-                                    </button>
+                                <!-- Edit account status info -->
+                                <div *ngIf="!isEditPassword==false" class="change-password-form">
+                                    <div class="form-group my-2">
+                                        <label class="mb-1" for="password">Password</label>
+                                        <input id="password" formControlName="password" type="password"
+                                            class="form-control">
+                                    </div>
+                                    <div class="form-group my-2">
+                                        <label class="mb-1" for="password">Confirm password</label>
+                                        <input id="password" type="password" class="form-control">
+                                    </div>
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                                        <button *ngIf="!isEditPassword==false"
+                                            class="btn purple-btn save-doctor-info-btn" type="button">Save
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 

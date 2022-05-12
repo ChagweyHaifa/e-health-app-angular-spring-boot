@@ -66,7 +66,7 @@ export class UserComponent implements OnInit, OnDestroy {
   currentUserUsername: string;
   isEditAbout: boolean = false;
   isEditContact: boolean = false;
-  isEditAccount: boolean = false;
+  isEditAccountStatus: boolean = false;
   isEditPassword: boolean;
 
   constructor(
@@ -78,27 +78,32 @@ export class UserComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder
   ) {
     this.editDoctorForm = this.formBuilder.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
-      username: ['', Validators.required],
-      role: ['', Validators.required],
-      password: [''],
-      gender: ['', Validators.required],
-      email: ['', Validators.required],
-      phoneNumber: [Validators.required],
-      address: this.formBuilder.group({
-        country: new FormControl('', [Validators.required]),
-        state: new FormControl('', [Validators.required]),
-        city: new FormControl('', [Validators.required]),
-        street: new FormControl('', [Validators.required]),
+      about: this.formBuilder.group({
+        firstName: [''],
+        lastName: [''],
+        username: [''],
+        role: [''],
+        speciality: this.formBuilder.group({
+          id: new FormControl(''),
+          name: new FormControl(''),
+        }),
+        gender: [''],
       }),
-      speciality: this.formBuilder.group({
-        id: new FormControl('', [Validators.required]),
-        name: new FormControl('', [Validators.required]),
+      contact: this.formBuilder.group({
+        email: [''],
+        phoneNumber: [],
+        address: this.formBuilder.group({
+          country: new FormControl(''),
+          state: new FormControl(''),
+          city: new FormControl(''),
+          street: new FormControl(''),
+        }),
       }),
-      status: ['', Validators.required],
-      active: [Validators.required],
-      notLocked: [Validators.required],
+      accountStatus: this.formBuilder.group({
+        status: [''],
+        active: [],
+        notLocked: [],
+      }),
     });
   }
 
@@ -156,62 +161,38 @@ export class UserComponent implements OnInit, OnDestroy {
     );
   }
 
-  // ****display user info****
-  public viewDoctorInfo(selectedDoctor: Doctor): void {
-    this.selectedDoctor = selectedDoctor;
-    this.clickButton('openDoctorInfo');
-  }
-
   launchEditDoctorModal(doctor: Doctor) {
     this.isEditAbout = false;
-    this.isEditAccount = false;
+    this.isEditAccountStatus = false;
     this.isEditContact = false;
+    this.isEditPassword = false;
     this.selectedDoctor = doctor;
     this.currentUserUsername = doctor.username;
     this.getCountries();
     this.getStates(doctor.address.country);
     this.getCities(doctor.address.state);
-    console.log(doctor);
+    // console.log(doctor);
     this.editDoctorForm.patchValue(doctor);
     this.clickButton('edit-doctor-modal-trigger-btn');
-    this.editDoctorForm.controls['role'].disable();
-    this.editDoctorForm.controls['gender'].disable();
-    this.editDoctorForm.controls['speciality'].disable();
-    this.editDoctorForm.controls['address'].get('country').disable();
-    this.editDoctorForm.controls['address'].get('state').disable();
-    this.editDoctorForm.controls['address'].get('city').disable();
-    this.editDoctorForm.controls['status'].disable();
-    this.editDoctorForm.controls['active'].disable();
-    this.editDoctorForm.controls['notLocked'].disable();
-    this.editDoctorForm.controls['password'].disable();
   }
+
   onEditDoctor(section: string) {
     switch (section) {
       case 'about': {
         this.isEditAbout = true;
-        this.editDoctorForm.controls['role'].enable();
-        this.editDoctorForm.controls['gender'].enable();
-        this.editDoctorForm.controls['speciality'].enable();
+        this.editDoctorForm.patchValue({});
         break;
       }
       case 'contact': {
         this.isEditContact = true;
-        this.editDoctorForm.controls['address'].get('country').enable();
-        this.editDoctorForm.controls['address'].get('state').enable();
-        this.editDoctorForm.controls['address'].get('city').enable();
         break;
       }
-      case 'account': {
-        this.isEditAccount = true;
-        this.editDoctorForm.controls['status'].enable();
-        this.editDoctorForm.controls['active'].enable();
-        this.editDoctorForm.controls['notLocked'].enable();
+      case 'accountStatus': {
+        this.isEditAccountStatus = true;
         break;
       }
       case 'password': {
-        this.editDoctorForm.controls['password'].enable();
-
-        // this.isEditPassword = true;
+        this.isEditPassword = true;
         break;
       }
     }
