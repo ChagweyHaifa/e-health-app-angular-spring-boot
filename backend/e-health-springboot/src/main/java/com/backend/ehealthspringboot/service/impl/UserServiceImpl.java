@@ -35,14 +35,14 @@ import com.backend.ehealthspringboot.service.LoginAttemptService;
 import com.backend.ehealthspringboot.service.UserService;
 
 import javax.mail.MessagingException;
-//import javax.persistence.AssociationOverride;
-import static com.backend.ehealthspringboot.enumeration.Role.ROLE_DOCTOR;
-import static com.backend.ehealthspringboot.enumeration.Role.ROLE_VISITOR;
+
+
+import static com.backend.ehealthspringboot.enumeration.Role.ROLE_USER;
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.springframework.http.MediaType.*;
 import static com.backend.ehealthspringboot.constant.UserImplConstant.*;
 import static com.backend.ehealthspringboot.constant.FileConstant.*;
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
 
 @Service
 @Transactional
@@ -56,12 +56,12 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
 
     private UserRepository userRepository;
     private DoctorRepository doctorRepository;
-    private VisitorRepository visitorRepository;
+
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            DoctorRepository doctorRepository,
-                           VisitorRepository visitorRepository,
+
                            BCryptPasswordEncoder passwordEncoder,
                            LoginAttemptService loginAttemptService,
                            EmailService emailService) {
@@ -71,7 +71,7 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
         this.emailService = emailService;
         this.userRepository = userRepository;
         this.doctorRepository = doctorRepository;
-        this.visitorRepository = visitorRepository;
+
     }
 
     @Override
@@ -86,15 +86,7 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
         }
     }
 
-    @Override
-    public User findUserByUsername(String username) {
-        return userRepository.findUserByUsername(username);
-    }
 
-    @Override
-    public User findUserByEmail(String email) {
-        return userRepository.findUserByEmail(email);
-    }
 
 	@Override
 //    this funtion is executed when the user trys to log in
@@ -113,6 +105,34 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
             return userPrincipal;
         }
 	}
+
+    @Override
+    public User findUserByUsername(String username) {
+        return userRepository.findUserByUsername(username);
+    }
+
+    @Override
+    public User findUserByEmail(String email) {
+        return userRepository.findUserByEmail(email);
+    }
+
+    @Override
+    public User register(User user) throws UserNotFoundException, UsernameExistException, EmailExistException {
+        validateNewUsernameAndEmail(EMPTY, user.getUsername(), user.getEmail());
+        user.setUserId(generateUserId());
+        String password = generatePassword();
+        user.setJoinDate(new Date());
+        user.setPassword(encodePassword(password));
+        user.setActive(true);
+        user.setNotLocked(true);
+//        emailService.sendNewPasswordEmail(firstName, password, email);
+//        set a default image for user
+        LOGGER.info("New user password: " + password);
+        user.setRole(ROLE_USER.name());
+        user.setAuthorities(ROLE_USER.getAuthorities());
+        userRepository.save(user);
+        return user;
+    }
 
 
 //    @Override

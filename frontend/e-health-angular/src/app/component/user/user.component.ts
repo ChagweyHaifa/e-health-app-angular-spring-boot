@@ -2,17 +2,28 @@ import {
   HttpErrorResponse,
   HttpEvent,
   HttpEventType,
+  HttpResponse,
 } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  NgForm,
+  Validators,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { NotificationType } from 'src/app/enum/notification-type.enum';
 import { Role } from 'src/app/enum/role.enum';
+import { City } from 'src/app/model/city';
+import { Country } from 'src/app/model/country';
 import { CustomHttpResponse } from 'src/app/model/custom-http-response';
 import { Doctor } from 'src/app/model/doctor';
+import { DoctorDto } from 'src/app/model/doctor-dto';
 import { FileUploadStatus } from 'src/app/model/file-upload-status';
 import { Speciality } from 'src/app/model/speciality';
+import { State } from 'src/app/model/state';
 import { User } from 'src/app/model/user';
 import { AuthenticationService } from 'src/app/service/authentication.service';
 import { FormService } from 'src/app/service/form.service';
@@ -43,17 +54,53 @@ export class UserComponent implements OnInit, OnDestroy {
   public fileStatus = new FileUploadStatus();
 
   private subscriptions: Subscription[] = [];
-  selectedDoctor: Doctor;
-  public users: any;
   doctors: Doctor[];
+  public users: User[];
   specialities: Speciality[];
+  selectedDoctor = new Doctor();
+
+  countries: Country[];
+  states: State[];
+  cities: City[];
+  editDoctorForm: FormGroup;
+  currentUserUsername: string;
+  isEditAbout: boolean = false;
+  isEditContact: boolean = false;
+  isEditAccount: boolean = false;
+  isEditPassword: boolean;
+
   constructor(
     private userService: UserService,
     private notificationService: NotificationService,
     private authenticationService: AuthenticationService,
     private formService: FormService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private formBuilder: FormBuilder
+  ) {
+    this.editDoctorForm = this.formBuilder.group({
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
+      username: ['', Validators.required],
+      role: ['', Validators.required],
+      password: [''],
+      gender: ['', Validators.required],
+      email: ['', Validators.required],
+      phoneNumber: [Validators.required],
+      address: this.formBuilder.group({
+        country: new FormControl('', [Validators.required]),
+        state: new FormControl('', [Validators.required]),
+        city: new FormControl('', [Validators.required]),
+        street: new FormControl('', [Validators.required]),
+      }),
+      speciality: this.formBuilder.group({
+        id: new FormControl('', [Validators.required]),
+        name: new FormControl('', [Validators.required]),
+      }),
+      status: ['', Validators.required],
+      active: [Validators.required],
+      notLocked: [Validators.required],
+    });
+  }
 
   ngOnInit(): void {
     this.loggedInUser = this.authenticationService.getUserFromLocalCache();
@@ -80,7 +127,7 @@ export class UserComponent implements OnInit, OnDestroy {
   public getUsers(role: string): void {
     this.subscriptions.push(
       this.userService.getUsersByRole(role).subscribe(
-        (response: any) => {
+        (response: User[]) => {
           this.users = response;
         },
         (errorResponse: HttpErrorResponse) => {
@@ -113,6 +160,171 @@ export class UserComponent implements OnInit, OnDestroy {
   public viewDoctorInfo(selectedDoctor: Doctor): void {
     this.selectedDoctor = selectedDoctor;
     this.clickButton('openDoctorInfo');
+  }
+
+  launchEditDoctorModal(doctor: Doctor) {
+    this.isEditAbout = false;
+    this.isEditAccount = false;
+    this.isEditContact = false;
+    this.selectedDoctor = doctor;
+    this.currentUserUsername = doctor.username;
+    this.getCountries();
+    this.getStates(doctor.address.country);
+    this.getCities(doctor.address.state);
+    console.log(doctor);
+    this.editDoctorForm.patchValue(doctor);
+    this.clickButton('edit-doctor-modal-trigger-btn');
+    this.editDoctorForm.controls['role'].disable();
+    this.editDoctorForm.controls['gender'].disable();
+    this.editDoctorForm.controls['speciality'].disable();
+    this.editDoctorForm.controls['address'].get('country').disable();
+    this.editDoctorForm.controls['address'].get('state').disable();
+    this.editDoctorForm.controls['address'].get('city').disable();
+    this.editDoctorForm.controls['status'].disable();
+    this.editDoctorForm.controls['active'].disable();
+    this.editDoctorForm.controls['notLocked'].disable();
+    this.editDoctorForm.controls['password'].disable();
+  }
+  onEditDoctor(section: string) {
+    switch (section) {
+      case 'about': {
+        this.isEditAbout = true;
+        this.editDoctorForm.controls['role'].enable();
+        this.editDoctorForm.controls['gender'].enable();
+        this.editDoctorForm.controls['speciality'].enable();
+        break;
+      }
+      case 'contact': {
+        this.isEditContact = true;
+        this.editDoctorForm.controls['address'].get('country').enable();
+        this.editDoctorForm.controls['address'].get('state').enable();
+        this.editDoctorForm.controls['address'].get('city').enable();
+        break;
+      }
+      case 'account': {
+        this.isEditAccount = true;
+        this.editDoctorForm.controls['status'].enable();
+        this.editDoctorForm.controls['active'].enable();
+        this.editDoctorForm.controls['notLocked'].enable();
+        break;
+      }
+      case 'password': {
+        this.editDoctorForm.controls['password'].enable();
+
+        // this.isEditPassword = true;
+        break;
+      }
+    }
+  }
+
+  getCountries() {
+    this.subscriptions.push(
+      this.formService.getCountries().subscribe(
+        (response: Country[]) => {
+          this.countries = response;
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendNotification(
+            NotificationType.ERROR,
+            errorResponse.error.message
+          );
+        }
+      )
+    );
+  }
+
+  resetAddress(address: string) {
+    switch (address) {
+      case 'country': {
+        this.editDoctorForm.controls['address'].patchValue({
+          state: '',
+          city: '',
+          street: '',
+        });
+        break;
+      }
+      case 'state': {
+        this.editDoctorForm.controls['address'].patchValue({
+          city: '',
+          street: '',
+        });
+        break;
+      }
+      case 'city': {
+        this.editDoctorForm.controls['address'].patchValue({
+          street: '',
+        });
+        break;
+      }
+    }
+  }
+
+  changeLockoutStatus() {
+    const lockoutStatus = this.editDoctorForm.value.status;
+    if (lockoutStatus == 'VERIFIED') {
+      this.editDoctorForm.controls.notLocked.setValue(true);
+    } else {
+      this.editDoctorForm.controls.notLocked.setValue(false);
+    }
+  }
+  getStates(countryName: string) {
+    this.subscriptions.push(
+      this.formService.getStates(countryName).subscribe(
+        (response: State[]) => {
+          this.states = response;
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendNotification(
+            NotificationType.ERROR,
+            errorResponse.error.message
+          );
+        }
+      )
+    );
+  }
+
+  getCities(stateName: string) {
+    this.subscriptions.push(
+      this.formService.getCities(stateName).subscribe(
+        (response: City[]) => {
+          this.cities = response;
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendNotification(
+            NotificationType.ERROR,
+            errorResponse.error.message
+          );
+        }
+      )
+    );
+  }
+
+  public editProfileImage(event: Event): void {
+    this.profileImage = (<HTMLInputElement>event.target).files[0];
+    this.fileName = this.profileImage.name;
+  }
+
+  editDoctor() {
+    // console.log(this.editDoctorForm.value);
+    const doctorDto = new DoctorDto();
+    doctorDto.doctor = this.editDoctorForm.value;
+    doctorDto.profileImage = this.profileImage;
+    doctorDto.currentDoctorUsername = this.currentUserUsername;
+    console.log(doctorDto);
+
+    this.subscriptions.push(
+      this.userService.updateDoctor(doctorDto).subscribe(
+        (response: HttpResponse<Doctor>) => {
+          this.getDoctors();
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendNotification(
+            NotificationType.ERROR,
+            errorResponse.error.message
+          );
+        }
+      )
+    );
   }
 
   // ****display user info****
@@ -160,25 +372,22 @@ export class UserComponent implements OnInit, OnDestroy {
   }
 
   // ****search user****
-  public searchUsers(searchTerm: string): void {
-    console.log('searchTerm = "' + searchTerm + '"');
-    const results: User[] = [];
-    for (const user of this.userService.getUsersFromLocalCache()) {
-      if (
-        user.firstName.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
-        user.lastName.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
-        user.username.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
-        user.userId.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
-      ) {
-        results.push(user);
-      }
-    }
-    console.log('length' + results.length);
-    this.users = results;
-    // if (results.length === 0) {
-    //   this.users = this.userService.getUsersFromLocalCache();
-    // }
-  }
+  // public searchUsers(searchTerm: string): void {
+  //   console.log('searchTerm = "' + searchTerm + '"');
+  //   const results: User[] = [];
+  //   for (const user of this.userService.getUsersFromLocalCache()) {
+  //     if (
+  //       user.firstName.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
+  //       user.lastName.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
+  //       user.username.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
+  //       user.userId.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
+  //     ) {
+  //       results.push(user);
+  //     }
+  //   }
+  //   console.log('length' + results.length);
+  //   this.users = results;
+  // }
 
   // ****edit user****
   // user selection
@@ -231,24 +440,6 @@ export class UserComponent implements OnInit, OnDestroy {
       )
     );
   }
-  // ****change password****
-  public onResetPassword(emailForm: NgForm): void {
-    this.refreshing = true;
-    const emailAddress = emailForm.value['reset-password-email'];
-    this.subscriptions.push(
-      this.userService.resetPassword(emailAddress).subscribe(
-        (response: CustomHttpResponse) => {
-          this.sendNotification(NotificationType.SUCCESS, response.message);
-          this.refreshing = false;
-        },
-        (error: HttpErrorResponse) => {
-          this.sendNotification(NotificationType.WARNING, error.error.message);
-          this.refreshing = false;
-        },
-        () => emailForm.reset()
-      )
-    );
-  }
 
   // edit user profile
   // we can pass loggedInUser variable
@@ -291,55 +482,10 @@ export class UserComponent implements OnInit, OnDestroy {
     this.clickButton('profile-image-input');
   }
 
-  public onProfileImageChange(event: Event): void {
-    // console.log(event);
-    this.profileImage = (<HTMLInputElement>event.target).files[0];
-    this.fileName = this.profileImage.name;
-    // console.log(this.profileImage);
-    // console.log("filename:" + this.fileName);
-  }
-
-  onUpdateProfileImage() {
-    // const formData = new FormData();
-    // formData.append('username', this.loggedInUser.username);
-    // formData.append('profileImage', this.profileImage);
-    // this.subscriptions.push(
-    //   this.userService.updateProfileImage(formData).subscribe(
-    //     (event: HttpEvent<any>) => {
-    //       // this.reportUploadProgress(event);
-    //     },
-    //     (errorResponse: HttpErrorResponse) => {
-    //       this.sendNotification(
-    //         NotificationType.ERROR,
-    //         errorResponse.error.message
-    //       );
-    //       this.fileStatus.status = 'done';
-    //     }
-    //   )
-    // );
-  }
-
-  onLogOut(): void {
-    this.authenticationService.logOut();
-    this.router.navigate(['/login']);
-    this.sendNotification(
-      NotificationType.SUCCESS,
-      `You've been successfully logged out`
-    );
-  }
-
   public get isAdmin(): boolean {
     return this.getUserRole() === Role.ADMIN;
     //|| this.getUserRole() === Role.SUPER_ADMIN
   }
-
-  // public get isManager(): boolean {
-  //   return this.isAdmin || this.getUserRole() === Role.MANAGER;
-  // }
-
-  // public get isAdminOrManager(): boolean {
-  //   return this.isAdmin || this.isManager;
-  // }
 
   // private methods
   private clickButton(buttonId: string) {

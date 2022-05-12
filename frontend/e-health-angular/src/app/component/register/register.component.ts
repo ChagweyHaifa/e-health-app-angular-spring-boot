@@ -111,12 +111,12 @@ export class RegisterComponent implements OnInit, OnDestroy {
     );
   }
 
-  onRegisterVisitor(visitor: Visitor) {
+  onRegisterVisitor(user: User) {
     // console.log(visitor);
     this.showLoading = true;
     this.subscriptions.push(
-      this.authenticationService.registerVisitor(visitor).subscribe(
-        (response: Visitor) => {
+      this.authenticationService.registerUser(user).subscribe(
+        (response: User) => {
           // console.log(response);
           this.showLoading = false;
           this.sendNotification(

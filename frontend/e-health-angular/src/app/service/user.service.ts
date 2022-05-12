@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { User } from '../model/user';
 import { CustomHttpResponse } from '../model/custom-http-response';
 import { Doctor } from '../model/doctor';
+import { DoctorDto } from '../model/doctor-dto';
 
 @Injectable({
   providedIn: 'root',
@@ -55,8 +56,13 @@ export class UserService {
     );
   }
 
-  public updateDoctor(doctor: Doctor): Observable<HttpResponse<Doctor>> {
-    return this.http.put<Doctor>(`${this.host}/users/doctors`, doctor, {
+  // public updateDoctor(doctor: Doctor): Observable<HttpResponse<Doctor>> {
+  //   return this.http.put<Doctor>(`${this.host}/users/doctors`, doctor, {
+  //     observe: 'response',
+  //   });
+  // }
+  public updateDoctor(doctorDto: DoctorDto): Observable<HttpResponse<Doctor>> {
+    return this.http.put<Doctor>(`${this.host}/users/doctors`, doctorDto, {
       observe: 'response',
     });
   }

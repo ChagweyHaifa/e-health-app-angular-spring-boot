@@ -1,18 +1,11 @@
+import { Status } from '../enum/status.enum';
 import { Speciality } from './speciality';
 import { User } from './user';
 
 export class Doctor extends User {
-  speciality: Speciality;
-  nbOfRecommendations: number;
-  nbOfReviews: number;
+  status: string;
+  speciality: Speciality = new Speciality();
   public profileImageUrl: string;
   nbOfRatings: number;
   averageOfRatings: number;
-  constructor() {
-    super();
-    this.speciality = new Speciality();
-    this.nbOfRecommendations = 0;
-    this.nbOfReviews = 0;
-    this.profileImageUrl = '';
-  }
 }

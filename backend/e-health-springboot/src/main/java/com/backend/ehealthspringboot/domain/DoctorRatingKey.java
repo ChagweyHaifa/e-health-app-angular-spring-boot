@@ -14,8 +14,8 @@ import java.util.Objects;
 @Embeddable
 public class DoctorRatingKey implements Serializable {
 
-    @Column(name = "visitor_id")
-    Long visitorId;
+    @Column(name = "user_id")
+    Long userId;
 
     @Column(name = "doctor_id")
     Long doctorId;
@@ -23,8 +23,8 @@ public class DoctorRatingKey implements Serializable {
     public DoctorRatingKey() {
     }
 
-    public DoctorRatingKey(Long doctorId, Long visitorId) {
-        this.visitorId = visitorId;
+    public DoctorRatingKey(Long doctorId, Long userId) {
+        this.userId = userId;
         this.doctorId = doctorId;
 
     }
@@ -34,12 +34,12 @@ public class DoctorRatingKey implements Serializable {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
         DoctorRatingKey  doctorRatingKey  = ( DoctorRatingKey ) object;
-        return visitorId.equals(doctorRatingKey.visitorId) &&
+        return userId.equals(doctorRatingKey.userId) &&
                 doctorId.equals(doctorRatingKey.doctorId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(visitorId, doctorId);
+        return Objects.hash(userId, doctorId);
     }
 }

@@ -10,7 +10,8 @@ public interface DoctorRatingRepository extends JpaRepository<DoctorRating,Long>
 
     List<DoctorRating> findByDoctorUsername(String username);
 
-    DoctorRating findByVisitorUsernameAndDoctorUsername(String loggedInVisitorUsername, String doctorUsername);
 
 
+
+    DoctorRating findByUserUsernameAndDoctorUsername(String loggedInUsername, String doctorUsername);
 }

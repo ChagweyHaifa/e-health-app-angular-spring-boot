@@ -5,7 +5,8 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.HashSet;
+
+
 import java.util.List;
 import java.util.Set;
 
@@ -14,6 +15,10 @@ import java.util.Set;
 //@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,property = "id")
 @DiscriminatorValue(value="doctor")
 public class Doctor extends User {
+
+
+    @Column(name="status")
+    private String status;
 
     @Column(name="profile_image_url")
     private String profileImageUrl;
@@ -24,7 +29,7 @@ public class Doctor extends User {
 
     @JsonIgnore
     @OneToMany(mappedBy = "doctor")
-    List<DoctorRating> ratings;
+    List<DoctorRating> doctorRatings;
 
     @Column(name = "nb_of_ratings",columnDefinition = "Integer default 0")
     private Integer nbOfRatings = 0;
@@ -61,16 +66,16 @@ public class Doctor extends User {
 //    }
     public void calculateAverageOfRating(){
 
-        if(this.ratings==null){
-            this.ratings = new ArrayList<>();
+        if(this.doctorRatings==null){
+            this.ratings =  new ArrayList<>();
         }
 
-        if(this.ratings.size() != 0){
+        if(this.doctorRatings.size() != 0){
             float sum = 0;
-            for (int i = 0; i < this.ratings.size(); i++){
-                sum = sum + this.ratings.get(i).getRating();
+            for (int i = 0; i < this.doctorRatings.size(); i++){
+                sum = sum + this.doctorRatings.get(i).getRating();
             }
-            this.averageOfRatings = sum/this.ratings.size();
+            this.averageOfRatings = sum/this.doctorRatings.size();
         }
         else{
             this.averageOfRatings = 0;

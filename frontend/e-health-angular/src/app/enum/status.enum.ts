@@ -1,0 +1,5 @@
+export enum Status {
+  VERIFIED,
+  NOT_VERIFIED,
+  UNDER_VERIFICATION,
+}

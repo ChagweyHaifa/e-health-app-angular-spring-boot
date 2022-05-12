@@ -41,9 +41,7 @@ export class AuthInterceptor implements HttpInterceptor {
     }
 
     if (
-      httpRequest.url.includes(
-        `${this.authenticationService.host}/users/visitors/register`
-      )
+      httpRequest.url.includes(`${this.authenticationService.host}/register`)
     ) {
       return httpHandler.handle(httpRequest);
     }

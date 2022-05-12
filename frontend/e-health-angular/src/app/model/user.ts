@@ -8,6 +8,7 @@ export class User {
   public email: string;
   public address: Address;
   public phoneNumber: string;
+
   public gender: string;
   public lastLoginDate: Date;
   public lastLoginDateDisplay: Date;

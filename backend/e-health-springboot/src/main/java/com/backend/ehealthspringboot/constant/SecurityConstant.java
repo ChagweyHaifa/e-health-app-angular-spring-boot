@@ -12,10 +12,10 @@ public class SecurityConstant {
     public static final String FORBIDDEN_MESSAGE = "You need to log in to access this page";
     public static final String ACCESS_DENIED_MESSAGE = "You do not have permission to access this page";
     public static final String OPTIONS_HTTP_METHOD = "OPTIONS";
-    public static final String[] PUBLIC_URLS = { "/api/login", "/api/users/doctors/register","/api/users/visitors/register", "/api/users/doctors/image/**" ,
+    public static final String[] PUBLIC_URLS = { "/api/login", "/api/users/doctors/register","/api/register", "/api/users/doctors/image/**" ,
             "/api/specialities","/api/countries","/api/states/**","/api/cities/**",
                                             "/api/users/doctors/search/**","/api/ratings/search/**",
-                                                "/api/reviews/search/**","/api/questions","/api/users/**"};
+                                               "/api/questions/**"};
 //    public static final String[] PUBLIC_URLS = {"**"};
 
 }

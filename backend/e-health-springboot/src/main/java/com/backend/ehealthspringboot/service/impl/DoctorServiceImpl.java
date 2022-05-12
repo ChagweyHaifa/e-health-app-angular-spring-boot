@@ -1,13 +1,11 @@
 package com.backend.ehealthspringboot.service.impl;
-
 import com.backend.ehealthspringboot.domain.Doctor;
-import com.backend.ehealthspringboot.domain.DoctorRating;
 import com.backend.ehealthspringboot.domain.User;
+import com.backend.ehealthspringboot.dto.DoctorDto;
 import com.backend.ehealthspringboot.exception.domain.EmailExistException;
 import com.backend.ehealthspringboot.exception.domain.NotAnImageFileException;
 import com.backend.ehealthspringboot.exception.domain.UserNotFoundException;
 import com.backend.ehealthspringboot.exception.domain.UsernameExistException;
-import com.backend.ehealthspringboot.repository.DoctorRatingRepository;
 import com.backend.ehealthspringboot.repository.DoctorRepository;
 import com.backend.ehealthspringboot.repository.UserRepository;
 import com.backend.ehealthspringboot.service.DoctorService;
@@ -35,7 +33,9 @@ import java.util.List;
 import static com.backend.ehealthspringboot.constant.FileConstant.*;
 import static com.backend.ehealthspringboot.constant.FileConstant.JPG_EXTENSION;
 import static com.backend.ehealthspringboot.constant.UserImplConstant.*;
+import static com.backend.ehealthspringboot.enumeration.Role.ROLE_ADMIN;
 import static com.backend.ehealthspringboot.enumeration.Role.ROLE_DOCTOR;
+import static com.backend.ehealthspringboot.enumeration.Status.UNDER_VERIFICATION;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.springframework.http.MediaType.*;
@@ -76,7 +76,8 @@ public class DoctorServiceImpl implements DoctorService {
         doctor.setJoinDate(new Date());
         doctor.setPassword(encodePassword(password));
         doctor.setActive(true);
-        doctor.setNotLocked(true);
+        doctor.setStatus(UNDER_VERIFICATION.name());
+        doctor.setNotLocked(false);
 //        emailService.sendNewPasswordEmail(firstName, password, email);
 //        set a default image for doctor
         LOGGER.info("New user password: " + password);
@@ -106,19 +107,38 @@ public class DoctorServiceImpl implements DoctorService {
                         doctor.getAddress().getCity());
     }
 
+//    @Override
+//    public Doctor updateDoctor(String doctorUsername, Doctor doctor) throws UserNotFoundException, EmailExistException, UsernameExistException {
+//        Doctor newDoctor = validateNewUsernameAndEmail(doctorUsername,doctor.getUsername(),doctor.getEmail());
+//        newDoctor.setFirstName(doctor.getFirstName());
+//        newDoctor.setLastName(doctor.getLastName());
+//        newDoctor.setUsername(doctor.getUsername());
+//        newDoctor.setEmail(doctor.getEmail());
+//        newDoctor.setAddress(doctor.getAddress());
+//        newDoctor.setPhoneNumber(doctor.getPhoneNumber());
+//        newDoctor.setSpeciality(doctor.getSpeciality());
+//        newDoctor.setGender(doctor.getGender());
+//        doctorRepository.save(newDoctor);
+//        return newDoctor;
+//    }
+
     @Override
-    public Doctor updateDoctor(String doctorUsername, Doctor doctor) throws UserNotFoundException, EmailExistException, UsernameExistException {
-        Doctor newDoctor = validateNewUsernameAndEmail(doctorUsername,doctor.getUsername(),doctor.getEmail());
-        newDoctor.setFirstName(doctor.getFirstName());
-        newDoctor.setLastName(doctor.getLastName());
-        newDoctor.setUsername(doctor.getUsername());
-        newDoctor.setEmail(doctor.getEmail());
-        newDoctor.setAddress(doctor.getAddress());
-        newDoctor.setPhoneNumber(doctor.getPhoneNumber());
-        newDoctor.setSpeciality(doctor.getSpeciality());
-        newDoctor.setGender(doctor.getGender());
-        doctorRepository.save(newDoctor);
-        return newDoctor;
+    public Doctor updateDoctor(String loggedInUsername, DoctorDto doctorDto) throws UserNotFoundException, EmailExistException, UsernameExistException, IOException, NotAnImageFileException {
+        User user = userRepository.findUserByUsername(loggedInUsername);
+        if(user == null){
+            throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + loggedInUsername);
+        }
+        if(user.getUsername()==ROLE_ADMIN.name()){
+            Doctor doctor = validateNewUsernameAndEmail(doctorDto.getCurrentDoctorUsername(),doctorDto.getDoctor().getUsername(),doctorDto.getDoctor().getEmail());
+            doctor.setStatus(doctorDto.getDoctor().getStatus());
+            saveProfileImage(doctor,doctorDto.getProfileImage());
+            doctorRepository.save(doctor);
+        }else{
+
+        }
+
+
+        return null;
     }
 
     @Override
@@ -128,12 +148,14 @@ public class DoctorServiceImpl implements DoctorService {
         return doctor;
     }
 
+
+
     private Doctor validateNewUsernameAndEmail(String currentDoctorUsername, String newUsername, String newEmail) throws UserNotFoundException, UsernameExistException, EmailExistException {
         User userByNewUsername = findUserByUsername(newUsername);
         User userByNewEmail = findUserByEmail(newEmail);
 //      updating case
         if(StringUtils.isNotBlank(currentDoctorUsername)) {
-//            get current user info from DB
+//            check if the doctor exists
             Doctor currentDoctor = findDoctorByUsername(currentDoctorUsername);
             if(currentDoctor == null) {
                 throw new UserNotFoundException(NO_DOCTOR_FOUND_BY_USERNAME + currentDoctorUsername);

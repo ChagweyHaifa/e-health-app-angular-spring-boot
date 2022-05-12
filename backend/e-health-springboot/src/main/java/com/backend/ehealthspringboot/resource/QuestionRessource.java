@@ -46,6 +46,7 @@ public class QuestionRessource {
 
 
     @PostMapping("")
+
     public ResponseEntity<Question> addQuestion(HttpServletRequest request , @RequestParam("specialityName") String specialityName,
                                             @RequestParam("questionTitle") String questionTitle,
                                             @RequestParam("question") String question,
@@ -96,6 +97,7 @@ public class QuestionRessource {
     }
 
     @PostMapping("/responses/{questionId}")
+    @PreAuthorize("hasAnyAuthority('questionResponse:create')")
     public ResponseEntity<Question> addResponse(HttpServletRequest request, @PathVariable("questionId") Long questionId ,@RequestBody QuestionResponse questionResponse) throws UserNotFoundException, QuestionNotFoundException, QuestionResponseExistExecption {
         String loggedInUsername = getUsernameFromJWTToken(request);
         Question question = questionService.addResponse(loggedInUsername,questionId,questionResponse);
@@ -112,7 +114,7 @@ public class QuestionRessource {
 
     @DeleteMapping("/responses/{questionId}")
     @PreAuthorize("hasAnyAuthority('questionResponse:delete')")
-    public ResponseEntity<Question> updateResponse(HttpServletRequest request, @PathVariable("questionId") Long questionId) throws Exception {
+    public ResponseEntity<Question> deleteResponse(HttpServletRequest request, @PathVariable("questionId") Long questionId) throws Exception {
         String loggedInUsername = getUsernameFromJWTToken(request);
         Question question = questionService.deleteResponse(loggedInUsername,questionId);
         return new ResponseEntity<>(question, OK);

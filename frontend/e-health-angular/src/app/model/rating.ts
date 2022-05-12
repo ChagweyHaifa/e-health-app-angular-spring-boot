@@ -1,15 +1,15 @@
 import { Doctor } from './doctor';
+import { User } from './user';
 import { Visitor } from './visitor';
 
 export class Rating {
-  visitor: Visitor;
+  user: User = new User();
   doctor: Doctor;
   rating: number;
   review: string;
   creationDate: Date;
 
   constructor() {
-    this.visitor = new Visitor();
     this.doctor = new Doctor();
     this.rating = 0;
     this.review = '';

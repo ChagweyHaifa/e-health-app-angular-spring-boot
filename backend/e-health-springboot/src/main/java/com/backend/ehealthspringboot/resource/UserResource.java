@@ -51,6 +51,12 @@ public class UserResource extends ExceptionHandling {
         return new ResponseEntity<>(loginUser, jwtHeader, OK);
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<User> register(@RequestBody User user) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
+        User newUser = userService.register(user);
+        return new ResponseEntity<>(newUser, OK);
+    }
+
 //    @GetMapping("/users")
 //    public ResponseEntity<List<User>> getAllUsers() {
 //        List<User> users = userService.getUsers();

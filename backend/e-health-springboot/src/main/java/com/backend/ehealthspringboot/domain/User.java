@@ -8,6 +8,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -77,5 +78,7 @@ public class User  {
   @OneToMany(mappedBy = "user")
   Set<Question> questions;
 
-
+  @JsonIgnore
+  @OneToMany(mappedBy = "user")
+  List<DoctorRating> ratings;
 }

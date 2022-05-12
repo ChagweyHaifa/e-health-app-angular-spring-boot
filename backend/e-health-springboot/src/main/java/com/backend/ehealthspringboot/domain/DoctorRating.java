@@ -15,9 +15,9 @@ public class DoctorRating {
     DoctorRatingKey id = new DoctorRatingKey();
 
     @ManyToOne
-    @MapsId("visitorId")
-    @JoinColumn(name = "visitor_id")
-    Visitor visitor;
+    @MapsId("userId")
+    @JoinColumn(name = "user_id")
+    User user;
 
     @ManyToOne
     @MapsId("doctorId")

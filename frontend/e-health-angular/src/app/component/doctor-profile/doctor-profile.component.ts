@@ -105,7 +105,7 @@ export class DoctorProfileComponent implements OnInit {
 
   addOrEditDoctorRating() {
     for (let rating of this.ratings) {
-      if (rating.visitor.username == this.loggedInUser.username) {
+      if (rating.user.username == this.loggedInUser.username) {
         this.myRating = rating;
         this.editRatingForm.patchValue({
           rating: rating.rating,

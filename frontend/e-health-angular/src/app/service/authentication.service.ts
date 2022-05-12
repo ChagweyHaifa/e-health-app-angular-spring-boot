@@ -34,11 +34,8 @@ export class AuthenticationService {
   // takes the whole response including the header to get the JSON Web Token
   // by default it just get the body
 
-  public registerVisitor(visitor: Visitor): Observable<Visitor> {
-    return this.http.post<Visitor>(
-      `${this.host}/users/visitors/register`,
-      visitor
-    );
+  public registerUser(user: User): Observable<User> {
+    return this.http.post<User>(`${this.host}/register`, user);
   }
 
   public registerDoctor(doctor: Doctor): Observable<Doctor> {
