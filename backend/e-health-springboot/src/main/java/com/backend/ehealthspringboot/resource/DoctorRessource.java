@@ -4,12 +4,9 @@ import com.backend.ehealthspringboot.domain.Doctor;
 import com.backend.ehealthspringboot.domain.DoctorRating;
 import com.backend.ehealthspringboot.domain.User;
 import com.backend.ehealthspringboot.domain.UserPrincipal;
-import com.backend.ehealthspringboot.dto.DoctorDto;
+
 import com.backend.ehealthspringboot.exception.ExceptionHandling;
-import com.backend.ehealthspringboot.exception.domain.EmailExistException;
-import com.backend.ehealthspringboot.exception.domain.NotAnImageFileException;
-import com.backend.ehealthspringboot.exception.domain.UserNotFoundException;
-import com.backend.ehealthspringboot.exception.domain.UsernameExistException;
+import com.backend.ehealthspringboot.exception.domain.*;
 import com.backend.ehealthspringboot.service.DoctorService;
 import com.backend.ehealthspringboot.service.UserService;
 import com.backend.ehealthspringboot.utility.JWTTokenProvider;
@@ -66,21 +63,11 @@ public class DoctorRessource extends ExceptionHandling {
         return new ResponseEntity(doctors, OK);
     }
 
-//    @PutMapping("")
-//    @PreAuthorize("hasAnyAuthority('doctor:update')")
-//    public ResponseEntity<Doctor> updateDoctor(HttpServletRequest request,@RequestBody Doctor theDoctor) throws UserNotFoundException, EmailExistException, UsernameExistException {
-//        String loggedInDoctorUsername = getUsernameFromJWTToken(request);
-//        Doctor doctor = doctorService.updateDoctor(loggedInDoctorUsername, theDoctor);
-//        UserPrincipal userPrincipal = new UserPrincipal(doctor);
-//        HttpHeaders jwtHeader = getJwtHeader(userPrincipal);
-//        return new ResponseEntity(doctor, jwtHeader, OK);
-//    }
-
-    @PutMapping("")
+    @PutMapping("/{username}")
     @PreAuthorize("hasAnyAuthority('doctor:update')")
-    public ResponseEntity<Doctor> updateDoctor(HttpServletRequest request,@RequestBody DoctorDto doctorDto) throws UserNotFoundException, EmailExistException, UsernameExistException, IOException, NotAnImageFileException {
+    public ResponseEntity<Doctor> updateDoctor(HttpServletRequest request,@RequestBody Doctor theDoctor, @PathVariable("username")String currentDoctorUsername) throws Exception {
         String loggedInUsername = getUsernameFromJWTToken(request);
-        Doctor doctor = doctorService.updateDoctor(loggedInUsername, doctorDto);
+        Doctor doctor = doctorService.updateDoctor(loggedInUsername, currentDoctorUsername,theDoctor );
         UserPrincipal userPrincipal = new UserPrincipal(doctor);
         HttpHeaders jwtHeader = getJwtHeader(userPrincipal);
         return new ResponseEntity(doctor, jwtHeader, OK);

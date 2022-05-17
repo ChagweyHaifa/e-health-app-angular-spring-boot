@@ -20,7 +20,6 @@ import { City } from 'src/app/model/city';
 import { Country } from 'src/app/model/country';
 import { CustomHttpResponse } from 'src/app/model/custom-http-response';
 import { Doctor } from 'src/app/model/doctor';
-import { DoctorDto } from 'src/app/model/doctor-dto';
 import { FileUploadStatus } from 'src/app/model/file-upload-status';
 import { Speciality } from 'src/app/model/speciality';
 import { State } from 'src/app/model/state';
@@ -29,6 +28,7 @@ import { AuthenticationService } from 'src/app/service/authentication.service';
 import { FormService } from 'src/app/service/form.service';
 import { NotificationService } from 'src/app/service/notification.service';
 import { UserService } from 'src/app/service/user.service';
+import { SubSink } from 'subsink';
 
 @Component({
   selector: 'app-user',
@@ -36,10 +36,7 @@ import { UserService } from 'src/app/service/user.service';
   styleUrls: ['./user.component.css'],
 })
 export class UserComponent implements OnInit, OnDestroy {
-  private titleSubject = new BehaviorSubject<string>('Users');
-  // a listener , an observable that will get notified if titleSubject value has been changed
-  public titleAction$ = this.titleSubject.asObservable();
-
+  private subs = new SubSink();
   public loggedInUser: User;
 
   public selectedUser: User;
@@ -51,9 +48,6 @@ export class UserComponent implements OnInit, OnDestroy {
   profileImage: File;
   public refreshing: boolean = false;
 
-  public fileStatus = new FileUploadStatus();
-
-  private subscriptions: Subscription[] = [];
   doctors: Doctor[];
   public users: User[];
   specialities: Speciality[];
@@ -68,6 +62,9 @@ export class UserComponent implements OnInit, OnDestroy {
   isEditContact: boolean = false;
   isEditAccountStatus: boolean = false;
   isEditPassword: boolean;
+  showLoading: boolean;
+
+  submitted = false;
 
   constructor(
     private userService: UserService,
@@ -77,32 +74,43 @@ export class UserComponent implements OnInit, OnDestroy {
     private router: Router,
     private formBuilder: FormBuilder
   ) {
+    // this.editDoctorAboutForm({
+
+    // })
+
     this.editDoctorForm = this.formBuilder.group({
       about: this.formBuilder.group({
-        firstName: [''],
-        lastName: [''],
-        username: [''],
-        role: [''],
+        firstName: ['', [Validators.required]],
+        lastName: ['', [Validators.required]],
+        username: ['', [Validators.required]],
+        role: ['', [Validators.required]],
         speciality: this.formBuilder.group({
           id: new FormControl(''),
-          name: new FormControl(''),
+          name: new FormControl([Validators.required]),
         }),
-        gender: [''],
+        gender: ['', [Validators.required]],
       }),
       contact: this.formBuilder.group({
-        email: [''],
-        phoneNumber: [],
+        email: ['', [Validators.required, Validators.email]],
+        phoneNumber: ['', [Validators.required]],
         address: this.formBuilder.group({
-          country: new FormControl(''),
-          state: new FormControl(''),
-          city: new FormControl(''),
-          street: new FormControl(''),
+          id: new FormControl(''),
+          country: new FormControl('', [Validators.required]),
+          state: new FormControl('', [Validators.required]),
+          city: new FormControl('', [Validators.required]),
+          street: new FormControl('', [Validators.required]),
         }),
       }),
       accountStatus: this.formBuilder.group({
-        status: [''],
-        active: [],
-        notLocked: [],
+        status: ['', [Validators.required]],
+        active: [[Validators.required]],
+        notLocked: [[Validators.required]],
+      }),
+
+      changePassword: this.formBuilder.group({
+        currentPassword: ['', [Validators.required]],
+        password: ['', [Validators.required, Validators.minLength(8)]],
+        confirmPassword: ['', [Validators.required]],
       }),
     });
   }
@@ -114,7 +122,7 @@ export class UserComponent implements OnInit, OnDestroy {
   }
 
   public getDoctors(): void {
-    this.subscriptions.push(
+    this.subs.add(
       this.userService.getAllDoctors().subscribe(
         (response: Doctor[]) => {
           this.doctors = response;
@@ -130,7 +138,7 @@ export class UserComponent implements OnInit, OnDestroy {
   }
 
   public getUsers(role: string): void {
-    this.subscriptions.push(
+    this.subs.add(
       this.userService.getUsersByRole(role).subscribe(
         (response: User[]) => {
           this.users = response;
@@ -146,7 +154,7 @@ export class UserComponent implements OnInit, OnDestroy {
   }
 
   getSpecialities() {
-    this.subscriptions.push(
+    this.subs.add(
       this.formService.getSpecialities().subscribe(
         (response: Speciality[]) => {
           this.specialities = response;
@@ -162,44 +170,17 @@ export class UserComponent implements OnInit, OnDestroy {
   }
 
   launchEditDoctorModal(doctor: Doctor) {
+    this.selectedDoctor = doctor;
+    this.currentUserUsername = doctor.username;
     this.isEditAbout = false;
     this.isEditAccountStatus = false;
     this.isEditContact = false;
     this.isEditPassword = false;
-    this.selectedDoctor = doctor;
-    this.currentUserUsername = doctor.username;
-    this.getCountries();
-    this.getStates(doctor.address.country);
-    this.getCities(doctor.address.state);
-    // console.log(doctor);
-    this.editDoctorForm.patchValue(doctor);
     this.clickButton('edit-doctor-modal-trigger-btn');
   }
 
-  onEditDoctor(section: string) {
-    switch (section) {
-      case 'about': {
-        this.isEditAbout = true;
-        this.editDoctorForm.patchValue({});
-        break;
-      }
-      case 'contact': {
-        this.isEditContact = true;
-        break;
-      }
-      case 'accountStatus': {
-        this.isEditAccountStatus = true;
-        break;
-      }
-      case 'password': {
-        this.isEditPassword = true;
-        break;
-      }
-    }
-  }
-
   getCountries() {
-    this.subscriptions.push(
+    this.subs.add(
       this.formService.getCountries().subscribe(
         (response: Country[]) => {
           this.countries = response;
@@ -214,42 +195,8 @@ export class UserComponent implements OnInit, OnDestroy {
     );
   }
 
-  resetAddress(address: string) {
-    switch (address) {
-      case 'country': {
-        this.editDoctorForm.controls['address'].patchValue({
-          state: '',
-          city: '',
-          street: '',
-        });
-        break;
-      }
-      case 'state': {
-        this.editDoctorForm.controls['address'].patchValue({
-          city: '',
-          street: '',
-        });
-        break;
-      }
-      case 'city': {
-        this.editDoctorForm.controls['address'].patchValue({
-          street: '',
-        });
-        break;
-      }
-    }
-  }
-
-  changeLockoutStatus() {
-    const lockoutStatus = this.editDoctorForm.value.status;
-    if (lockoutStatus == 'VERIFIED') {
-      this.editDoctorForm.controls.notLocked.setValue(true);
-    } else {
-      this.editDoctorForm.controls.notLocked.setValue(false);
-    }
-  }
   getStates(countryName: string) {
-    this.subscriptions.push(
+    this.subs.add(
       this.formService.getStates(countryName).subscribe(
         (response: State[]) => {
           this.states = response;
@@ -265,7 +212,7 @@ export class UserComponent implements OnInit, OnDestroy {
   }
 
   getCities(stateName: string) {
-    this.subscriptions.push(
+    this.subs.add(
       this.formService.getCities(stateName).subscribe(
         (response: City[]) => {
           this.cities = response;
@@ -280,31 +227,195 @@ export class UserComponent implements OnInit, OnDestroy {
     );
   }
 
+  onEditDoctor(section: string) {
+    switch (section) {
+      case 'about': {
+        this.isEditAbout = true;
+        this.editDoctorForm.controls['about'].patchValue(this.selectedDoctor);
+        break;
+      }
+      case 'contact': {
+        this.isEditContact = true;
+        this.getCountries();
+        this.getStates(this.selectedDoctor.address.country);
+        this.getCities(this.selectedDoctor.address.state);
+        this.editDoctorForm.controls['contact'].patchValue(this.selectedDoctor);
+        break;
+      }
+      case 'accountStatus': {
+        this.isEditAccountStatus = true;
+        this.editDoctorForm.controls['accountStatus'].patchValue(
+          this.selectedDoctor
+        );
+        break;
+      }
+      case 'changePassword': {
+        this.isEditPassword = true;
+        break;
+      }
+    }
+  }
+
   public editProfileImage(event: Event): void {
     this.profileImage = (<HTMLInputElement>event.target).files[0];
     this.fileName = this.profileImage.name;
   }
 
-  editDoctor() {
-    // console.log(this.editDoctorForm.value);
-    const doctorDto = new DoctorDto();
-    doctorDto.doctor = this.editDoctorForm.value;
-    doctorDto.profileImage = this.profileImage;
-    doctorDto.currentDoctorUsername = this.currentUserUsername;
-    console.log(doctorDto);
+  resetAddress(address: string) {
+    switch (address) {
+      case 'country': {
+        this.editDoctorForm.controls['contact'].get('address').patchValue({
+          state: '',
+          city: '',
+          street: '',
+        });
+        break;
+      }
+      case 'state': {
+        this.editDoctorForm.controls['contact'].get('address').patchValue({
+          city: '',
+          street: '',
+        });
+        break;
+      }
+      case 'city': {
+        this.editDoctorForm.controls['contact'].get('address').patchValue({
+          street: '',
+        });
+        break;
+      }
+    }
+  }
 
-    this.subscriptions.push(
-      this.userService.updateDoctor(doctorDto).subscribe(
-        (response: HttpResponse<Doctor>) => {
-          this.getDoctors();
-        },
-        (errorResponse: HttpErrorResponse) => {
-          this.sendNotification(
-            NotificationType.ERROR,
-            errorResponse.error.message
-          );
+  changeLockoutStatus() {
+    const lockoutStatus =
+      this.editDoctorForm.controls['accountStatus'].get('status').value;
+    if (lockoutStatus == 'VERIFIED') {
+      this.editDoctorForm.controls['accountStatus']
+        .get('notLocked')
+        .setValue(true);
+    } else {
+      this.editDoctorForm.controls['accountStatus']
+        .get('notLocked')
+        .setValue(false);
+    }
+  }
+
+  get f() {
+    return this.editDoctorForm.controls;
+  }
+
+  editDoctor(section: string) {
+    this.submitted = true;
+    switch (section) {
+      case 'about': {
+        if (this.editDoctorForm.controls.about.invalid) {
+          return;
         }
-      )
+        break;
+      }
+      case 'contact': {
+        if (this.editDoctorForm.controls.contact.invalid) {
+          return;
+        }
+        break;
+      }
+      case 'accountStatus': {
+        if (this.editDoctorForm.controls.accountStatus.invalid) {
+          return;
+        }
+        break;
+      }
+      case 'changePassword': {
+        if (this.editDoctorForm.controls.changePassword.invalid) {
+          return;
+        }
+        break;
+      }
+    }
+
+    // console.log(this.editDoctorForm.value);
+    console.log(this.selectedDoctor);
+
+    this.showLoading = true;
+    switch (section) {
+      case 'about': {
+        this.selectedDoctor.firstName =
+          this.editDoctorForm.controls['about'].value.firstName;
+        this.selectedDoctor.lastName =
+          this.editDoctorForm.controls['about'].value.lastName;
+        this.selectedDoctor.username =
+          this.editDoctorForm.controls['about'].value.username;
+        this.selectedDoctor.speciality =
+          this.editDoctorForm.controls['about'].get('speciality').value;
+        this.selectedDoctor.role =
+          this.editDoctorForm.controls['about'].value.role;
+
+        break;
+      }
+      case 'contact': {
+        this.selectedDoctor.email =
+          this.editDoctorForm.controls['contact'].value.email;
+        this.selectedDoctor.phoneNumber =
+          this.editDoctorForm.controls['contact'].value.phoneNumber;
+        this.selectedDoctor.address =
+          this.editDoctorForm.controls['contact'].value.address;
+        break;
+      }
+      case 'accountStatus': {
+        this.selectedDoctor.status =
+          this.editDoctorForm.controls['accountStatus'].value.status;
+        this.selectedDoctor.active =
+          this.editDoctorForm.controls['accountStatus'].value.active;
+        this.selectedDoctor.notLocked =
+          this.editDoctorForm.controls['accountStatus'].value.notLocked;
+        break;
+      }
+      case 'changePassword': {
+        this.selectedDoctor.password =
+          this.editDoctorForm.controls['changePassword'].value.password;
+      }
+    }
+
+    this.subs.add(
+      this.userService
+        .updateDoctor(this.selectedDoctor, this.currentUserUsername)
+        .subscribe(
+          (response: HttpResponse<Doctor>) => {
+            // this.selectedDoctor = response.body;
+            // this.getDoctors();
+            this.showLoading = false;
+            this.sendNotification(
+              NotificationType.SUCCESS,
+              'you have edited successfully'
+            );
+            switch (section) {
+              case 'about': {
+                this.isEditAbout = false;
+                break;
+              }
+              case 'contact': {
+                this.isEditContact = false;
+                break;
+              }
+              case 'accountStatus': {
+                this.isEditAccountStatus = false;
+                break;
+              }
+              case 'changePassword': {
+                this.isEditPassword = false;
+                break;
+              }
+            }
+          },
+          (errorResponse: HttpErrorResponse) => {
+            this.showLoading = false;
+            this.sendNotification(
+              NotificationType.ERROR,
+              errorResponse.error.message
+            );
+          }
+        )
     );
   }
 
@@ -327,29 +438,29 @@ export class UserComponent implements OnInit, OnDestroy {
       userForm.value,
       this.profileImage
     );
-    this.subscriptions.push(
-      this.userService.addUser(formData).subscribe(
-        (response: User) => {
-          this.clickButton('new-user-close');
-          // make a call to the backend to get the new list of users
+    // this.subs.add(
+    //   this.userService.addUser(formData).subscribe(
+    //     (response: User) => {
+    //       this.clickButton('new-user-close');
+    //       // make a call to the backend to get the new list of users
 
-          this.fileName = null;
-          this.profileImage = null;
-          userForm.reset();
-          this.sendNotification(
-            NotificationType.SUCCESS,
-            `${response.firstName} ${response.lastName} added successfully`
-          );
-        },
-        (errorResponse: HttpErrorResponse) => {
-          this.sendNotification(
-            NotificationType.ERROR,
-            errorResponse.error.message
-          );
-          this.profileImage = null;
-        }
-      )
-    );
+    //       this.fileName = null;
+    //       this.profileImage = null;
+    //       userForm.reset();
+    //       this.sendNotification(
+    //         NotificationType.SUCCESS,
+    //         `${response.firstName} ${response.lastName} added successfully`
+    //       );
+    //     },
+    //     (errorResponse: HttpErrorResponse) => {
+    //       this.sendNotification(
+    //         NotificationType.ERROR,
+    //         errorResponse.error.message
+    //       );
+    //       this.profileImage = null;
+    //     }
+    //   )
+    // );
   }
 
   // ****search user****
@@ -386,31 +497,31 @@ export class UserComponent implements OnInit, OnDestroy {
       this.profileImage
     );
 
-    this.subscriptions.push(
-      this.userService.updateUser(formData).subscribe(
-        (response: User) => {
-          this.clickButton('edit-user-close');
+    // this.subs.add(
+    //   this.userService.updateUser(formData).subscribe(
+    //     (response: User) => {
+    //       this.clickButton('edit-user-close');
 
-          this.fileName = null;
-          this.profileImage = null;
-          this.sendNotification(
-            NotificationType.SUCCESS,
-            `${response.firstName} ${response.lastName} updated successfully`
-          );
-        },
-        (errorResponse: HttpErrorResponse) => {
-          this.sendNotification(
-            NotificationType.ERROR,
-            errorResponse.error.message
-          );
-          this.profileImage = null;
-        }
-      )
-    );
+    //       this.fileName = null;
+    //       this.profileImage = null;
+    //       this.sendNotification(
+    //         NotificationType.SUCCESS,
+    //         `${response.firstName} ${response.lastName} updated successfully`
+    //       );
+    //     },
+    //     (errorResponse: HttpErrorResponse) => {
+    //       this.sendNotification(
+    //         NotificationType.ERROR,
+    //         errorResponse.error.message
+    //       );
+    //       this.profileImage = null;
+    //     }
+    //   )
+    // );
   }
   // ****delete user****
   public onDeleteUser(username: string): void {
-    this.subscriptions.push(
+    this.subs.add(
       this.userService.deleteUser(username).subscribe(
         (response: CustomHttpResponse) => {
           this.sendNotification(NotificationType.SUCCESS, response.message);
@@ -422,42 +533,6 @@ export class UserComponent implements OnInit, OnDestroy {
     );
   }
 
-  // edit user profile
-  // we can pass loggedInUser variable
-  onUpdateUserProfile(user: User) {
-    this.refreshing = true;
-    this.currentUsername =
-      this.authenticationService.getUserFromLocalCache().username;
-    const formData = this.userService.createUserFormDate(
-      this.currentUsername,
-      user,
-      this.profileImage
-    );
-    this.subscriptions.push(
-      this.userService.updateUser(formData).subscribe(
-        (response: User) => {
-          this.authenticationService.addUserToLocalCache(response);
-          // to update authorities on the template
-          // this.loggedInUser = response;
-
-          this.fileName = null;
-          this.profileImage = null;
-          this.sendNotification(
-            NotificationType.SUCCESS,
-            `${response.firstName} ${response.lastName} updated successfully`
-          );
-        },
-        (errorResponse: HttpErrorResponse) => {
-          this.sendNotification(
-            NotificationType.ERROR,
-            errorResponse.error.message
-          );
-          this.refreshing = false;
-          this.profileImage = null;
-        }
-      )
-    );
-  }
   // update profile image
   updateProfileImage() {
     this.clickButton('profile-image-input');
@@ -487,43 +562,11 @@ export class UserComponent implements OnInit, OnDestroy {
     }
   }
 
-  // private reportUploadProgress(event: HttpEvent<any>): void {
-  //   switch (event.type) {
-  //     case HttpEventType.UploadProgress:
-  //       this.fileStatus.percentage = Math.round(
-  //         (100 * event.loaded) / event.total
-  //       );
-  //       this.fileStatus.status = 'progress';
-  //       break;
-  //     case HttpEventType.Response:
-  //       if (event.status === 200) {
-  //         this.loggedInUser.profileImageUrl = `${
-  //           event.body.profileImageUrl
-  //         }?time=${new Date().getTime()}`;
-  //         this.sendNotification(
-  //           NotificationType.SUCCESS,
-  //           `${event.body.firstName}\'s profile image updated successfully`
-  //         );
-  //         this.fileStatus.status = 'done';
-  //         this.getUsers(false);
-  //         break;
-  //       } else {
-  //         this.sendNotification(
-  //           NotificationType.ERROR,
-  //           `Unable to upload image. Please try again`
-  //         );
-  //         break;
-  //       }
-  //     default:
-  //       `Finished all processes`;
-  //   }
-  // }
-
   private getUserRole(): string {
     return this.authenticationService.getUserFromLocalCache().role;
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
+    this.subs.unsubscribe();
   }
 }

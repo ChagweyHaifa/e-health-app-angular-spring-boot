@@ -29,6 +29,7 @@
     "ngx-star-rating": "^2.1.0",
     "popper.js": "^1.16.1",
     "rxjs": "~6.6.0",
+    "subsink": "^1.0.2",
     "tslib": "^2.2.0",
     "zone.js": "~0.11.4"
   },

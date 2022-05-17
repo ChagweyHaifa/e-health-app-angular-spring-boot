@@ -12,90 +12,117 @@
             </div>
         </div>
 
+        <div class="row justify-content-end">
+            <div class="col-6">
+                <div id="search-questions-bar">
+                    <div class="row">
+                        <input type="text" class=" col" placeholder="Doctor name">
+                        <div class="col-1">
+                            <i class="fa fa-search" aria-hidden="true"></i>
+                        </div>
 
-        <form #DoctorSearchForm="ngForm" class="search-form" (ngSubmit)="onSearchDoctor(DoctorSearchForm)">
-            <div class=" row">
 
-                <div class="col p-0">
-                    <select class="form-select" name="specialityName" ngModel>
-                        <option value="">Speciality</option>
-                        <option *ngFor="let tempSpeciality of specialities">
-                            {{tempSpeciality.name}}</option>
-                    </select>
+                    </div>
                 </div>
-
-                <div class="col p-0">
-                    <select class="form-select" name="country" ngModel
-                        (change)="getStates(DoctorSearchForm.value.country)">
-                        <option value="">Country</option>
-                        <option *ngFor="let tempCountry of countries">{{tempCountry.name}}
-                        </option>
-                    </select>
-                </div>
-                <div class="col p-0">
-                    <select class="form-select" name="state" ngModel (change)="getCities(DoctorSearchForm.value.state)">
-                        <option value="">State</option>
-                        <option *ngFor="let tempState of states">{{tempState.name}}
-                        </option>
-                    </select>
-                </div>
-                <div class="col p-0">
-                    <select class="form-select" name="city" ngModel>
-                        <option value="">City</option>
-                        <option *ngFor="let tempCity of cities">{{tempCity.name}}
-                        </option>
-                    </select>
-                </div>
-                <div class="col-1 p-0">
-                    <button type="submit" class="btn purple-btn"><i class="fa fa-search" aria-hidden="true"></i>
-                    </button>
-                </div>
-
             </div>
-        </form>
 
+        </div>
 
-        <div class="people-nearby my-5">
+        <div class="doctors-container">
+            <div class="row">
+                <aside class="col-3  my-3">
+                    <form #DoctorSearchForm="ngForm" class="search-form" (ngSubmit)="onSearchDoctor(DoctorSearchForm)">
+                        <div class=" ">
 
-            <div class="nearby-user my-3" *ngFor="let tempDoctor of doctors">
-
-                <div class="card">
-                    <div class="card-header">
-                        <div class="row" (click)="getDoctorProfile(tempDoctor.username)">
-                            <div class="" style="width: 11%;">
-                                <img src="{{tempDoctor.profileImageUrl}}" alt="doctor" class="profile-photo-lg">
+                            <div class="mb-2">
+                                <select class="form-select" name="specialityName" ngModel>
+                                    <option value="">Speciality</option>
+                                    <option *ngFor="let tempSpeciality of specialities">
+                                        {{tempSpeciality.name}}</option>
+                                </select>
                             </div>
-                            <div class="col">
-                                <div class="doctor-info">
-                                    <h4>Dr {{tempDoctor.firstName}} {{tempDoctor.lastName}}
-                                    </h4>
 
-                                    <p>{{tempDoctor.speciality.name}} <i class="fa fa-star" aria-hidden="true"></i>
-                                        {{tempDoctor.averageOfRatings}}
-                                        <small>({{tempDoctor.nbOfRatings}})</small>
-                                        <br>{{tempDoctor.address.city}}
-                                        {{tempDoctor.address.state}} {{tempDoctor.address.country}}
-                                    </p>
+                            <div class="mb-2">
+                                <select class="form-select" name="country" ngModel
+                                    (change)="getStates(DoctorSearchForm.value.country)">
+                                    <option value="">Country</option>
+                                    <option *ngFor="let tempCountry of countries">{{tempCountry.name}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <select class="form-select" name="state" ngModel
+                                    (change)="getCities(DoctorSearchForm.value.state)">
+                                    <option value="">State</option>
+                                    <option *ngFor="let tempState of states">{{tempState.name}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <select class="form-select" name="city" ngModel>
+                                    <option value="">City</option>
+                                    <option *ngFor="let tempCity of cities">{{tempCity.name}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <button style="width:100%" type="submit" class="btn purple-btn"><i class="fa fa-search"
+                                        aria-hidden="true"></i> Search
+                                </button>
+                            </div>
 
+                        </div>
+                    </form>
+
+                </aside>
+                <div class="col" id="doctors">
+
+                    <div class="people-nearby">
+
+                        <div class="nearby-user my-3" *ngFor="let tempDoctor of doctors">
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="row" (click)="getDoctorProfile(tempDoctor.username)">
+                                        <div class="" style="width: 13%;">
+                                            <img src="{{tempDoctor.profileImageUrl}}" alt="doctor"
+                                                class="profile-photo-lg">
+                                        </div>
+                                        <div class="col">
+                                            <div class="doctor-info">
+                                                <h5>Dr {{tempDoctor.firstName}} {{tempDoctor.lastName}}
+                                                </h5>
+
+                                                <p>{{tempDoctor.speciality.name}} <i class="fa fa-star"
+                                                        aria-hidden="true"></i>
+                                                    {{tempDoctor.averageOfRatings}}
+                                                    <small>({{tempDoctor.nbOfRatings}})</small>
+                                                    <br>{{tempDoctor.address.city}}
+                                                    {{tempDoctor.address.state}} {{tempDoctor.address.country}}
+                                                </p>
+
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div (click)="getDoctorProfile(tempDoctor.username)">
+
+                                        <p class="card-text">With supporting text below as a natural lead-in to
+                                            additional
+                                            content.
+                                        </p>
+                                    </div>
 
                                 </div>
                             </div>
 
                         </div>
-                    </div>
-                    <div class="card-body">
-                        <div (click)="getDoctorProfile(tempDoctor.username)">
-                            <h5 class="card-title">Special title treatment</h5>
-                            <p class="card-text">With supporting text below as a natural lead-in to additional content.
-                            </p>
-                        </div>
 
                     </div>
                 </div>
 
             </div>
-
         </div>
-
-    </div>
-</div>

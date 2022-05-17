@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { NotificationType } from 'src/app/enum/notification-type.enum';
@@ -20,7 +20,7 @@ import { Router } from '@angular/router';
   templateUrl: './doctors.component.html',
   styleUrls: ['./doctors.component.css'],
 })
-export class DoctorsComponent implements OnInit {
+export class DoctorsComponent implements OnInit, OnDestroy {
   default: string = null;
   private subscriptions: Subscription[] = [];
   specialities: Speciality[];
@@ -157,5 +157,9 @@ export class DoctorsComponent implements OnInit {
         'An error occurred. Please try again.'
       );
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 }

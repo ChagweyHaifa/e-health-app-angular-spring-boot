@@ -16,6 +16,7 @@ import { Visitor } from 'src/app/model/visitor';
 import { AuthenticationService } from 'src/app/service/authentication.service';
 import { FormService } from 'src/app/service/form.service';
 import { NotificationService } from 'src/app/service/notification.service';
+import { SubSink } from 'subsink';
 
 @Component({
   selector: 'app-register',
@@ -23,6 +24,7 @@ import { NotificationService } from 'src/app/service/notification.service';
   styleUrls: ['./register.component.css'],
 })
 export class RegisterComponent implements OnInit, OnDestroy {
+  private subs = new SubSink();
   showLoading: boolean = false;
   private subscriptions: Subscription[] = [];
   specialities: Speciality[];
@@ -48,7 +50,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   getSpecialities() {
-    this.subscriptions.push(
+    this.subs.add(
       this.formService.getSpecialities().subscribe(
         (response: Speciality[]) => {
           this.specialities = response;
@@ -64,7 +66,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   getCountries() {
-    this.subscriptions.push(
+    this.subs.add(
       this.formService.getCountries().subscribe(
         (response: Country[]) => {
           this.countries = response;
@@ -80,7 +82,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   getStates(countryName: string) {
-    this.subscriptions.push(
+    this.subs.add(
       this.formService.getStates(countryName).subscribe(
         (response: State[]) => {
           this.states = response;
@@ -96,7 +98,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   getCities(stateName: string) {
-    this.subscriptions.push(
+    this.subs.add(
       this.formService.getCities(stateName).subscribe(
         (response: City[]) => {
           this.cities = response;
@@ -114,7 +116,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   onRegisterVisitor(user: User) {
     // console.log(visitor);
     this.showLoading = true;
-    this.subscriptions.push(
+    this.subs.add(
       this.authenticationService.registerUser(user).subscribe(
         (response: User) => {
           // console.log(response);
@@ -153,7 +155,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     newDoctor.address = address;
     // console.log(newDoctor);
     this.showLoading = true;
-    this.subscriptions.push(
+    this.subs.add(
       this.authenticationService.registerDoctor(newDoctor).subscribe(
         (response: Doctor) => {
           // console.log(response);
@@ -191,6 +193,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
+    this.subs.unsubscribe();
   }
 }

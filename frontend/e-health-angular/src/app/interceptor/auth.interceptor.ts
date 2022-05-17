@@ -10,6 +10,7 @@ import { AuthenticationService } from '../service/authentication.service';
 import { FormService } from '../service/form.service';
 import { UserService } from '../service/user.service';
 import { RatingService } from '../service/rating.service';
+import { QuestionService } from '../service/question.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -20,7 +21,8 @@ export class AuthInterceptor implements HttpInterceptor {
     private authenticationService: AuthenticationService,
     private formService: FormService,
     private userService: UserService,
-    private ratingService: RatingService
+    private ratingService: RatingService,
+    private questionService: QuestionService
   ) {}
 
   intercept(
@@ -75,9 +77,10 @@ export class AuthInterceptor implements HttpInterceptor {
       return httpHandler.handle(httpRequest);
     }
 
-    // if (httpRequest.url.includes(`${this.authenticationService.host}/resetpassword`)) {
-    //   return httpHandler.handle(httpRequest);
-    // }
+    if (httpRequest.url.includes(`${this.questionService.host}/questions/`)) {
+      return httpHandler.handle(httpRequest);
+    }
+
     this.authenticationService.getToken();
     const token = this.authenticationService.getToken();
     // the httpRequest (original request) is mutable we can't modify it, we have to make a clone of it

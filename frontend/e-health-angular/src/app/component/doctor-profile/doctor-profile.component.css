@@ -45,3 +45,27 @@
   color: #212529;
   background-color: #efefef;
 }
+
+/* edit doctor profile form */
+
+.form-area {
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 20px;
+}
+.form-area .form-area-title {
+  margin-top: -2rem;
+}
+.form-area .form-area-title span {
+  padding: 0px 20px;
+  background-color: #fff;
+  /* font-size: 1.1rem; */
+  /* text-transform: uppercase; */
+}
+.form-area .form-area-title span .edit-section-btn {
+  padding-left: 10px;
+}
+
+.save-doctor-info-btn {
+  border-radius: 5px;
+}

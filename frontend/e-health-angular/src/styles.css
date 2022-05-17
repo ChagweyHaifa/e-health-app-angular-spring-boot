@@ -1,7 +1,8 @@
 @import "~angular-notifier/styles";
 
+@import url("https://fonts.googleapis.com/css2?family=Vollkorn&display=swap");
 body {
-  font-family: "Patrick Hand", cursive;
+  font-family: "Vollkorn", serif;
 }
 
 td {
@@ -231,4 +232,31 @@ input.star ~ label.star:before {
 }
 input.star:checked ~ label.star:before {
   color: rgb(243, 243, 89) !important;
+}
+
+/* serach bar (questions, doctors componenets) */
+
+#search-questions-bar {
+  border-radius: 1.5rem;
+  border: 1px solid #ddd;
+}
+#search-questions-bar div {
+  border-radius: 1.5rem;
+  margin: 0.1rem 0.1rem 0.1rem 0.8rem;
+}
+#search-questions-bar input {
+  border: none;
+  padding: 0px;
+  border-radius: 1.5rem;
+  outline: none;
+}
+#search-questions-bar input:active {
+  border: none;
+  outline: none;
+}
+#search-questions-bar i {
+  padding: 0.7rem;
+  border-radius: 50%;
+  background-color: #efefef;
+  color: #252932;
 }

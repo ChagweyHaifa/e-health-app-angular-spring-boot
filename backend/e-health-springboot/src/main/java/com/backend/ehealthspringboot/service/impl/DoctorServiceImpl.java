@@ -1,12 +1,13 @@
 package com.backend.ehealthspringboot.service.impl;
 import com.backend.ehealthspringboot.domain.Doctor;
+import com.backend.ehealthspringboot.domain.Speciality;
 import com.backend.ehealthspringboot.domain.User;
-import com.backend.ehealthspringboot.dto.DoctorDto;
-import com.backend.ehealthspringboot.exception.domain.EmailExistException;
-import com.backend.ehealthspringboot.exception.domain.NotAnImageFileException;
-import com.backend.ehealthspringboot.exception.domain.UserNotFoundException;
-import com.backend.ehealthspringboot.exception.domain.UsernameExistException;
+
+import com.backend.ehealthspringboot.enumeration.Role;
+import com.backend.ehealthspringboot.enumeration.Status;
+import com.backend.ehealthspringboot.exception.domain.*;
 import com.backend.ehealthspringboot.repository.DoctorRepository;
+import com.backend.ehealthspringboot.repository.SpecialityRepository;
 import com.backend.ehealthspringboot.repository.UserRepository;
 import com.backend.ehealthspringboot.service.DoctorService;
 import com.backend.ehealthspringboot.service.EmailService;
@@ -29,6 +30,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import static com.backend.ehealthspringboot.constant.FileConstant.*;
 import static com.backend.ehealthspringboot.constant.FileConstant.JPG_EXTENSION;
@@ -49,6 +51,7 @@ public class DoctorServiceImpl implements DoctorService {
     private DoctorRepository doctorRepository;
     private LoginAttemptService loginAttemptService;
     private EmailService emailService;
+    private SpecialityRepository specialityRepository;
 
 
     @Autowired
@@ -57,13 +60,15 @@ public class DoctorServiceImpl implements DoctorService {
                            DoctorRepository doctorRepository,
                            BCryptPasswordEncoder passwordEncoder,
                            LoginAttemptService loginAttemptService,
-                           EmailService emailService
+                           EmailService emailService,
+            SpecialityRepository specialityRepository
           ) {
     this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
         this.emailService = emailService;
         this.doctorRepository = doctorRepository;
+        this.specialityRepository = specialityRepository;
 
 
     }
@@ -107,38 +112,51 @@ public class DoctorServiceImpl implements DoctorService {
                         doctor.getAddress().getCity());
     }
 
-//    @Override
-//    public Doctor updateDoctor(String doctorUsername, Doctor doctor) throws UserNotFoundException, EmailExistException, UsernameExistException {
-//        Doctor newDoctor = validateNewUsernameAndEmail(doctorUsername,doctor.getUsername(),doctor.getEmail());
-//        newDoctor.setFirstName(doctor.getFirstName());
-//        newDoctor.setLastName(doctor.getLastName());
-//        newDoctor.setUsername(doctor.getUsername());
-//        newDoctor.setEmail(doctor.getEmail());
-//        newDoctor.setAddress(doctor.getAddress());
-//        newDoctor.setPhoneNumber(doctor.getPhoneNumber());
-//        newDoctor.setSpeciality(doctor.getSpeciality());
-//        newDoctor.setGender(doctor.getGender());
-//        doctorRepository.save(newDoctor);
-//        return newDoctor;
-//    }
 
     @Override
-    public Doctor updateDoctor(String loggedInUsername, DoctorDto doctorDto) throws UserNotFoundException, EmailExistException, UsernameExistException, IOException, NotAnImageFileException {
+    public Doctor updateDoctor(String loggedInUsername,String currentDoctorUsername, Doctor theDoctor) throws Exception {
         User user = userRepository.findUserByUsername(loggedInUsername);
         if(user == null){
             throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + loggedInUsername);
         }
-        if(user.getUsername()==ROLE_ADMIN.name()){
-            Doctor doctor = validateNewUsernameAndEmail(doctorDto.getCurrentDoctorUsername(),doctorDto.getDoctor().getUsername(),doctorDto.getDoctor().getEmail());
-            doctor.setStatus(doctorDto.getDoctor().getStatus());
-            saveProfileImage(doctor,doctorDto.getProfileImage());
-            doctorRepository.save(doctor);
-        }else{
-
+        LOGGER.info("loggedInUsername: " + loggedInUsername);
+        LOGGER.info("currentDoctorUsername: " + currentDoctorUsername);
+        LOGGER.info("new doctor username: " + theDoctor.getUsername());
+        LOGGER.info(String.valueOf(getRoleEnumName(user.getRole()) == ROLE_DOCTOR));
+        LOGGER.info(String.valueOf(getRoleEnumName(user.getRole()) == ROLE_ADMIN));
+        LOGGER.info(String.valueOf(Objects.isNull(currentDoctorUsername)));
+        Doctor newDoctor;
+        if((getRoleEnumName(user.getRole()) == ROLE_ADMIN )){
+            newDoctor = validateNewUsernameAndEmail(currentDoctorUsername ,theDoctor.getUsername(),theDoctor.getEmail());
+            LOGGER.info("admin");
+            newDoctor.setStatus( getStatusEnumName(theDoctor.getStatus()).name());
+            newDoctor.setRole(getRoleEnumName(theDoctor.getRole()).name());
+        }else {
+            LOGGER.info("doctor");
+            newDoctor = validateNewUsernameAndEmail(loggedInUsername ,theDoctor.getUsername(),theDoctor.getEmail());
         }
 
+        newDoctor.setFirstName(theDoctor.getFirstName());
+        newDoctor.setLastName(theDoctor.getLastName());
+        newDoctor.setUsername(theDoctor.getUsername());
+        newDoctor.setEmail(theDoctor.getEmail());
+        newDoctor.setAddress(theDoctor.getAddress());
+        newDoctor.setPhoneNumber(theDoctor.getPhoneNumber());
+        if(theDoctor.getPassword() != null){
+            newDoctor.setPassword(encodePassword(theDoctor.getPassword()));
+        }
+        Speciality speciality = specialityRepository.findByName(theDoctor.getSpeciality().getName());
+        if (speciality == null){
+            throw new SpecialityNotFoundException(NO_SPECIALTY_FOUND);
+        }
+        newDoctor.setSpeciality(speciality);
+        newDoctor.setNotLocked(theDoctor.isNotLocked());
+        newDoctor.setActive(theDoctor.isActive());
+        newDoctor.setGender(theDoctor.getGender());
+        doctorRepository.save(newDoctor);
 
-        return null;
+
+        return newDoctor;
     }
 
     @Override
@@ -223,7 +241,12 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
 
-
+    private Role getRoleEnumName(String role) {
+        return Role.valueOf(role.toUpperCase());
+    }
+    private Status getStatusEnumName(String status) {
+        return Status.valueOf(status.toUpperCase());
+    }
     public User findUserByUsername(String username) {
         return userRepository.findUserByUsername(username);
     }

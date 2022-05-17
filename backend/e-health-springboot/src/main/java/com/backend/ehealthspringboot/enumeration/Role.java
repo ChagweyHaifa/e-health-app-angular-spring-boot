@@ -4,8 +4,8 @@ public enum Role {
 	
 	ROLE_USER(USER_AUTHORITIES),
 	ROLE_DOCTOR(DOCTOR_AUTHORITIES ),
-	ROLE_ADMIN(ADMIN_AUTHORITIES);
-
+	ROLE_ADMIN(ADMIN_AUTHORITIES)
+;
 	
 	private String[] authorities;
 	

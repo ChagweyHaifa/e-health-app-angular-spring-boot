@@ -16,7 +16,7 @@ export class NavBarComponent implements OnInit {
     private notificationService: NotificationService,
     private router: Router
   ) {}
-  // public loggedInUser: User;
+  public loggedInUser: User;
   isLoggedIn: boolean;
 
   ngOnInit(): void {
@@ -24,6 +24,7 @@ export class NavBarComponent implements OnInit {
     this.authenticationService.isLoggedIn.subscribe(
       (data) => (this.isLoggedIn = data)
     );
+    // this.loggedInUser = this.authenticationService.getUserFromLocalCache();
     // console.log(this.isLoggedIn);
   }
 

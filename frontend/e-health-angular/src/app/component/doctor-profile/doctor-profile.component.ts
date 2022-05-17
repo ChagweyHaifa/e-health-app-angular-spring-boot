@@ -1,5 +1,5 @@
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { NotificationType } from 'src/app/enum/notification-type.enum';
@@ -16,14 +16,21 @@ import { FormService } from 'src/app/service/form.service';
 
 import { RatingService } from 'src/app/service/rating.service';
 import { Rating } from 'src/app/model/rating';
-import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  NgForm,
+  Validators,
+} from '@angular/forms';
+import { HeaderType } from 'src/app/enum/header-type.enum';
 
 @Component({
   selector: 'app-doctor-profile',
   templateUrl: './doctor-profile.component.html',
   styleUrls: ['./doctor-profile.component.css'],
 })
-export class DoctorProfileComponent implements OnInit {
+export class DoctorProfileComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
   showLoading: boolean = false;
 
@@ -41,6 +48,9 @@ export class DoctorProfileComponent implements OnInit {
   public editRatingForm: FormGroup;
   public addRatingForm: FormGroup;
   myRating: Rating;
+
+  editDoctorProfileForm: FormGroup;
+  submitted: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -60,6 +70,31 @@ export class DoctorProfileComponent implements OnInit {
       rating: ['', Validators.required],
       review: '',
     });
+
+    this.editDoctorProfileForm = this.formBuilder.group({
+      firstName: ['', [Validators.required]],
+      lastName: ['', [Validators.required]],
+      username: ['', [Validators.required]],
+
+      speciality: this.formBuilder.group({
+        id: new FormControl(''),
+        name: new FormControl([Validators.required]),
+      }),
+      gender: ['', [Validators.required]],
+
+      email: ['', [Validators.required, Validators.email]],
+      phoneNumber: ['', [Validators.required]],
+      address: this.formBuilder.group({
+        id: new FormControl(''),
+        country: new FormControl('', [Validators.required]),
+        state: new FormControl('', [Validators.required]),
+        city: new FormControl('', [Validators.required]),
+        street: new FormControl('', [Validators.required]),
+      }),
+
+      active: [[Validators.required]],
+      notLocked: [[Validators.required]],
+    });
   }
 
   ngOnInit(): void {
@@ -76,6 +111,7 @@ export class DoctorProfileComponent implements OnInit {
       this.userService.getDoctorInfo(this.doctorUsername).subscribe(
         (response: Doctor) => {
           this.doctor = response;
+          // console.log(this.doctor);
         },
         (errorResponse: HttpErrorResponse) => {
           this.sendNotification(
@@ -196,6 +232,33 @@ export class DoctorProfileComponent implements OnInit {
   }
 
   // edit doctor profile
+
+  resetAddress(address: string) {
+    switch (address) {
+      case 'country': {
+        this.f.address.patchValue({
+          state: '',
+          city: '',
+          street: '',
+        });
+        break;
+      }
+      case 'state': {
+        this.f.address.patchValue({
+          city: '',
+          street: '',
+        });
+        break;
+      }
+      case 'city': {
+        this.f.address.patchValue({
+          street: '',
+        });
+        break;
+      }
+    }
+  }
+
   getSpecialities() {
     this.subscriptions.push(
       this.formService.getSpecialities().subscribe(
@@ -260,42 +323,54 @@ export class DoctorProfileComponent implements OnInit {
     );
   }
 
-  onEditDoctorProfile() {
+  launchEditDoctorProfileModal() {
     this.getSpecialities();
     this.getCountries();
     this.getStates(this.doctor.address.country);
     this.getCities(this.doctor.address.state);
+    this.editDoctorProfileForm.patchValue(this.doctor);
   }
 
   clickDoctorProfileSubmitBtn() {
     this.clickButton('edit-doctor-profile-submit-btn');
   }
 
-  editDoctorProfile(form: NgForm) {
-    console.log(form.value);
+  get f() {
+    return this.editDoctorProfileForm.controls;
+  }
+
+  editDoctorProfile() {
+    this.submitted = true;
+    if (this.editDoctorProfileForm.invalid) {
+      return;
+    }
+    // console.log(this.editDoctorProfileForm.value);
     // console.log(this.doctor);
-    // this.showLoading = true;
-    // this.subscriptions.push(
-    //   this.userService.updateDoctor(this.doctor).subscribe(
-    //     (response: HttpResponse<Doctor>) => {
-    //       this.showLoading = false;
-    //       const token = response.headers.get(HeaderType.JWT_TOKEN);
-    //       this.authenticationService.saveToken(token);
-    //       this.clickButton('edit-doctor-profile-close-btn');
-    //       this.sendNotification(
-    //         NotificationType.SUCCESS,
-    //         'you have successfully updated your profile'
-    //       );
-    //     },
-    //     (errorResponse: HttpErrorResponse) => {
-    //       this.showLoading = false;
-    //       this.sendNotification(
-    //         NotificationType.ERROR,
-    //         errorResponse.error.message
-    //       );
-    //     }
-    //   )
-    // );
+    this.showLoading = true;
+    this.subscriptions.push(
+      this.userService
+        .updateDoctor(this.editDoctorProfileForm.value, null)
+        .subscribe(
+          (response: HttpResponse<Doctor>) => {
+            this.getDoctorInfo();
+            this.showLoading = false;
+            const token = response.headers.get(HeaderType.JWT_TOKEN);
+            this.authenticationService.saveToken(token);
+            this.clickButton('edit-doctor-profile-close-btn');
+            this.sendNotification(
+              NotificationType.SUCCESS,
+              'you have successfully updated your profile'
+            );
+          },
+          (errorResponse: HttpErrorResponse) => {
+            this.showLoading = false;
+            this.sendNotification(
+              NotificationType.ERROR,
+              errorResponse.error.message
+            );
+          }
+        )
+    );
   }
   // update profile image
 
@@ -362,5 +437,9 @@ export class DoctorProfileComponent implements OnInit {
 
   private clickButton(buttonId: string) {
     document.getElementById(buttonId).click();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 }

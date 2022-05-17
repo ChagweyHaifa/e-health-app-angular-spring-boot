@@ -16,6 +16,7 @@ export class User {
   public active: boolean;
   public notLocked: boolean;
   public role: string;
+  public password: string;
   public authorities: [];
 
   constructor() {

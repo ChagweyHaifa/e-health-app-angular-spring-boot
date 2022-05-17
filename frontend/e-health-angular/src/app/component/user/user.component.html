@@ -10,12 +10,13 @@
             <button class=" btn " id="v-pills-home-tab" data-bs-toggle="pill" data-bs-target="#v-pills-home"
                 type="button" role="tab" aria-controls="v-pills-home" aria-selected="true"
                 (click)="getDoctors()">Doctors</button>
+            <button class="btn" id="v-pills-messages-tab" data-bs-toggle="pill" data-bs-target="#v-pills-messages"
+                type="button" role="tab" aria-controls="v-pills-messages" aria-selected="false"
+                (click)="getUsers('ROLE_USER')">Visitors</button>
             <button class="btn" id="v-pills-profile-tab" data-bs-toggle="pill" data-bs-target="#v-pills-profile"
                 type="button" role="tab" aria-controls="v-pills-profile" aria-selected="false"
                 (click)="getUsers('ROLE_ADMIN')">Administrators</button>
-            <button class="btn" id="v-pills-messages-tab" data-bs-toggle="pill" data-bs-target="#v-pills-messages"
-                type="button" role="tab" aria-controls="v-pills-messages" aria-selected="false"
-                (click)="getUsers('ROLE_USER')">Users</button>
+
             <button class="btn" id="v-pills-settings-tab" data-bs-toggle="pill" data-bs-target="#v-pills-settings"
                 type="button" role="tab" aria-controls="v-pills-settings" aria-selected="false"
                 (click)="getSpecialities()">Specialities</button>
@@ -336,13 +337,16 @@
                     </div>
                     <div class="edit-doctor-form-container">
                         <form [formGroup]="editDoctorForm">
+                            <!-- About section -->
                             <div class="form-area mt-3 mb-4" id="about-section">
+                                <!--about title  -->
                                 <div class="form-area-title">
                                     <span><i class="fa fa-user-md" aria-hidden="true"></i>
                                         About <i (click)="onEditDoctor('about')"
                                             class="fa fa-pencil-square-o edit-section-btn" style="cursor:pointer ;"
                                             aria-hidden="true"></i></span>
                                 </div>
+                                <!-- about info -->
                                 <div *ngIf="isEditAbout==false" class="mt-2" id="about-info">
                                     <div class="row mb-2">
                                         <div class="col"> <b>FirstName:</b> {{selectedDoctor?.firstName}}</div>
@@ -358,23 +362,43 @@
                                     <div class="mb-2"><b>Speciality: </b>{{selectedDoctor?.speciality?.name}}</div>
                                     <div class="mb-2"><b>Gender: </b>{{selectedDoctor?.gender}}</div>
                                 </div>
-                                <div *ngIf="!isEditAbout==false" class="about-form">
-
-
+                                <!-- edit about info -->
+                                <div formGroupName="about" *ngIf="!isEditAbout==false" class="about-form">
                                     <div class="form-group my-2 row ">
                                         <div class="col">
                                             <label class="mb-1" for="firstName">First Name</label>
-                                            <input formControlName="firstName" type="text" class="form-control">
-                                            <!-- whenever we change smthg in template or the from , the controller will be updated automatically -->
+                                            <input formControlName="firstName" type="text" class="form-control"
+                                                [ngClass]="{ 'is-invalid': submitted && f.about.get('firstName').errors }">
+                                            <div *ngIf="submitted && f.about.get('firstName').errors"
+                                                class="invalid-feedback">
+                                                <div *ngIf="f.about.get('firstName').errors.required">
+                                                    First Name is required
+                                                </div>
+                                            </div>
+
                                         </div>
                                         <div class="col">
                                             <label class="mb-1">Last Name</label>
-                                            <input formControlName="lastName" type="text" class="form-control">
+                                            <input formControlName="lastName" type="text" class="form-control"
+                                                [ngClass]="{ 'is-invalid': submitted && f.about.get('lastName').errors }">
+                                            <div *ngIf="submitted && f.about.get('lastName').errors"
+                                                class="invalid-feedback">
+                                                <div *ngIf="f.about.get('lastName').errors.required">
+                                                    Last Name is required
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="form-group my-2">
                                         <label class="mb-1" for="username">Username</label>
-                                        <input formControlName="username" type="text" class="form-control">
+                                        <input formControlName="username" type="text" class="form-control"
+                                            [ngClass]="{ 'is-invalid': submitted && f.about.get('username').errors }">
+                                        <div *ngIf="submitted && f.about.get('username').errors"
+                                            class="invalid-feedback">
+                                            <div *ngIf="f.about.get('username').errors.required">
+                                                Username is required
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div class="form-group my-2">
@@ -412,15 +436,23 @@
                                             </label>
                                         </div>
                                     </div>
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                                        <button (click)="editDoctor('about')"
+                                            class="btn purple-btn save-doctor-info-btn" type="button">
+                                            <span *ngIf="!showLoading">Save</span>
+                                            <span *ngIf="showLoading" class="spinner-grow spinner-grow-sm" role="status"
+                                                aria-hidden="true"> </span>
+
+                                            <span *ngIf="showLoading"> Loading...</span>
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
-                                    <button *ngIf="!isEditAbout==false" class="btn purple-btn save-doctor-info-btn"
-                                        type="button">Save
-                                    </button>
-                                </div>
+
                             </div>
+                            <!-- End about section -->
                             <!-- Contact section -->
                             <div class="form-area mt-3 mb-4">
+                                <!-- Contact title -->
                                 <div class=" form-area-title">
                                     <span><i class="fa fa-envelope" aria-hidden="true"></i> Contact <i
                                             (click)="onEditDoctor('contact')"
@@ -443,14 +475,31 @@
                                         {{selectedDoctor?.address?.country}}</div>
                                 </div>
                                 <!-- Edit contact info -->
-                                <div *ngIf="!isEditContact==false" class="contact-form">
+                                <div formGroupName="contact" *ngIf="!isEditContact==false" class="contact-form">
                                     <div class="form-group my-2">
                                         <label class="mb-1" for="email">Email</label>
-                                        <input formControlName="email" type="email" class=" form-control">
+                                        <input formControlName="email" type="email" class=" form-control"
+                                            [ngClass]="{ 'is-invalid': submitted && f.contact.get('email').errors }">
+                                        <div *ngIf="submitted && f.contact.get('email').errors"
+                                            class="invalid-feedback">
+                                            <div *ngIf="f.contact.get('email').errors.required">
+                                                Email is required
+                                            </div>
+                                            <div *ngIf="f.contact.get('email').errors.email">
+                                                Email must be a valid email address
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="form-group my-2">
                                         <label class="mb-1">Phone number</label>
-                                        <input type="number" formControlName="phoneNumber" class="form-control">
+                                        <input type="number" formControlName="phoneNumber" class="form-control"
+                                            [ngClass]="{ 'is-invalid': submitted && f.contact.get('phoneNumber').errors }">
+                                        <div *ngIf="submitted && f.contact.get('phoneNumber').errors"
+                                            class="invalid-feedback">
+                                            <div *ngIf="f.contact.get('phoneNumber').errors.required">
+                                                Phone Number is required
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div formGroupName="address">
@@ -458,7 +507,7 @@
                                             <div class="col">
                                                 <label class="mb-1">Country</label>
                                                 <select formControlName="country" class="form-select"
-                                                    (change)="getStates(editDoctorForm.controls['address'].value.country);resetAddress('country')">
+                                                    (change)="getStates(editDoctorForm.controls['contact'].get('address').value.country);resetAddress('country')">
                                                     <option *ngFor="let tempCountry of countries"
                                                         [ngValue]="tempCountry.name">
                                                         {{tempCountry.name}}
@@ -468,32 +517,59 @@
                                             <div class="col">
                                                 <label class="mb-1">State</label>
                                                 <select formControlName="state" class="form-select"
-                                                    (change)="getCities(editDoctorForm.controls['address'].value.state);resetAddress('state')">
+                                                    [ngClass]="{ 'is-invalid': submitted && f.contact.get('address').get('state').errors }"
+                                                    (change)="getCities(editDoctorForm.controls['contact'].get('address').value.state);resetAddress('state')">
                                                     <option *ngFor="let tempState of states" [ngValue]="tempState.name"
                                                         (change)="getCities(editDoctorForm.value.state)">
                                                         {{tempState.name}}
                                                     </option>
                                                 </select>
+                                                <div *ngIf="submitted && f.contact.get('address').get('state').errors"
+                                                    class="invalid-feedback">
+                                                    <div *ngIf="f.contact.get('address').get('state').errors.required">
+                                                        State is required
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="my-2 row">
                                             <div class="col">
                                                 <label class="mb-1">City</label>
                                                 <select formControlName="city" class="form-select"
+                                                    [ngClass]="{ 'is-invalid': submitted && f.contact.get('address').get('city').errors }"
                                                     (change)="resetAddress('city')">
                                                     <option *ngFor="let tempCity of cities" [ngValue]="tempCity.name">
                                                         {{tempCity.name}}
                                                 </select>
+                                                <div *ngIf="submitted && f.contact.get('address').get('city').errors"
+                                                    class="invalid-feedback">
+                                                    <div *ngIf="f.contact.get('address').get('city').errors.required">
+                                                        City is required
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div class="col">
                                                 <label class="mb-1">Address</label>
                                                 <input formControlName="street" class="form-control" type="text"
-                                                    placeholder="Address(street,center)">
+                                                    placeholder="Address(street,center)"
+                                                    [ngClass]="{ 'is-invalid': submitted && f.contact.get('address').get('street').errors }">
+                                                <div *ngIf="submitted && f.contact.get('address').get('street').errors"
+                                                    class="invalid-feedback">
+                                                    <div *ngIf="f.contact.get('address').get('street').errors.required">
+                                                        Address is required
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
-                                        <button class="btn purple-btn save-doctor-info-btn" type="button">Save
+                                        <!-- [disabled]="editDoctorForm.controls['contact'].invalid" -->
+                                        <button (click)="editDoctor('contact')"
+                                            class="btn purple-btn save-doctor-info-btn" type="button">
+                                            <span *ngIf="!showLoading">Save</span>
+                                            <span *ngIf="showLoading" class="spinner-grow spinner-grow-sm" role="status"
+                                                aria-hidden="true"> </span>
+                                            <span *ngIf="showLoading"> Loading...</span>
                                         </button>
                                     </div>
                                 </div>
@@ -501,16 +577,14 @@
                             <!-- End contact section -->
 
                             <!-- Account status section -->
-
                             <div class="form-area mt-3 mb-4">
-
+                                <!-- account title -->
                                 <div class=" form-area-title">
                                     <span><i class="fa fa-unlock-alt" aria-hidden="true"></i> Account status <i
                                             (click)="onEditDoctor('accountStatus')"
                                             class="fa fa-pencil-square-o edit-section-btn" style="cursor:pointer ;"
                                             aria-hidden="true"></i></span>
                                 </div>
-
                                 <!-- Account status info -->
                                 <div *ngIf="isEditAccountStatus==false" class="mt-2" id="account-status-info">
                                     <div class="row mb-2">
@@ -550,8 +624,9 @@
                                     </div>
 
                                 </div>
-                                <!-- Edit account status info -->
-                                <div *ngIf="!isEditAccountStatus==false" class="account-status-form">
+                                <!-- Edit account status form -->
+                                <div formGroupName="accountStatus" *ngIf="!isEditAccountStatus==false"
+                                    class="account-status-form">
                                     <div class="row my-2">
                                         <div class="col">
                                             <div class="form-group">
@@ -599,7 +674,13 @@
                                         </div>
                                     </div>
                                     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
-                                        <button class="btn purple-btn save-doctor-info-btn" type="button">Save
+                                        <button [disabled]="editDoctorForm.controls['accountStatus'].invalid"
+                                            (click)="editDoctor('accountStatus')"
+                                            class="btn purple-btn save-doctor-info-btn" type="button">
+                                            <span *ngIf="!showLoading">Save</span>
+                                            <span *ngIf="showLoading" class="spinner-grow spinner-grow-sm" role="status"
+                                                aria-hidden="true"> </span>
+                                            <span *ngIf="showLoading"> Loading...</span>
                                         </button>
                                     </div>
                                 </div>
@@ -611,22 +692,58 @@
                                 <div class=" form-area-title">
                                     <span><i class="fa fa-key" aria-hidden="true"></i> Change Password <i
                                             class="fa fa-pencil-square-o edit-section-btn" style="cursor: pointer;"
-                                            (click)="onEditDoctor('password')" aria-hidden="true"></i></span>
+                                            (click)="onEditDoctor('changePassword')" aria-hidden="true"></i></span>
                                 </div>
                                 <!-- Edit account status info -->
-                                <div *ngIf="!isEditPassword==false" class="change-password-form">
+                                <div formGroupName="changePassword" *ngIf="!isEditPassword==false"
+                                    class="change-password-form">
+
                                     <div class="form-group my-2">
                                         <label class="mb-1" for="password">Password</label>
-                                        <input id="password" formControlName="password" type="password"
-                                            class="form-control">
+                                        <input formControlName="currentPassword" type="password" class="form-control"
+                                            [ngClass]="{ 'is-invalid': submitted && f.changePassword.get('currentPassword').errors }">
+                                        <div *ngIf="submitted && f.changePassword.get('currentPassword').errors"
+                                            class="invalid-feedback">
+                                            <div *ngIf="f.changePassword.get('currentPassword').errors.required">
+                                                Current password is required
+                                            </div>
+
+                                        </div>
                                     </div>
                                     <div class="form-group my-2">
+                                        <label class="mb-1" for="password">Password</label>
+                                        <input formControlName="password" type="password" class="form-control"
+                                            [ngClass]="{ 'is-invalid': submitted && f.changePassword.get('password').errors }">
+                                        <div *ngIf="submitted && f.changePassword.get('password').errors"
+                                            class="invalid-feedback">
+                                            <div *ngIf="f.changePassword.get('password').errors.required">
+                                                Password is required
+                                            </div>
+                                            <div *ngIf="f.changePassword.get('password').errors.minlength">
+                                                Password must be at least 6 characters
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group my-2">
                                         <label class="mb-1" for="password">Confirm password</label>
-                                        <input id="password" type="password" class="form-control">
+                                        <input formControlName="confirmPassword" type="password" class="form-control"
+                                            [ngClass]="{ 'is-invalid': submitted && f.changePassword.get('confirmPassword').errors }">
+                                        <div *ngIf="submitted && f.changePassword.get('confirmPassword').errors"
+                                            class="invalid-feedback">
+                                            <div *ngIf="f.changePassword.get('confirmPassword').errors.required">
+                                                Password onfirmation is required
+                                            </div>
+
+                                        </div>
                                     </div>
                                     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
-                                        <button *ngIf="!isEditPassword==false"
-                                            class="btn purple-btn save-doctor-info-btn" type="button">Save
+                                        <button (click)="editDoctor('changePassword')"
+                                            class="btn purple-btn save-doctor-info-btn" type="button">
+                                            <span *ngIf="!showLoading">Save</span>
+                                            <span *ngIf="showLoading" class="spinner-grow spinner-grow-sm" role="status"
+                                                aria-hidden="true"> </span>
+                                            <span *ngIf="showLoading"> Loading...</span>
                                         </button>
                                     </div>
                                 </div>

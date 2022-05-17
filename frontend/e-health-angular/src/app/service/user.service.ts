@@ -23,12 +23,17 @@ export class UserService {
     return this.http.get<Doctor[]>(`${this.host}/users/doctors`);
   }
 
-  public addUser(formData: FormData): Observable<User> {
-    return this.http.post<User>(`${this.host}/users`, formData);
-  }
-
-  public updateUser(formData: FormData): Observable<User> {
-    return this.http.put<User>(`${this.host}/users`, formData);
+  public updateUser(
+    currentUsername: string,
+    user: User
+  ): Observable<HttpResponse<User>> {
+    return this.http.put<User>(
+      `${this.host}/users/doctors/${currentUsername}`,
+      user,
+      {
+        observe: 'response',
+      }
+    );
   }
 
   public deleteUser(username: string): Observable<CustomHttpResponse> {
@@ -56,15 +61,17 @@ export class UserService {
     );
   }
 
-  // public updateDoctor(doctor: Doctor): Observable<HttpResponse<Doctor>> {
-  //   return this.http.put<Doctor>(`${this.host}/users/doctors`, doctor, {
-  //     observe: 'response',
-  //   });
-  // }
-  public updateDoctor(doctorDto: DoctorDto): Observable<HttpResponse<Doctor>> {
-    return this.http.put<Doctor>(`${this.host}/users/doctors`, doctorDto, {
-      observe: 'response',
-    });
+  public updateDoctor(
+    doctor: Doctor,
+    currentDoctorUsername: string
+  ): Observable<HttpResponse<Doctor>> {
+    return this.http.put<Doctor>(
+      `${this.host}/users/doctors/${currentDoctorUsername}`,
+      doctor,
+      {
+        observe: 'response',
+      }
+    );
   }
 
   public updateProfileImage(formData: FormData): Observable<Doctor> {
@@ -72,10 +79,6 @@ export class UserService {
       `${this.host}/users/doctors/updateProfileImage`,
       formData
     );
-  }
-
-  public addUsersToLocalCache(users: User[]): void {
-    localStorage.setItem('users', JSON.stringify(users));
   }
 
   public getUsersFromLocalCache(): User[] {

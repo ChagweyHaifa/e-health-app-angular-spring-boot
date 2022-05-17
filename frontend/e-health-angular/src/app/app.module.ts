@@ -23,6 +23,8 @@ import { DoctorProfileComponent } from './component/doctor-profile/doctor-profil
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgxRatingStarsModule } from 'ngx-rating-stars';
 import { NgxStarRatingModule } from 'ngx-star-rating';
+import { SettingsComponent } from './component/settings/settings.component';
+import { MedicalMagazineComponent } from './components/medical-magazine/medical-magazine.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +36,8 @@ import { NgxStarRatingModule } from 'ngx-star-rating';
     QuestionsComponent,
     NavBarComponent,
     DoctorProfileComponent,
+    SettingsComponent,
+    MedicalMagazineComponent,
   ],
   imports: [
     BrowserModule,

@@ -142,7 +142,7 @@
                         <label for="speciality" class="form-label">Speciality (required) </label>
 
                         <select class="form-select" formControlName="speciality">
-                            <option value="">Speciality</option>
+                            <!-- <option value="">speciality</option> -->
                             <option *ngFor="let tempSpeciality of specialities" [ngValue]="tempSpeciality.name">
                                 {{tempSpeciality.name}}</option>
                         </select>

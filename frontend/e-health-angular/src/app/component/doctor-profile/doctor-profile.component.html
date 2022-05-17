@@ -85,7 +85,7 @@
                             <!-- <button type="button" class="btn purple-btn"><i class="fa fa-envelope"></i> Send
                                 Message</button> -->
                             <button type="button" class="btn purple-btn " data-bs-toggle="modal"
-                                data-bs-target="#editDoctorProfileModal" (click)="onEditDoctorProfile()"><i
+                                data-bs-target="#editDoctorProfileModal" (click)="launchEditDoctorProfileModal()"><i
                                     class="fa fa-pencil-square" aria-hidden="true"></i>
                                 Edit Profile</button>
                         </div><!-- End .user-button -->
@@ -196,130 +196,197 @@
             </div>
             <div class="modal-body">
 
-                <form #editDoctorProfileForm="ngForm" (ngSubmit)="editDoctorProfile(editDoctorProfileForm)"
-                    class="login-form">
+                <form [formGroup]="editDoctorProfileForm" class="login-form" (ngSubmit)="editDoctorProfile()">
                     <!-- doctor username -->
-                    <div class="my-2">
-                        <input type="text" class="form-control" name="username" placeholder="Username" required
-                            [(ngModel)]="doctor.username" #DoctorUsernameInput="ngModel">
-                        <span class="help-block" *ngIf="DoctorUsernameInput.invalid && DoctorUsernameInput.touched"
-                            style="color:red;">Please enter a username</span>
-                    </div>
-
-
-                    <div class="row my-2">
-                        <!-- doctor firstName -->
-                        <div class="  col ">
-                            <input type="text" class="form-control" name="firstName" placeholder="First name" required
-                                [(ngModel)]="doctor.firstName" #DoctorFirstNameInput="ngModel">
-                            <span class="help-block"
-                                *ngIf="DoctorFirstNameInput.invalid && DoctorFirstNameInput.touched"
-                                style="color:red;">Please enter a first name</span>
+                    <div class="form-area mt-3 mb-4" id="about-section">
+                        <!--about title  -->
+                        <div class="form-area-title">
+                            <span><i class="fa fa-user-md" aria-hidden="true"></i>
+                                About </span>
                         </div>
+                        <div class="about-form">
+                            <div class="form-group my-2 row ">
+                                <div class="col">
+                                    <label class="mb-1" for="firstName">First Name</label>
+                                    <input formControlName="firstName" type="text" class="form-control"
+                                        [ngClass]="{ 'is-invalid': submitted && f.firstName.errors }">
+                                    <div *ngIf="submitted && f.firstName.errors" class="invalid-feedback">
+                                        <div *ngIf="f.firstName.errors.required">
+                                            First Name is required
+                                        </div>
+                                    </div>
 
-                        <!-- doctor lastName -->
-                        <div class="col">
-                            <input type="text" class="form-control" name="lastName" placeholder="Last name" required
-                                [(ngModel)]="doctor.lastName" #DoctorLastNameInput="ngModel">
-                            <span class="help-block" *ngIf="DoctorLastNameInput.invalid && DoctorLastNameInput.touched"
-                                style="color:red;">Please enter a last name</span>
-                        </div>
-
-                    </div>
-                    <!-- doctor email -->
-
-                    <div class=" my-2">
-                        <input type="text" class="form-control" name="email" placeholder="Email" required
-                            [(ngModel)]="doctor.email" #DoctorEmailInput="ngModel">
-                        <span class="help-block" *ngIf="DoctorEmailInput.invalid && DoctorEmailInput.touched"
-                            style="color:red;">Please enter your email.</span>
-                    </div>
-
-
-                    <div class=" my-2">
-                        <select class="form-select" name="speciality" [(ngModel)]="doctor.speciality" required
-                            #specialityInput="ngModel">
-                            <option value="">Speciality</option>
-                            <option *ngFor="let tempSpeciality of specialities">
-                                {{tempSpeciality.name}}</option>
-                        </select>
-                        <span class="help-block" *ngIf="specialityInput.invalid && specialityInput.touched"
-                            style="color:red;">Please select a speciality.</span>
-                    </div>
-
-                    <div class="row my-2">
-                        <div class="col">
-                            <div class="input-group ">
-                                <input type="text" class="form-control" name="phoneNumber" placeholder="PhoneNumber"
-                                    required [(ngModel)]="doctor.phoneNumber" #phoneNumberInput="ngModel">
+                                </div>
+                                <div class="col">
+                                    <label class="mb-1">Last Name</label>
+                                    <input formControlName="lastName" type="text" class="form-control"
+                                        [ngClass]="{ 'is-invalid': submitted && f.lastName.errors }">
+                                    <div *ngIf="submitted && f.lastName.errors" class="invalid-feedback">
+                                        <div *ngIf="f.lastName.errors.required">
+                                            Last Name is required
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <span class="help-block" *ngIf="phoneNumberInput.invalid && phoneNumberInput.touched"
-                                style="color:red;">Please enter a phoneNumber</span>
-                        </div>
+                            <div class="form-group my-2">
+                                <label class="mb-1" for="username">Username</label>
+                                <input formControlName="username" type="text" class="form-control"
+                                    [ngClass]="{ 'is-invalid': submitted && f.username.errors }">
+                                <div *ngIf="submitted && f.username.errors" class="invalid-feedback">
+                                    <div *ngIf="f.username.errors.required">
+                                        Username is required
+                                    </div>
+                                </div>
+                            </div>
 
-                        <div class="col">
-                            <select class="form-control" name="country" required [(ngModel)]="doctor.address.country"
-                                #countryInput="ngModel" (change)="getStates(editDoctorProfileForm.value.country)">
-                                <option value="">Country</option>
-                                <option *ngFor="let tempCountry of countries" [value]="tempCountry.name">
-                                    {{tempCountry.name}}
-                                </option>
-                            </select>
-                            <span class="help-block" *ngIf="countryInput.invalid && countryInput.touched"
-                                style="color:red;">Please select a country.</span>
+                            <div formGroupName="speciality" class="form-group my-2">
+                                <label class="mb-1">Speciality</label>
+                                <select formControlName="name" class="form-select">
+                                    <option *ngFor="let tempSpeciality of specialities" [ngValue]="tempSpeciality.name">
+                                        {{tempSpeciality.name}}</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="form-check ">
+                                    <input class="form-check-input" type="radio" id="flexRadioDefault1"
+                                        formControlName="gender" value="man">
+                                    <label class="form-check-label" for="flexRadioDefault1">
+                                        Man
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" id="flexRadioDefault2"
+                                        formControlName="gender" value="woman">
+                                    <label class="form-check-label" for="flexRadioDefault2">
+                                        Woman
+                                    </label>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <!--contact section  -->
+                    <div class="form-area mt-3 mb-4" id="contact-section">
+                        <div class="form-area-title">
+                            <span><i class="fa fa-user-md" aria-hidden="true"></i>
+                                About </span>
+                        </div>
+                        <div class="about-form">
+                            <div class="form-group my-2">
+                                <label class="mb-1" for="email">Email</label>
+                                <input formControlName="email" type="email" class=" form-control"
+                                    [ngClass]="{ 'is-invalid': submitted && f.email.errors }">
+                                <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
+                                    <div *ngIf="f.email.errors.required">
+                                        Email is required
+                                    </div>
+                                    <div *ngIf="f.email.errors.email">
+                                        Email must be a valid email address
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group my-2">
+                                <label class="mb-1">Phone number</label>
+                                <input type="number" formControlName="phoneNumber" class="form-control"
+                                    [ngClass]="{ 'is-invalid': submitted && f.phoneNumber.errors }">
+                                <div *ngIf="submitted && f.phoneNumber.errors" class="invalid-feedback">
+                                    <div *ngIf="f.phoneNumber.errors.required">
+                                        Phone Number is required
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div formGroupName="address">
+                                <div class="my-2 row">
+                                    <div class="col">
+                                        <label class="mb-1">Country</label>
+                                        <select formControlName="country" class="form-select"
+                                            (change)="getStates(f.address.value.country);resetAddress('country')">
+                                            <option *ngFor="let tempCountry of countries" [ngValue]="tempCountry.name">
+                                                {{tempCountry.name}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col">
+                                        <label class="mb-1">State</label>
+                                        <select formControlName="state" class="form-select"
+                                            [ngClass]="{ 'is-invalid': submitted && f.address.get('state').errors }"
+                                            (change)="getCities(f.address.value.state);resetAddress('state')">
+                                            <option *ngFor="let tempState of states" [ngValue]="tempState.name">
+                                                {{tempState.name}}
+                                            </option>
+                                        </select>
+                                        <div *ngIf="submitted && f.address.get('state').errors"
+                                            class="invalid-feedback">
+                                            <div *ngIf="f.address.get('state').errors.required">
+                                                State is required
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="my-2 row">
+                                    <div class="col">
+                                        <label class="mb-1">City</label>
+                                        <select formControlName="city" class="form-select"
+                                            [ngClass]="{ 'is-invalid': submitted && f.address.get('city').errors }"
+                                            (change)="resetAddress('city')">
+                                            <option *ngFor="let tempCity of cities" [ngValue]="tempCity.name">
+                                                {{tempCity.name}}
+                                        </select>
+                                        <div *ngIf="submitted && f.address.get('city').errors" class="invalid-feedback">
+                                            <div *ngIf="f.address.get('city').errors.required">
+                                                City is required
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <label class="mb-1">Address</label>
+                                        <input formControlName="street" class="form-control" type="text"
+                                            placeholder="Address(street,center)"
+                                            [ngClass]="{ 'is-invalid': submitted && f.address.get('street').errors }">
+                                        <div *ngIf="submitted && f.address.get('street').errors"
+                                            class="invalid-feedback">
+                                            <div *ngIf="f.address.get('street').errors.required">
+                                                Address is required
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="row my-2">
-                        <div class="col">
-                            <select class="form-control" name="state" [(ngModel)]="doctor.address.state" required
-                                #stateInput="ngModel" (change)="getCities(editDoctorProfileForm.value.state)">
-                                <option value="">State</option>
-                                <option *ngFor="let tempState of states" [value]="tempState.name">{{tempState.name}}
-                                </option>
-                            </select>
-                            <span class="help-block" *ngIf="stateInput.invalid && stateInput.touched"
-                                style="color:red;">Please select a state</span>
+                    <!--Account status section  -->
+                    <div class="form-area mt-3 mb-4" id="account-status-section">
+                        <div class="form-area-title">
+                            <span><i class="fa fa-user-md" aria-hidden="true"></i>
+                                Account status </span>
                         </div>
+                        <div id="account-status-form">
 
-                        <div class="col">
-                            <select class="form-control" name="city" [(ngModel)]="doctor.address.city" required
-                                #cityInput="ngModel">
-                                <option value="">City</option>
-                                <option *ngFor="let tempCity of cities" [value]="tempCity.name">{{tempCity.name}}
-                                </option>
-                            </select>
-                            <span class="help-block" *ngIf="cityInput.invalid && cityInput.touched"
-                                style="color:red;">Please select a city</span>
+                            <div class="my-2">
+
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" formControlName="active">
+                                    <label class="form-check-label" for="">Active status</label>
+                                </div>
+                            </div>
+                            <div class="my-2">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" formControlName="notLocked">
+                                    <label class="form-check-label" for="">Lockout status</label>
+                                </div>
+                            </div>
+
+
                         </div>
 
                     </div>
 
-                    <div class=" my-2">
-                        <input type="text" class="form-control" name="street"
-                            placeholder="Address (Street, Floor, Center)" required [(ngModel)]="doctor.address.street"
-                            #streetInput="ngModel">
-                        <span class="help-block" *ngIf="streetInput.invalid && streetInput.touched"
-                            style="color:red;">Please enter a street</span>
-                    </div>
-                    <div class=" my-2">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="gender" [(ngModel)]="doctor.gender"
-                                value="man" required>
-                            <label class="form-check-label" for="inlineRadio1">Man</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="gender" [(ngModel)]="doctor.gender"
-                                value="woman">
-                            <label class="form-check-label" for="inlineRadio2">Woman</label>
-                        </div>
-                    </div>
-
-
+                    <!--edit-doctor-profile form submit button -->
                     <div class=" mt-3 ">
-                        <!--  -->
                         <button type="submit" [hidden]="true" id="edit-doctor-profile-submit-btn">
-
                         </button>
                     </div>
                 </form>
@@ -328,10 +395,12 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" id="edit-doctor-profile-close-btn"
                     data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn purple-btn" [disabled]="editDoctorProfileForm.invalid || showLoading">
-                    <i *ngIf="showLoading" class="fas fa-spinner fa-spin"></i>&nbsp;&nbsp;
-                    <span *ngIf="showLoading">Loading...</span>
-                    <span *ngIf="!showLoading" (click)="clickDoctorProfileSubmitBtn()">Save changes</span></button>
+                <button type="button" class="btn purple-btn" (click)="clickDoctorProfileSubmitBtn()">
+                    <span *ngIf="!showLoading">Save changes</span>
+                    <span *ngIf="showLoading" class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true">
+                    </span>
+                    <span *ngIf="showLoading"> Loading...</span>
+                </button>
             </div>
         </div>
     </div>

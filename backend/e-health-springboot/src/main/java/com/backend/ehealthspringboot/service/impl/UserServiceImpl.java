@@ -129,7 +129,7 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
 //        set a default image for user
         LOGGER.info("New user password: " + password);
         user.setRole(ROLE_USER.name());
-        user.setAuthorities(ROLE_USER.getAuthorities());
+
         userRepository.save(user);
         return user;
     }

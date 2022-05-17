@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { NotificationType } from 'src/app/enum/notification-type.enum';
@@ -10,13 +10,15 @@ import { Speciality } from 'src/app/model/speciality';
 import { FormService } from 'src/app/service/form.service';
 import { NotificationService } from 'src/app/service/notification.service';
 import { QuestionService } from 'src/app/service/question.service';
+import { SubSink } from 'subsink';
 
 @Component({
   selector: 'app-questions',
   templateUrl: './questions.component.html',
   styleUrls: ['./questions.component.css'],
 })
-export class QuestionsComponent implements OnInit {
+export class QuestionsComponent implements OnInit, OnDestroy {
+  private subs = new SubSink();
   private subscriptions: Subscription[] = [];
   specialities: Speciality[];
   showLoading: boolean = false;
@@ -81,7 +83,7 @@ export class QuestionsComponent implements OnInit {
   //   });
   // }
   getSpecialities() {
-    this.subscriptions.push(
+    this.subs.add(
       this.formService.getSpecialities().subscribe(
         (response: Speciality[]) => {
           this.specialities = response;
@@ -97,17 +99,19 @@ export class QuestionsComponent implements OnInit {
   }
   getQuestionsBySpeciality(specialityName: string) {
     this.currenSpecialityName = specialityName;
-    this.questionService.getQuestionsBySpeciality(specialityName).subscribe(
-      (response: Question[]) => {
-        this.questions = response;
-      },
+    this.subs.add(
+      this.questionService.getQuestionsBySpeciality(specialityName).subscribe(
+        (response: Question[]) => {
+          this.questions = response;
+        },
 
-      (errorResponse: HttpErrorResponse) => {
-        this.sendNotification(
-          NotificationType.ERROR,
-          errorResponse.error.message
-        );
-      }
+        (errorResponse: HttpErrorResponse) => {
+          this.sendNotification(
+            NotificationType.ERROR,
+            errorResponse.error.message
+          );
+        }
+      )
     );
   }
 
@@ -122,7 +126,7 @@ export class QuestionsComponent implements OnInit {
   }
 
   addQuestion() {
-    // console.log(this.myQuestionForm.value);
+    console.log(this.myQuestionForm.value);
     this.showLoading = true;
     const formData = new FormData();
     formData.append('specialityName', this.myQuestionForm.value.speciality);
@@ -138,25 +142,27 @@ export class QuestionsComponent implements OnInit {
     for (const file of this.files) {
       formData.append('attachements', file);
     }
-    this.questionService.addQuestion(formData).subscribe(
-      (response: Question) => {
-        this.getQuestionsBySpeciality(this.myQuestionForm.value.speciality);
-        this.showLoading = false;
-        this.clickButton('my-question-form-close-btn');
-        this.myQuestionForm.reset();
-        this.sendNotification(
-          NotificationType.SUCCESS,
-          'You have added your question successfully'
-        );
-      },
+    this.subs.add(
+      this.questionService.addQuestion(formData).subscribe(
+        (response: Question) => {
+          this.getQuestionsBySpeciality(this.myQuestionForm.value.speciality);
+          this.showLoading = false;
+          this.clickButton('my-question-form-close-btn');
+          this.myQuestionForm.reset();
+          this.sendNotification(
+            NotificationType.SUCCESS,
+            'You have added your question successfully'
+          );
+        },
 
-      (errorResponse: HttpErrorResponse) => {
-        this.showLoading = false;
-        this.sendNotification(
-          NotificationType.ERROR,
-          errorResponse.error.message
-        );
-      }
+        (errorResponse: HttpErrorResponse) => {
+          this.showLoading = false;
+          this.sendNotification(
+            NotificationType.ERROR,
+            errorResponse.error.message
+          );
+        }
+      )
     );
   }
 
@@ -200,34 +206,16 @@ export class QuestionsComponent implements OnInit {
     for (const file of this.files) {
       formData.append('attachements', file);
     }
-    this.questionService.editQuestion(formData).subscribe(
-      (response: Question) => {
-        this.getQuestionsBySpeciality(this.currenSpecialityName);
-        this.showLoading = false;
-        this.clickButton('edit-my-question-form-close-btn');
-        this.sendNotification(
-          NotificationType.SUCCESS,
-          'You have edited your question successfully'
-        );
-      },
-
-      (errorResponse: HttpErrorResponse) => {
-        this.showLoading = false;
-        this.sendNotification(
-          NotificationType.ERROR,
-          errorResponse.error.message
-        );
-      }
-    );
-  }
-  deleteQuestion(questionId: bigint) {
-    // console.log(this.editMyQuestionForm.value.questionId);
-    const isConfirmed = confirm('Are you sure to delete this question ?');
-    if (isConfirmed) {
-      this.questionService.deleteQuestion(questionId).subscribe(
-        (response: CustomHttpResponse) => {
+    this.subs.add(
+      this.questionService.editQuestion(formData).subscribe(
+        (response: Question) => {
           this.getQuestionsBySpeciality(this.currenSpecialityName);
-          this.sendNotification(NotificationType.SUCCESS, response.message);
+          this.showLoading = false;
+          this.clickButton('edit-my-question-form-close-btn');
+          this.sendNotification(
+            NotificationType.SUCCESS,
+            'You have edited your question successfully'
+          );
         },
 
         (errorResponse: HttpErrorResponse) => {
@@ -237,6 +225,28 @@ export class QuestionsComponent implements OnInit {
             errorResponse.error.message
           );
         }
+      )
+    );
+  }
+  deleteQuestion(questionId: bigint) {
+    // console.log(this.editMyQuestionForm.value.questionId);
+    const isConfirmed = confirm('Are you sure to delete this question ?');
+    if (isConfirmed) {
+      this.subs.add(
+        this.questionService.deleteQuestion(questionId).subscribe(
+          (response: CustomHttpResponse) => {
+            this.getQuestionsBySpeciality(this.currenSpecialityName);
+            this.sendNotification(NotificationType.SUCCESS, response.message);
+          },
+
+          (errorResponse: HttpErrorResponse) => {
+            this.showLoading = false;
+            this.sendNotification(
+              NotificationType.ERROR,
+              errorResponse.error.message
+            );
+          }
+        )
       );
     }
   }
@@ -258,29 +268,31 @@ export class QuestionsComponent implements OnInit {
     let questionResponse = new QuestionResponse();
     questionResponse.content =
       this.respondToQuestionForm.value.questionResponse;
-    this.questionService
-      .addResponse(
-        this.respondToQuestionForm.value.questionId,
-        questionResponse
-      )
-      .subscribe(
-        (response: Question) => {
-          this.getQuestionsBySpeciality(this.currenSpecialityName);
-          this.clickButton('respond-to-question-modal-close-btn');
-          this.respondToQuestionForm.reset();
-          this.sendNotification(
-            NotificationType.SUCCESS,
-            'you have responded to the question successfully '
-          );
-        },
+    this.subs.add(
+      this.questionService
+        .addResponse(
+          this.respondToQuestionForm.value.questionId,
+          questionResponse
+        )
+        .subscribe(
+          (response: Question) => {
+            this.getQuestionsBySpeciality(this.currenSpecialityName);
+            this.clickButton('respond-to-question-modal-close-btn');
+            this.respondToQuestionForm.reset();
+            this.sendNotification(
+              NotificationType.SUCCESS,
+              'you have responded to the question successfully '
+            );
+          },
 
-        (errorResponse: HttpErrorResponse) => {
-          this.sendNotification(
-            NotificationType.ERROR,
-            errorResponse.error.message
-          );
-        }
-      );
+          (errorResponse: HttpErrorResponse) => {
+            this.sendNotification(
+              NotificationType.ERROR,
+              errorResponse.error.message
+            );
+          }
+        )
+    );
   }
 
   onEditQuestionResponse(question: Question) {
@@ -302,28 +314,30 @@ export class QuestionsComponent implements OnInit {
       this.respondToQuestionForm.value.questionResponse;
     console.log(questionResponse);
     console.log(this.respondToQuestionForm.value.questionId);
-    this.questionService
-      .editQuestionResponse(
-        this.respondToQuestionForm.value.questionId,
-        questionResponse
-      )
-      .subscribe(
-        (response: Question) => {
-          this.getQuestionsBySpeciality(this.currenSpecialityName);
-          this.clickButton('respond-to-question-modal-close-btn');
-          this.sendNotification(
-            NotificationType.SUCCESS,
-            'you have edited your response to the question successfully'
-          );
-        },
+    this.subs.add(
+      this.questionService
+        .editQuestionResponse(
+          this.respondToQuestionForm.value.questionId,
+          questionResponse
+        )
+        .subscribe(
+          (response: Question) => {
+            this.getQuestionsBySpeciality(this.currenSpecialityName);
+            this.clickButton('respond-to-question-modal-close-btn');
+            this.sendNotification(
+              NotificationType.SUCCESS,
+              'you have edited your response to the question successfully'
+            );
+          },
 
-        (errorResponse: HttpErrorResponse) => {
-          this.sendNotification(
-            NotificationType.ERROR,
-            errorResponse.error.message
-          );
-        }
-      );
+          (errorResponse: HttpErrorResponse) => {
+            this.sendNotification(
+              NotificationType.ERROR,
+              errorResponse.error.message
+            );
+          }
+        )
+    );
   }
 
   deleteQuestionResponse(questionId: bigint) {
@@ -331,22 +345,24 @@ export class QuestionsComponent implements OnInit {
       'Are you sure to delete your response to this question ?'
     );
     if (isConfirmed) {
-      this.questionService.deleteQuestionResponse(questionId).subscribe(
-        (response: Question) => {
-          this.getQuestionsBySpeciality(this.currenSpecialityName);
-          this.sendNotification(
-            NotificationType.SUCCESS,
-            'you have deleted your response to this question successfully'
-          );
-        },
+      this.subs.add(
+        this.questionService.deleteQuestionResponse(questionId).subscribe(
+          (response: Question) => {
+            this.getQuestionsBySpeciality(this.currenSpecialityName);
+            this.sendNotification(
+              NotificationType.SUCCESS,
+              'you have deleted your response to this question successfully'
+            );
+          },
 
-        (errorResponse: HttpErrorResponse) => {
-          this.showLoading = false;
-          this.sendNotification(
-            NotificationType.ERROR,
-            errorResponse.error.message
-          );
-        }
+          (errorResponse: HttpErrorResponse) => {
+            this.showLoading = false;
+            this.sendNotification(
+              NotificationType.ERROR,
+              errorResponse.error.message
+            );
+          }
+        )
       );
     }
   }
@@ -368,5 +384,8 @@ export class QuestionsComponent implements OnInit {
 
   private clickButton(buttonId: string) {
     document.getElementById(buttonId).click();
+  }
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
   }
 }
