@@ -64,13 +64,14 @@ export class SettingsComponent implements OnInit {
     this.loggedInUser = this.authenticationService.getUserFromLocalCache();
     console.log(this.loggedInUser);
     this.getCountries();
-    if (this.loggedInUser.address.country != null) {
-      this.getStates(this.loggedInUser.address.country);
+    if (this.loggedInUser.address != null) {
+      if (this.loggedInUser.address.country != null) {
+        this.getStates(this.loggedInUser.address.country);
+      }
+      if (this.loggedInUser.address.state != null) {
+        this.getCities(this.loggedInUser.address.state);
+      }
     }
-    if (this.loggedInUser.address.state != null) {
-      this.getCities(this.loggedInUser.address.state);
-    }
-
     this.editUserProfileForm.patchValue(this.loggedInUser);
   }
 
@@ -167,6 +168,10 @@ export class SettingsComponent implements OnInit {
             this.showLoading = false;
             const token = response.headers.get(HeaderType.JWT_TOKEN);
             this.authenticationService.saveToken(token);
+            this.sendNotification(
+              NotificationType.SUCCESS,
+              'You have edited your account informations successfully'
+            );
           },
           (errorResponse: HttpErrorResponse) => {
             this.showLoading = false;

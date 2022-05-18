@@ -13,11 +13,14 @@ import org.springframework.web.bind.annotation.*;
 import com.backend.ehealthspringboot.exception.ExceptionHandling;
 import com.backend.ehealthspringboot.service.UserService;
 import com.backend.ehealthspringboot.utility.JWTTokenProvider;
+
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.*;
 import static com.backend.ehealthspringboot.constant.SecurityConstant.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 
@@ -98,22 +101,16 @@ public class UserResource extends ExceptionHandling {
 //        return new ResponseEntity<>(newUser, OK);
 //    }
 
-//    @PutMapping("/users")
-////    @PreAuthorize("hasAnyAuthority('user:update')")
-//    //   => only manager, admin and super_admin are authorized
-//    public ResponseEntity<User> update(@RequestParam("currentUsername") String currentUsername,
-//                                       @RequestParam("firstName") String firstName,
-//                                       @RequestParam("lastName") String lastName,
-//                                       @RequestParam("username") String username,
-//                                       @RequestParam("email") String email,
-//                                       @RequestParam("role") String role,
-//                                       @RequestParam("isActive") String isActive,
-//                                       @RequestParam("isNonLocked") String isNonLocked,
-//                                       @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException, NotAnImageFileException {
-//        User updatedUser = userService.updateUser(currentUsername, firstName, lastName, username,email, role, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
-//        return new ResponseEntity<>(updatedUser, OK);
-////                 ResponseEntity<>(User object, HttpStatus object)
-//    }
+    @PutMapping("/users/{currentUsername}")
+    @PreAuthorize("hasAnyAuthority('user:update')")
+    public ResponseEntity<User> update(HttpServletRequest request,@RequestBody User user,@PathVariable("currentUsername")String currentUsername) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException, NotAnImageFileException {
+        String loggedInUsername = getUsernameFromJWTToken(request);
+        User updatedUser = userService.updateUser(loggedInUsername,currentUsername,user);
+        UserPrincipal userPrincipal = new UserPrincipal(updatedUser);
+        HttpHeaders jwtHeader = getJwtHeader(userPrincipal);
+        return new ResponseEntity<>(updatedUser,jwtHeader, OK);
+//                 ResponseEntity<>(User object, HttpStatus object)
+    }
 
     @DeleteMapping("/users/{username}")
     @PreAuthorize("hasAnyAuthority('user:delete')")
@@ -149,11 +146,17 @@ public class UserResource extends ExceptionHandling {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
     }
 
-	private HttpHeaders getJwtHeader(UserPrincipal user) {
+    private String getUsernameFromJWTToken(HttpServletRequest request){
+        String authorizationHeader = request.getHeader(AUTHORIZATION);
+        String token = authorizationHeader.substring(TOKEN_PREFIX.length());
+        return jwtTokenProvider.getSubject(token);
+    }
+    private HttpHeaders getJwtHeader(UserPrincipal user) {
         HttpHeaders headers = new HttpHeaders();
         headers.add(JWT_TOKEN_HEADER, jwtTokenProvider.generateJwtToken(user));
         return headers;
     }
+
 
 
 }

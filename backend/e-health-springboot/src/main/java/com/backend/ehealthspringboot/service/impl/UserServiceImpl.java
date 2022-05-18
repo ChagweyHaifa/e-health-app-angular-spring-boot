@@ -37,6 +37,7 @@ import com.backend.ehealthspringboot.service.UserService;
 import javax.mail.MessagingException;
 
 
+import static com.backend.ehealthspringboot.enumeration.Role.ROLE_ADMIN;
 import static com.backend.ehealthspringboot.enumeration.Role.ROLE_USER;
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.springframework.http.MediaType.*;
@@ -53,50 +54,31 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
     private BCryptPasswordEncoder passwordEncoder;
     private LoginAttemptService loginAttemptService;
     private EmailService emailService;
-
     private UserRepository userRepository;
     private DoctorRepository doctorRepository;
-
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            DoctorRepository doctorRepository,
-
                            BCryptPasswordEncoder passwordEncoder,
                            LoginAttemptService loginAttemptService,
                            EmailService emailService) {
-
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
         this.emailService = emailService;
         this.userRepository = userRepository;
         this.doctorRepository = doctorRepository;
-
     }
 
     @Override
-    public List<User> getUsers() {
-        return userRepository.findAll();
-    }
-
-    @Override
-    public List<User> getUsersByRole(String role) {
-        {
-            return userRepository.findByRole(role);
-        }
-    }
-
-
-
-	@Override
 //    this funtion is executed when the user trys to log in
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = userRepository.findUserByUsername(username);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findUserByUsername(username);
         if (user == null) {
             LOGGER.error(NO_USER_FOUND_BY_USERNAME + username);
             throw new UsernameNotFoundException(NO_USER_FOUND_BY_USERNAME + username);
         } else {
-        	validateLoginAttempt(user);
+            validateLoginAttempt(user);
             user.setLastLoginDateDisplay(user.getLastLoginDate());
             user.setLastLoginDate(new Date());
             userRepository.save(user);
@@ -104,16 +86,6 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
             LOGGER.info(FOUND_USER_BY_USERNAME + username);
             return userPrincipal;
         }
-	}
-
-    @Override
-    public User findUserByUsername(String username) {
-        return userRepository.findUserByUsername(username);
-    }
-
-    @Override
-    public User findUserByEmail(String email) {
-        return userRepository.findUserByEmail(email);
     }
 
     @Override
@@ -135,10 +107,59 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
     }
 
 
-//    @Override
-//    public User addNewUser(User user){
-//        return userRepository.save((user));
-//    }
+
+    @Override
+    public User updateUser(String loggedInUsername, String currentUsername, User theUser) throws UserNotFoundException, EmailExistException, UsernameExistException {
+
+        User user = this.findUserByUsername(loggedInUsername);
+        if(user == null){
+            throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + loggedInUsername);
+        }
+        User newUser;
+        if((getRoleEnumName(user.getRole()) == ROLE_ADMIN )){
+            newUser = validateNewUsernameAndEmail(currentUsername ,theUser.getUsername(),theUser.getEmail());
+            newUser.setRole(getRoleEnumName(theUser.getRole()).name());
+            LOGGER.info("admin");
+        }
+        else {
+            LOGGER.info("user");
+            newUser = validateNewUsernameAndEmail(loggedInUsername ,theUser.getUsername(),theUser.getEmail());
+        }
+        newUser.setFirstName(theUser.getFirstName());
+        newUser.setLastName(theUser.getLastName());
+        newUser.setUsername(theUser.getUsername());
+        newUser.setPhoneNumber(theUser.getPhoneNumber());
+        newUser.setEmail(theUser.getEmail());
+        newUser.setGender(theUser.getGender());
+        newUser.setAddress(theUser.getAddress());
+        newUser.setActive(theUser.isActive());
+        newUser.setNotLocked(theUser.isNotLocked());
+        userRepository.save(newUser);
+        return newUser;
+    }
+
+    @Override
+    public List<User> getUsers() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public List<User> getUsersByRole(String role) {
+
+        return userRepository.findByRole(role);
+
+    }
+
+    @Override
+    public User findUserByUsername(String username) {
+        return userRepository.findUserByUsername(username);
+    }
+
+    @Override
+    public User findUserByEmail(String email) {
+        return userRepository.findUserByEmail(email);
+    }
+
 
 
 //    @Override
@@ -166,21 +187,20 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
 //        return user;
 //    }
 
-    @Override
-    public User updateUser(String currentUsername, String newFirstName, String newLastName, String newUsername, String newEmail, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException, UsernameExistException, IOException, NotAnImageFileException {
-        User currentUser = validateNewUsernameAndEmail(currentUsername, newUsername, newEmail);
-        currentUser.setFirstName(newFirstName);
-        currentUser.setLastName(newLastName);
-        currentUser.setUsername(newUsername);
-        currentUser.setEmail(newEmail);
-        currentUser.setActive(isActive);
-        currentUser.setNotLocked(isNonLocked);
-        currentUser.setRole(getRoleEnumName(role).name());
-        currentUser.setAuthorities(getRoleEnumName(role).getAuthorities());
-        userRepository.save(currentUser);
-//        saveProfileImage(currentUser, profileImage);
-        return currentUser;
-    }
+//    @Override
+//    public User updateUser(String currentUsername, String newFirstName, String newLastName, String newUsername, String newEmail, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException, UsernameExistException, IOException, NotAnImageFileException {
+//        User currentUser = validateNewUsernameAndEmail(currentUsername, newUsername, newEmail);
+//        currentUser.setFirstName(newFirstName);
+//        currentUser.setLastName(newLastName);
+//        currentUser.setUsername(newUsername);
+//        currentUser.setEmail(newEmail);
+//        currentUser.setActive(isActive);
+//        currentUser.setNotLocked(isNonLocked);
+//        currentUser.setRole(getRoleEnumName(role).name());
+//        currentUser.setAuthorities(getRoleEnumName(role).getAuthorities());
+//        userRepository.save(currentUser);
+//        return currentUser;
+//    }
 
     @Override
     public void deleteUser(String username) throws IOException {

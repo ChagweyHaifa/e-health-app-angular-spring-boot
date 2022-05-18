@@ -27,13 +27,9 @@ export class UserService {
     currentUsername: string,
     user: User
   ): Observable<HttpResponse<User>> {
-    return this.http.put<User>(
-      `${this.host}/users/doctors/${currentUsername}`,
-      user,
-      {
-        observe: 'response',
-      }
-    );
+    return this.http.put<User>(`${this.host}/users/${currentUsername}`, user, {
+      observe: 'response',
+    });
   }
 
   public deleteUser(username: string): Observable<CustomHttpResponse> {

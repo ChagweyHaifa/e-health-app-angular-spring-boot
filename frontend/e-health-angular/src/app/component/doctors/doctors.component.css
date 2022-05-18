@@ -1,6 +1,9 @@
 /*==================================================
   Nearby People CSS
   ==================================================*/
+.doctor-card {
+  border-radius: 0.8rem;
+}
 
 img.profile-photo-lg {
   height: 100%;
@@ -9,4 +12,14 @@ img.profile-photo-lg {
 }
 .doctor-info i {
   color: rgb(243, 243, 89);
+}
+.search-section {
+  border: 1px solid #ddd;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  margin-right: 0.4rem;
+}
+#filter-text {
+  /* border-bottom: 1px solid #ddd; */
+  font-size: 1.1rem;
 }

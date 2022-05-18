@@ -13,25 +13,25 @@
         </div>
 
         <div class="row justify-content-end">
-            <div class="col-6">
-                <div id="search-questions-bar">
-                    <div class="row">
-                        <input type="text" class=" col" placeholder="Doctor name">
-                        <div class="col-1">
-                            <i class="fa fa-search" aria-hidden="true"></i>
-                        </div>
 
-
+            <div id="search-questions-bar" class="col-4 ">
+                <div class="row justify-content-between">
+                    <input type="text" class="col" placeholder="Doctor name">
+                    <div id="search-icon-container" class=" col-1">
+                        <i class="fa fa-search" aria-hidden="true"></i>
                     </div>
                 </div>
             </div>
 
         </div>
 
-        <div class="doctors-container">
-            <div class="row">
-                <aside class="col-3  my-3">
-                    <form #DoctorSearchForm="ngForm" class="search-form" (ngSubmit)="onSearchDoctor(DoctorSearchForm)">
+        <div class="doctors-container my-3">
+            <div class="row align-items-start">
+                <aside class="search-section col-3  ">
+                    <p class="text-center" id="filter-text">Filter by</p>
+
+                    <form #DoctorSearchForm="ngForm" class="search-form"
+                        (ngSubmit)="onSearchDoctor(DoctorSearchForm.value)">
                         <div class=" ">
 
                             <div class="mb-2">
@@ -65,7 +65,7 @@
                                     </option>
                                 </select>
                             </div>
-                            <div class="mb-2">
+                            <div class="my-3">
                                 <button style="width:100%" type="submit" class="btn purple-btn"><i class="fa fa-search"
                                         aria-hidden="true"></i> Search
                                 </button>
@@ -79,47 +79,46 @@
 
                     <div class="people-nearby">
 
-                        <div class="nearby-user my-3" *ngFor="let tempDoctor of doctors">
-
-                            <div class="card">
-                                <div class="card-header">
-                                    <div class="row" (click)="getDoctorProfile(tempDoctor.username)">
-                                        <div class="" style="width: 13%;">
-                                            <img src="{{tempDoctor.profileImageUrl}}" alt="doctor"
-                                                class="profile-photo-lg">
-                                        </div>
-                                        <div class="col">
-                                            <div class="doctor-info">
-                                                <h5>Dr {{tempDoctor.firstName}} {{tempDoctor.lastName}}
-                                                </h5>
-
-                                                <p>{{tempDoctor.speciality.name}} <i class="fa fa-star"
-                                                        aria-hidden="true"></i>
-                                                    {{tempDoctor.averageOfRatings}}
-                                                    <small>({{tempDoctor.nbOfRatings}})</small>
-                                                    <br>{{tempDoctor.address.city}}
-                                                    {{tempDoctor.address.state}} {{tempDoctor.address.country}}
-                                                </p>
 
 
-                                            </div>
-                                        </div>
-
+                        <div class="card doctor-card mb-3" *ngFor="let tempDoctor of doctors">
+                            <div class="card-header">
+                                <div class="row" (click)="getDoctorProfile(tempDoctor.username)">
+                                    <div class="" style="width: 15%; height:15%">
+                                        <img src="{{tempDoctor.profileImageUrl}}" alt="doctor" class="profile-photo-lg">
                                     </div>
-                                </div>
-                                <div class="card-body">
-                                    <div (click)="getDoctorProfile(tempDoctor.username)">
+                                    <div class="col">
+                                        <div class="doctor-info">
+                                            <h5>Dr {{tempDoctor.firstName}} {{tempDoctor.lastName}}
+                                            </h5>
 
-                                        <p class="card-text">With supporting text below as a natural lead-in to
-                                            additional
-                                            content.
-                                        </p>
+                                            <p>{{tempDoctor.speciality.name}} <i class="fa fa-star"
+                                                    aria-hidden="true"></i>
+                                                {{tempDoctor.averageOfRatings}}
+                                                <small>({{tempDoctor.nbOfRatings}})</small>
+                                                <br>{{tempDoctor.address.city}}
+                                                {{tempDoctor.address.state}} {{tempDoctor.address.country}}
+                                            </p>
+
+
+                                        </div>
                                     </div>
 
                                 </div>
                             </div>
+                            <div class="card-body">
+                                <div (click)="getDoctorProfile(tempDoctor.username)">
 
+                                    <p class="card-text">With supporting text below as a natural lead-in to
+                                        additional
+                                        content.
+                                    </p>
+                                </div>
+
+                            </div>
                         </div>
+
+
 
                     </div>
                 </div>

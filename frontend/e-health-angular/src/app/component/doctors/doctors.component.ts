@@ -38,6 +38,7 @@ export class DoctorsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.getSpecialities();
     this.getCountries();
+    this.onSearchDoctor({ country: 'Tunisie' });
   }
 
   getSpecialities() {
@@ -104,18 +105,18 @@ export class DoctorsComponent implements OnInit, OnDestroy {
     );
   }
 
-  onSearchDoctor(searchForm: NgForm) {
+  onSearchDoctor(searchForm: any) {
     // console.log(searchForm.value);
     const doctor = new Doctor();
 
     const speciality = new Speciality();
-    speciality.name = searchForm.value.specialityName;
+    speciality.name = searchForm.specialityName;
     doctor.speciality = speciality;
 
     const address = new Address();
-    address.country = searchForm.value.country;
-    address.state = searchForm.value.state;
-    address.city = searchForm.value.city;
+    address.country = searchForm.country;
+    address.state = searchForm.state;
+    address.city = searchForm.city;
     doctor.address = address;
 
     console.log(doctor);

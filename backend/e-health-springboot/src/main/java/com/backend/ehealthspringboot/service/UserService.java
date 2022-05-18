@@ -20,7 +20,6 @@ public interface UserService {
 
 //    User addNewUser(String firstName, String lastName, String username, String email, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException, UsernameExistException, IOException, NotAnImageFileException;
 
-    User updateUser(String currentUsername, String newFirstName, String newLastName, String newUsername, String newEmail, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException, UsernameExistException, IOException, NotAnImageFileException;
 
     void deleteUser(String username) throws IOException;
 
@@ -31,4 +30,6 @@ public interface UserService {
 
 
     List<User> getUsersByRole(String role);
+
+    User updateUser(String loggedInUsername, String currentUsername, User user) throws UserNotFoundException, EmailExistException, UsernameExistException;
 }
