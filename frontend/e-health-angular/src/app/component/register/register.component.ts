@@ -114,7 +114,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   onRegisterVisitor(user: User) {
-    // console.log(visitor);
+    console.log(user);
     this.showLoading = true;
     this.subs.add(
       this.authenticationService.registerUser(user).subscribe(
@@ -148,12 +148,14 @@ export class RegisterComponent implements OnInit, OnDestroy {
     newDoctor.phoneNumber = form.value.phoneNumber;
     newDoctor.gender = form.value.gender;
     newDoctor.speciality = form.value.speciality;
+    newDoctor.password = form.value.password;
     let address = new Address();
+    address.country = form.value.country;
     address.state = form.value.state;
     address.city = form.value.city;
     address.street = form.value.street;
     newDoctor.address = address;
-    // console.log(newDoctor);
+    console.log(newDoctor);
     this.showLoading = true;
     this.subs.add(
       this.authenticationService.registerDoctor(newDoctor).subscribe(

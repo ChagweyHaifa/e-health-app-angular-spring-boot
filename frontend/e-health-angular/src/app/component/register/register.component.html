@@ -62,9 +62,11 @@
                                     style="color:red;">Please enter an email.</span>
                             </div>
                             <div class=" my-2">
-                                <input type="text" class="form-control" placeholder="Password">
-                                <!-- <span class="help-block" *ngIf="visitorEmailInput.invalid && visitorEmailInput.touched"
-                                    style="color:red;">Please enter an email.</span> -->
+                                <input type="password" class="form-control" name="password" placeholder="Password"
+                                    ngModel required #visitorPasswordInput="ngModel" minlength="6">
+                                <span class="help-block"
+                                    *ngIf="visitorPasswordInput.invalid && visitorPasswordInput.touched"
+                                    style="color:red;">Please enter a password (min length = 6).</span>
                             </div>
 
 
@@ -123,9 +125,11 @@
                                     style="color:red;">Please enter your email.</span>
                             </div>
                             <div class=" my-2">
-                                <input type="text" class="form-control" placeholder="Password">
-                                <!-- <span class="help-block" *ngIf="visitorEmailInput.invalid && visitorEmailInput.touched"
-                                    style="color:red;">Please enter an email.</span> -->
+                                <input type="password" class="form-control" name="password" placeholder="Password"
+                                    ngModel required #doctorPasswordInput="ngModel" minlength="6">
+                                <span class="help-block"
+                                    *ngIf="doctorPasswordInput.invalid && doctorPasswordInput.touched"
+                                    style="color:red;">Please enter a password (min length = 6).</span>
                             </div>
 
                             <div class=" my-2">

@@ -14,7 +14,7 @@ public interface DoctorService {
 
 
 
-    Doctor register(Doctor doctor) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException;
+    Doctor register(Doctor doctor) throws Exception;
 
     List<Doctor> getDoctors();
 

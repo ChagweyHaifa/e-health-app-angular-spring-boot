@@ -74,18 +74,22 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Override
-    public Doctor register(Doctor doctor) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
+    public Doctor register(Doctor doctor) throws Exception {
         validateNewUsernameAndEmail(EMPTY, doctor.getUsername(), doctor.getEmail());
         doctor.setUserId(generateUserId());
-        String password = generatePassword();
+//        String password = generatePassword();
         doctor.setJoinDate(new Date());
-        doctor.setPassword(encodePassword(password));
+        LOGGER.info("New doctor password: " + doctor.getPassword());
+        if(doctor.getPassword() ==null || doctor.getPassword() == ""){
+            throw new Exception("password is required");
+        }
+        doctor.setPassword(encodePassword(doctor.getPassword()));
         doctor.setActive(true);
         doctor.setStatus(UNDER_VERIFICATION.name());
         doctor.setNotLocked(false);
 //        emailService.sendNewPasswordEmail(firstName, password, email);
 //        set a default image for doctor
-        LOGGER.info("New user password: " + password);
+        LOGGER.info("New doctor password: " + doctor.getPassword());
         doctor.setRole(ROLE_DOCTOR.name());
         doctor.setAuthorities(ROLE_DOCTOR.getAuthorities());
         doctor.setProfileImageUrl(getTemporaryProfileImageUrl(doctor.getGender()));

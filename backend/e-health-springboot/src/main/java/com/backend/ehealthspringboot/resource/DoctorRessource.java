@@ -52,7 +52,7 @@ public class DoctorRessource extends ExceptionHandling {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Doctor> register(@RequestBody Doctor doctor ) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
+    public ResponseEntity<Doctor> register(@RequestBody Doctor doctor ) throws Exception {
         Doctor newDoctor = doctorService.register(doctor);
         return new ResponseEntity<>(newDoctor, OK);
     }

@@ -89,17 +89,21 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
     }
 
     @Override
-    public User register(User user) throws UserNotFoundException, UsernameExistException, EmailExistException {
+    public User register(User user) throws Exception {
         validateNewUsernameAndEmail(EMPTY, user.getUsername(), user.getEmail());
-        user.setUserId(generateUserId());
-        String password = generatePassword();
+
+
         user.setJoinDate(new Date());
-        user.setPassword(encodePassword(password));
+        LOGGER.info("New doctor password: " + user.getPassword());
+        if(user.getPassword() ==null || user.getPassword() == ""){
+            throw new Exception("password is required");
+        }
+       user.setPassword(encodePassword(user.getPassword()));
         user.setActive(true);
         user.setNotLocked(true);
 //        emailService.sendNewPasswordEmail(firstName, password, email);
 //        set a default image for user
-        LOGGER.info("New user password: " + password);
+
         user.setRole(ROLE_USER.name());
 
         userRepository.save(user);

@@ -15,7 +15,7 @@ public interface UserService {
 
     User findUserByEmail(String email);
 
-    User register(User user) throws UserNotFoundException, UsernameExistException, EmailExistException;
+    User register(User user) throws Exception;
 //    User addNewUser(User user);
 
 //    User addNewUser(String firstName, String lastName, String username, String email, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException, UsernameExistException, IOException, NotAnImageFileException;
