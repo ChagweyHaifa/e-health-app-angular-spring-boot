@@ -77,7 +77,7 @@ export class QuestionsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.getSpecialities();
-    this.getQuestionsBySpeciality('Cardiologue');
+    this.getQuestionsBySpeciality('Cardiologist');
   }
 
   getSpecialities() {

@@ -34,7 +34,7 @@ export class DoctorsComponent implements OnInit, OnDestroy {
   states: State[];
   cities: City[];
   doctors: Doctor[];
-  defaultCountry: string = 'Tunisie';
+  defaultCountry: string = 'Tunisia';
 
   doctorSearchForm: FormGroup;
   constructor(
@@ -156,7 +156,7 @@ export class DoctorsComponent implements OnInit, OnDestroy {
   }
 
   onSearchDoctor() {
-    // console.log(this.doctorSearchForm.value);
+    console.log(this.doctorSearchForm.value);
     this.subscriptions.push(
       this.userService.searchForDoctors(this.doctorSearchForm.value).subscribe(
         (response: Doctor[]) => {

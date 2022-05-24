@@ -103,7 +103,7 @@ public class UserResource extends ExceptionHandling {
 //    }
 
     @PutMapping("/users/{currentUsername}")
-    @PreAuthorize("hasAnyAuthority('user:update')")
+//    @PreAuthorize("hasAnyAuthority('user:update')")
     public ResponseEntity<User> update(HttpServletRequest request,@RequestBody User user,@PathVariable("currentUsername")String currentUsername) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException, NotAnImageFileException {
         String loggedInUsername = getUsernameFromJWTToken(request);
         User updatedUser = userService.updateUser(loggedInUsername,currentUsername,user);

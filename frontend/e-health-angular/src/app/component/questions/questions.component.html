@@ -60,7 +60,7 @@
                                     <h5 class="card-title col-auto">{{tempQuestion.title}}
                                         {{tempQuestion.user.firstName}}</h5>
                                     <div class=" col-auto"
-                                        *ngIf=" tempQuestion.user.username== loggedInUser.username||isAdmin">
+                                        *ngIf=" tempQuestion.user.username== loggedInUser?.username||isAdmin">
                                         <button class="btn" (click)="launchEditQuestionModal(tempQuestion)">
                                             <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                                         </button>
@@ -103,12 +103,12 @@
                                         </div>
                                         <div class=" col-auto">
                                             <button
-                                                *ngIf="isDoctor && tempQuestion.response.doctor.username== loggedInUser.username "
+                                                *ngIf="isDoctor && tempQuestion.response.doctor.username== loggedInUser?.username "
                                                 class="btn" (click)=" onEditQuestionResponse(tempQuestion)">
                                                 <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                                             </button>
                                             <button class="btn"
-                                                *ngIf=" isAdmin||(isDoctor && tempQuestion.response.doctor.username== loggedInUser.username) "
+                                                *ngIf=" isAdmin||(isDoctor && tempQuestion.response.doctor.username== loggedInUser?.username) "
                                                 (click)="deleteQuestionResponse(tempQuestion.id)">
                                                 <i class="fa fa-trash-o" aria-hidden="true"
                                                     style=" cursor: pointer;"></i>

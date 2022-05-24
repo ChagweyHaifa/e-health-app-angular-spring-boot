@@ -189,6 +189,13 @@ export class SettingsComponent implements OnInit {
     );
   }
 
+  get isUser() {
+    if (this.loggedInUser != null) {
+      if (this.loggedInUser.role == 'ROLE_USER') return true;
+    }
+    return false;
+  }
+
   private sendNotification(
     notificationType: NotificationType,
     message: string

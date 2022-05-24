@@ -13,7 +13,14 @@ import { AuthenticationGuard } from './guard/authentication.guard';
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'user/management', component: UserComponent },
+  {
+    path: 'user/management',
+    component: UserComponent,
+    canActivate: [AuthenticationGuard],
+    data: {
+      role: 'ROLE_ADMIN',
+    },
+  },
   { path: 'find-a-doctor/:username', component: DoctorProfileComponent },
   { path: 'find-a-doctor', component: DoctorsComponent },
   { path: 'ask-a-question', component: QuestionsComponent },

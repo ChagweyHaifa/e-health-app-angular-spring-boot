@@ -349,8 +349,7 @@ export class DoctorProfileComponent implements OnInit, OnDestroy {
     if (this.editDoctorProfileForm.invalid) {
       return;
     }
-    // console.log(this.editDoctorProfileForm.value);
-    // console.log(this.doctor);
+    console.log(this.editDoctorProfileForm.value);
     this.showLoading = true;
     this.subscriptions.push(
       this.userService

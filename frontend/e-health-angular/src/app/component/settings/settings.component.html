@@ -2,7 +2,7 @@
 
     <div class="row justify-content-center align-items-start my-5 ">
 
-        <div class=" col-5 mx-3 setting-section" id="user-info-section">
+        <div class=" col-5 mx-3 setting-section" id="user-info-section" *ngIf="isUser">
 
             <h5 class="text-center mt-2 mb-4">Edit Account Information</h5>
             <form [formGroup]=" editUserProfileForm">
