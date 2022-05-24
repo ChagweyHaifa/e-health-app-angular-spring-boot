@@ -5,7 +5,7 @@
         <div class="header">
             <div class="header-text">
                 <h1 class="mb-4">Quickly find the right doctor near you!</h1>
-                <p>Optimize your time and easily find the nearest and the right doctor. </p>
+                <p class="lead-text">Optimize your time and easily find the nearest and the right doctor. </p>
             </div>
             <div class="header-img">
                 <img src="../../assets/doctor-desk.jpg" alt="" class="ml-5">
@@ -17,7 +17,7 @@
             <div id="search-questions-bar" class="col-4 ">
                 <div class="row justify-content-between">
                     <input type="text" class="col" placeholder="Doctor name">
-                    <div id="search-icon-container" class=" col-1">
+                    <div id="search-icon-container" class=" col-1" style="cursor: pointer;">
                         <i class="fa fa-search" aria-hidden="true"></i>
                     </div>
                 </div>
@@ -30,48 +30,58 @@
                 <aside class="search-section col-3  ">
                     <p class="text-center" id="filter-text">Filter by</p>
 
-                    <form #DoctorSearchForm="ngForm" class="search-form"
-                        (ngSubmit)="onSearchDoctor(DoctorSearchForm.value)">
-                        <div class=" ">
+                    <form [formGroup]="doctorSearchForm" class="search-form" (ngSubmit)="onSearchDoctor()">
 
-                            <div class="mb-2">
-                                <select class="form-select" name="specialityName" ngModel>
-                                    <option value="">Speciality</option>
-                                    <option *ngFor="let tempSpeciality of specialities">
-                                        {{tempSpeciality.name}}</option>
-                                </select>
-                            </div>
 
-                            <div class="mb-2">
-                                <select class="form-select" name="country" ngModel
-                                    (change)="getStates(DoctorSearchForm.value.country)">
-                                    <option value="">Country</option>
-                                    <option *ngFor="let tempCountry of countries">{{tempCountry.name}}
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="mb-2">
-                                <select class="form-select" name="state" ngModel
-                                    (change)="getCities(DoctorSearchForm.value.state)">
-                                    <option value="">State</option>
-                                    <option *ngFor="let tempState of states">{{tempState.name}}
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="mb-2">
-                                <select class="form-select" name="city" ngModel>
-                                    <option value="">City</option>
-                                    <option *ngFor="let tempCity of cities">{{tempCity.name}}
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="my-3">
-                                <button style="width:100%" type="submit" class="btn purple-btn"><i class="fa fa-search"
-                                        aria-hidden="true"></i> Search
-                                </button>
-                            </div>
-
+                        <div formGroupName="speciality" class="mb-2 form-floating" id="floatingSelectGrid">
+                            <select class="form-select" formControlName="name">
+                                <option value="">Select a speciality</option>
+                                <option *ngFor="let tempSpeciality of specialities" [ngValue]="tempSpeciality.name">
+                                    {{tempSpeciality.name}}</option>
+                            </select>
+                            <label for="floatingSelectGrid">Speciality</label>
                         </div>
+
+                        <div formGroupName="address">
+                            <div class="mb-2 form-floating">
+                                <select formControlName="country" class="form-select" id="floatingSelectGrid"
+                                    aria-label="Floating label select example"
+                                    (change)="getStates(f.address.value.country);resetAddress('country');">
+                                    <option *ngFor="let tempCountry of countries" [ngValue]="tempCountry.name">
+                                        {{tempCountry.name}}
+                                    </option>
+                                </select>
+                                <label for="floatingSelectGrid">Country</label>
+                            </div>
+                            <div class="mb-2 form-floating">
+                                <select formControlName="state" class="form-select" id="floatingSelectGrid"
+                                    (change)="getCities(f.address.value.state);resetAddress('state');">
+                                    <option value="">Select a state</option>
+                                    <option *ngFor="let tempState of states" [ngValue]="tempState.name">
+                                        {{tempState.name}}
+                                    </option>
+                                </select>
+                                <label for="floatingSelectGrid">State</label>
+                            </div>
+                            <div class="mb-2 form-floating">
+                                <select formControlName="city" class="form-select" id="floatingSelectGrid"
+                                    (change)="resetAddress('city');">
+                                    <option value="">Select a city</option>
+                                    <option *ngFor="let tempCity of cities" [ngValue]="tempCity.name">
+                                        {{tempCity.name}}
+                                    </option>
+                                </select>
+                                <label for="floatingSelectGrid">ِCity</label>
+                            </div>
+                        </div>
+                        <div></div>
+                        <div class="my-3">
+                            <button style="width:100%" id="search-btn" type="submit" class="btn purple-btn"><i
+                                    class="fa fa-search" aria-hidden="true"></i> Search
+                            </button>
+                        </div>
+
+
                     </form>
 
                 </aside>
@@ -81,10 +91,11 @@
 
 
 
-                        <div class="card doctor-card mb-3" *ngFor="let tempDoctor of doctors">
+                        <div class="card doctor-card mb-3" *ngFor="let tempDoctor of doctors"
+                            (click)="getDoctorProfile(tempDoctor.username)" style="cursor: pointer;">
                             <div class="card-header">
-                                <div class="row" (click)="getDoctorProfile(tempDoctor.username)">
-                                    <div class="" style="width: 15%; height:15%">
+                                <div class="row">
+                                    <div class="col-auto" style="width: 15%; height:15%">
                                         <img src="{{tempDoctor.profileImageUrl}}" alt="doctor" class="profile-photo-lg">
                                     </div>
                                     <div class="col">
@@ -107,8 +118,7 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <div (click)="getDoctorProfile(tempDoctor.username)">
-
+                                <div>
                                     <p class="card-text">With supporting text below as a natural lead-in to
                                         additional
                                         content.
@@ -116,6 +126,11 @@
                                 </div>
 
                             </div>
+                        </div>
+
+
+                        <div *ngIf="doctors?.length == 0" class="alert alert-warning" role="alert">
+                            No doctors found.
                         </div>
 
 

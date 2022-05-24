@@ -142,6 +142,7 @@ export class UserComponent implements OnInit, OnDestroy {
       this.userService.getUsersByRole(role).subscribe(
         (response: User[]) => {
           this.users = response;
+          console.log(this.users);
         },
         (errorResponse: HttpErrorResponse) => {
           this.sendNotification(

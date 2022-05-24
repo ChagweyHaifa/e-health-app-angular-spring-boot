@@ -54,6 +54,7 @@
                                 Questions
                             </button>
                         </li>
+
                     </ul>
                 </div>
             </div>
@@ -84,10 +85,12 @@
                         <div class="user-button">
                             <!-- <button type="button" class="btn purple-btn"><i class="fa fa-envelope"></i> Send
                                 Message</button> -->
-                            <button type="button" class="btn purple-btn " data-bs-toggle="modal"
+                            <button *ngIf="isDoctor" type="button" class="btn purple-btn " data-bs-toggle="modal"
                                 data-bs-target="#editDoctorProfileModal" (click)="launchEditDoctorProfileModal()"><i
                                     class="fa fa-pencil-square" aria-hidden="true"></i>
                                 Edit Profile</button>
+
+
                         </div><!-- End .user-button -->
 
                     </div><!-- End div .box-info -->
@@ -130,6 +133,8 @@
                                         <i class="fa fa-star" aria-hidden="true"></i>
                                         Rate this doctor
                                     </button>
+
+
                                 </div>
                                 <div class="card my-3" *ngFor="let tempRating of ratings">
 
@@ -144,16 +149,24 @@
                                                     [id]="'rating1'">
                                                 </ngx-star-rating>
                                             </div>
+
                                         </div>
 
                                         <p class=" card-text">{{tempRating.review}}</p>
                                     </div>
                                     <div class="card-footer text-muted ">
-
-                                        <i class=" fa fa-clock-o "> {{tempRating.creationDate|
-                                            date:'medium'}}</i>
-
-
+                                        <div class="row  justify-content-between">
+                                            <div class="col-auto">
+                                                <i class=" fa fa-clock-o "> {{tempRating.creationDate|
+                                                    date:'medium'}}</i>
+                                            </div>
+                                            <div class="col-auto" *ngIf="isAdmin">
+                                                <button class="btn"><i class="fa fa-trash-o"
+                                                        aria-hidden="true"></i></button>
+                                                <button class="btn"> <i class="fa fa-pencil-square-o"
+                                                        aria-hidden="true"></i></button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 

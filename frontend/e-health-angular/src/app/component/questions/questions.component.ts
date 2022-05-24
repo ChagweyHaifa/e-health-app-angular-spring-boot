@@ -1,12 +1,14 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { NotificationType } from 'src/app/enum/notification-type.enum';
 import { CustomHttpResponse } from 'src/app/model/custom-http-response';
 import { Question } from 'src/app/model/question';
 import { QuestionResponse } from 'src/app/model/question-response';
 import { Speciality } from 'src/app/model/speciality';
+import { AuthenticationService } from 'src/app/service/authentication.service';
 import { FormService } from 'src/app/service/form.service';
 import { NotificationService } from 'src/app/service/notification.service';
 import { QuestionService } from 'src/app/service/question.service';
@@ -19,7 +21,7 @@ import { SubSink } from 'subsink';
 })
 export class QuestionsComponent implements OnInit, OnDestroy {
   private subs = new SubSink();
-  private subscriptions: Subscription[] = [];
+
   specialities: Speciality[];
   showLoading: boolean = false;
 
@@ -35,12 +37,14 @@ export class QuestionsComponent implements OnInit, OnDestroy {
   questionTitleToAdd: string;
   isEditQuestionResponse: boolean;
   isAddQuestionResponse: boolean;
-
+  loggedInUser = this.authenticationService.getUserFromLocalCache();
   constructor(
     private formService: FormService,
     private notificationService: NotificationService,
     private formBuilder: FormBuilder,
-    private questionService: QuestionService
+    private questionService: QuestionService,
+    private router: Router,
+    private authenticationService: AuthenticationService
   ) {
     this.myQuestionForm = this.formBuilder.group({
       speciality: ['', Validators.required],
@@ -76,12 +80,6 @@ export class QuestionsComponent implements OnInit, OnDestroy {
     this.getQuestionsBySpeciality('Cardiologue');
   }
 
-  // onAddAQuestion() {
-  //   this.defaultSpeciality = this.specialities[1];
-  //   this.myQuestionForm.patchValue({
-  //     speciality: this.defaultSpeciality,
-  //   });
-  // }
   getSpecialities() {
     this.subs.add(
       this.formService.getSpecialities().subscribe(
@@ -118,6 +116,15 @@ export class QuestionsComponent implements OnInit, OnDestroy {
   showResponse(question: Question) {}
 
   // add question
+
+  launchAskQuestionModal() {
+    if (!this.authenticationService.isUserLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+    this.clickButton('launch-ask-question-modal-trigger-btn');
+  }
+
   uploadMyQuestionFormFiles(event: Event) {
     const lengh: number = (<HTMLInputElement>event.target).files.length;
     for (var i = 0; i < lengh; i++) {
@@ -348,6 +355,7 @@ export class QuestionsComponent implements OnInit, OnDestroy {
       this.subs.add(
         this.questionService.deleteQuestionResponse(questionId).subscribe(
           (response: Question) => {
+            this.respondToQuestionForm.reset();
             this.getQuestionsBySpeciality(this.currenSpecialityName);
             this.sendNotification(
               NotificationType.SUCCESS,
@@ -365,6 +373,20 @@ export class QuestionsComponent implements OnInit, OnDestroy {
         )
       );
     }
+  }
+
+  get isDoctor() {
+    if (this.loggedInUser != null) {
+      if (this.loggedInUser.role == 'ROLE_DOCTOR') return true;
+    }
+    return false;
+  }
+
+  get isAdmin() {
+    if (this.loggedInUser != null) {
+      if (this.loggedInUser.role == 'ROLE_ADMIN') return true;
+    }
+    return false;
   }
 
   private sendNotification(

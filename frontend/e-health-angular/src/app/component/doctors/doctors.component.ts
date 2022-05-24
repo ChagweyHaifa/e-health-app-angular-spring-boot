@@ -1,6 +1,12 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  NgForm,
+  Validators,
+} from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { NotificationType } from 'src/app/enum/notification-type.enum';
 import { City } from 'src/app/model/city';
@@ -28,17 +34,38 @@ export class DoctorsComponent implements OnInit, OnDestroy {
   states: State[];
   cities: City[];
   doctors: Doctor[];
+  defaultCountry: string = 'Tunisie';
+
+  doctorSearchForm: FormGroup;
   constructor(
     private formService: FormService,
     private userService: UserService,
     private notificationService: NotificationService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private formBuilder: FormBuilder
+  ) {
+    this.doctorSearchForm = this.formBuilder.group({
+      speciality: this.formBuilder.group({
+        id: '',
+        name: '',
+      }),
+      address: this.formBuilder.group({
+        id: '',
+        country: '',
+        state: '',
+        city: '',
+      }),
+    });
+    this.doctorSearchForm.controls.address
+      .get('country')
+      .setValue(this.defaultCountry);
+  }
 
   ngOnInit(): void {
     this.getSpecialities();
     this.getCountries();
-    this.onSearchDoctor({ country: 'Tunisie' });
+    this.getStates(this.defaultCountry);
+    this.onSearchDoctor();
   }
 
   getSpecialities() {
@@ -105,23 +132,33 @@ export class DoctorsComponent implements OnInit, OnDestroy {
     );
   }
 
-  onSearchDoctor(searchForm: any) {
-    // console.log(searchForm.value);
-    const doctor = new Doctor();
+  get f() {
+    return this.doctorSearchForm.controls;
+  }
 
-    const speciality = new Speciality();
-    speciality.name = searchForm.specialityName;
-    doctor.speciality = speciality;
+  resetAddress(address: string) {
+    switch (address) {
+      case 'country': {
+        this.f.address.patchValue({
+          state: '',
+          city: '',
+        });
+        break;
+      }
+      case 'state': {
+        this.f.address.patchValue({
+          city: '',
+        });
+        break;
+      }
+    }
+    // console.log(this.doctorSearchForm.value);
+  }
 
-    const address = new Address();
-    address.country = searchForm.country;
-    address.state = searchForm.state;
-    address.city = searchForm.city;
-    doctor.address = address;
-
-    console.log(doctor);
+  onSearchDoctor() {
+    // console.log(this.doctorSearchForm.value);
     this.subscriptions.push(
-      this.userService.searchForDoctors(doctor).subscribe(
+      this.userService.searchForDoctors(this.doctorSearchForm.value).subscribe(
         (response: Doctor[]) => {
           this.doctors = response;
           // console.log(this.doctors);
@@ -158,6 +195,10 @@ export class DoctorsComponent implements OnInit, OnDestroy {
         'An error occurred. Please try again.'
       );
     }
+  }
+
+  private clickButton(buttonId: string) {
+    document.getElementById(buttonId).click();
   }
 
   ngOnDestroy(): void {

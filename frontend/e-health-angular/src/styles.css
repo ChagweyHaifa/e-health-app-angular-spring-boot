@@ -38,25 +38,12 @@ td {
   display: block;
 }
 .m-heading {
-  color: #2e8fcc;
+  color: #17a2b8;
 }
-
-/* .bright-blue-btn{
-  background-color: #35BBCA;
+.lead-text {
+  font-size: 1.15rem;
+  color: #666;
 }
-.blue-btn{
-  background-color: #0191B4;
-  color: #fff;
-}
-.yellow-btn{
-  background-color: #F8D90F;
-}
-.green-btn{
-  background-color: #D3DD18;
-}
-.orange-btn{
-  background-color: #FE7A15;
-} */
 
 .bright-blue-btn {
   background-color: #7bd5f5;
@@ -78,14 +65,30 @@ td {
   color: #787ff6;
   border: 1px solid #787ff6;
 }
+.green-btn {
+  background-color: #17a2b8;
+  color: #fff;
+  cursor: grab;
+}
+.green-btn:hover {
+  background-color: #fff;
+  color: #17a2b8;
+  border: 1px solid #17a2b8;
+}
+.green-btn-wg {
+  background-color: #fff;
+  color: #17a2b8;
+  border: 1px solid #17a2b8;
+}
 .yellow-btn {
   background-color: #4adede;
   color: #fff;
 }
-.green-btn {
+/* .green-btn {
   background-color: #1ca7ec;
   color: #fff;
-}
+} */
+
 .orange-btn {
   background-color: #1f2f98;
   color: #fff;
@@ -95,6 +98,10 @@ td {
 }
 .purple-text:hover {
   color: #787ff6;
+}
+
+.green-badge {
+  background-color: #17a2b8;
 }
 
 /* .l-heading{} */
@@ -148,12 +155,12 @@ html {
 
 .login_btn {
   width: 100%;
-  color: #2e8fcc;
-  border: #2e8fcc solid 1px;
+  color: #17a2b8;
+  border: #17a2b8 solid 1px;
   border-radius: 0.5rem;
 }
 .login_btn:hover {
-  background-color: #2e8fcc;
+  background-color: #17a2b8;
   color: #fff;
 }
 /* .login_btn:focus {
@@ -172,7 +179,7 @@ html {
   outline: 0px !important;
 }
 .custom-checkbox .custom-control-input:checked ~ .custom-control-label::before {
-  background-color: #2e8fcc !important;
+  background-color: #17a2b8 !important;
 }
 
 .login-form input,
@@ -185,8 +192,11 @@ html {
 } */
 
 a {
-  color: #2e8fcc;
+  color: #17a2b8;
   text-decoration: none;
+}
+a:hover {
+  color: #17a2b8;
 }
 
 /* find doctors */

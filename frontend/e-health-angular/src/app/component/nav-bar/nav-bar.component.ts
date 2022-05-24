@@ -20,22 +20,36 @@ export class NavBarComponent implements OnInit {
   isLoggedIn: boolean;
 
   ngOnInit(): void {
-    this.authenticationService.isUserLoggedIn();
     this.authenticationService.isLoggedIn.subscribe(
       (data) => (this.isLoggedIn = data)
     );
-    // this.loggedInUser = this.authenticationService.getUserFromLocalCache();
-    // console.log(this.isLoggedIn);
+    this.authenticationService.loggedInUser.subscribe(
+      (data) => (this.loggedInUser = data)
+    );
   }
 
   onLogOut(): void {
     this.authenticationService.logOut();
-    // this.authenticationService.isLoggedIn.next(false);
+    this.authenticationService.isUserLoggedIn();
     this.router.navigate(['/login']);
     this.sendNotification(
       NotificationType.SUCCESS,
       `You've been successfully logged out`
     );
+  }
+
+  get isAdmin() {
+    if (this.loggedInUser != null) {
+      if (this.loggedInUser.role == 'ROLE_ADMIN') return true;
+    }
+    return false;
+  }
+
+  get isDoctor() {
+    if (this.loggedInUser != null) {
+      if (this.loggedInUser.role == 'ROLE_DOCTOR') return true;
+    }
+    return false;
   }
 
   private sendNotification(

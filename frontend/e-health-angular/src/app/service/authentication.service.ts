@@ -14,9 +14,7 @@ export class AuthenticationService {
   private jwtHelper = new JwtHelperService();
   public host = environment.apiUrl;
 
-  // currentUser: Subject<User> = new BehaviorSubject<User>(
-  //   this.getUserFromLocalCache()
-  // );
+  loggedInUser: Subject<User> = new BehaviorSubject<User>(null);
 
   isLoggedIn: Subject<boolean> = new BehaviorSubject<boolean>(
     this.isUserLoggedIn()
@@ -46,10 +44,10 @@ export class AuthenticationService {
   }
 
   public logOut() {
-    this.isLoggedIn.next(false);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    localStorage.removeItem('users');
+    this.isLoggedIn.next(false);
+    this.loggedInUser.next(null);
   }
 
   public saveToken(token: string): void {
@@ -72,6 +70,7 @@ export class AuthenticationService {
   public addUserToLocalCache(user: User): void {
     localStorage.setItem('user', JSON.stringify(user));
     this.isLoggedIn.next(true);
+    this.loggedInUser.next(user);
   }
 
   public getUserFromLocalCache(): User {
@@ -96,13 +95,15 @@ export class AuthenticationService {
         if (!this.jwtHelper.isTokenExpired(token)) {
           const loggedInUsername: string =
             this.jwtHelper.decodeToken(token).sub;
+          this.loggedInUser.next(this.getUserFromLocalCache());
+
           return true;
         }
       }
     }
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    localStorage.removeItem('users');
+
     return false;
   }
 }

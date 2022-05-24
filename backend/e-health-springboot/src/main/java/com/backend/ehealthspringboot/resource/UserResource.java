@@ -66,6 +66,7 @@ public class UserResource extends ExceptionHandling {
 //        return new ResponseEntity<>(users, OK);
 //    }
     @GetMapping("/users")
+    @PreAuthorize("hasAnyAuthority('user:read')")
     public ResponseEntity<List<User>> getUsersByRole(@RequestParam("role")String role) {
         List<User> users = userService.getUsersByRole(role);
         return new ResponseEntity<>(users, OK);

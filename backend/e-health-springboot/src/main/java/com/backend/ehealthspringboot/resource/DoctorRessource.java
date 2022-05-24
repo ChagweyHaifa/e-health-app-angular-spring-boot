@@ -58,6 +58,7 @@ public class DoctorRessource extends ExceptionHandling {
     }
 
     @GetMapping("")
+    @PreAuthorize("hasAnyAuthority('doctor:read')")
     public ResponseEntity<List<Doctor>> getAllDoctors() {
         List<Doctor> doctors = doctorService.getDoctors();
         return new ResponseEntity(doctors, OK);

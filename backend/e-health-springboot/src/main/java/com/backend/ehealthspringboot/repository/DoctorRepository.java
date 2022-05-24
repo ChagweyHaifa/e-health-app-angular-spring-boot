@@ -23,9 +23,9 @@ public interface DoctorRepository extends JpaRepository<Doctor,Long> {
     @Query("SELECT c FROM Doctor c WHERE (:specialityName = '' or :specialityName is null or c.speciality.name = :specialityName) and " +
             "(:addressCountry = '' or :addressCountry is null or c.address.country = :addressCountry) and " +
             "(:addressState = '' or :addressState is null or c.address.state = :addressState) and " +
-            "(:addressCity = '' or :addressCity is null or c.address.city = :addressCity)")
-    List<Doctor> findBySpecialityNameAndAddressCountryAndAddressStateAndAddressCity(
-            String specialityName,  String addressCountry,  String addressState, String addressCity);
+            "(:addressCity = '' or :addressCity is null or c.address.city = :addressCity) and" + " (c.isNotLocked = :isNotLocked)")
+    List<Doctor> findBySpecialityNameAndAddressCountryAndAddressStateAndAddressCityAndByIsNotLocked(
+            String specialityName,  String addressCountry,  String addressState, String addressCity,boolean isNotLocked);
 
 
 }

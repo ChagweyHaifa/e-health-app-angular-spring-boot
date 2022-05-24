@@ -38,7 +38,7 @@ public class QuestionRessource {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    @GetMapping("/{specialityName}")
+    @GetMapping("/search/findBySpecialityName/{specialityName}")
     public ResponseEntity<Question[]> findQuestionsBySpecialityName(@PathVariable("specialityName") String specialityName){
         Question[] questions = questionService.findQuestionsBySpecialityName(specialityName);
         return new ResponseEntity<>(questions, OK);

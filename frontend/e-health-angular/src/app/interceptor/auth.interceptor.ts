@@ -77,7 +77,9 @@ export class AuthInterceptor implements HttpInterceptor {
       return httpHandler.handle(httpRequest);
     }
 
-    if (httpRequest.url.includes(`${this.questionService.host}/questions/`)) {
+    if (
+      httpRequest.url.includes(`${this.questionService.host}/questions/search/`)
+    ) {
       return httpHandler.handle(httpRequest);
     }
 

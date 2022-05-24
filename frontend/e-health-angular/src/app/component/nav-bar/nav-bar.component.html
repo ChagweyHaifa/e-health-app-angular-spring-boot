@@ -17,26 +17,38 @@
             </li>
         </ul>
 
-        <ul class="nav">
-            <!-- <li class="nav-item">
-                <h5 *ngIf="loggedInUser">{{loggedInUser?.firstName}} {{loggedInUser?.lastName}}</h5>
-            </li> -->
-            <li class="nav-item">
-                <a class="nav-link" routerLink="/settings" *ngIf="isLoggedIn">Settings</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" routerLink="/login" *ngIf="isLoggedIn" (click)="onLogOut()">Logout</a>
-            </li>
-            <!-- <li class="nav-item">
-                <a class="nav-link" routerLink="/login" (click)="onLogOut()">{{isLoggedIn}}</a>
-            </li> -->
 
 
+        <ul class="nav" *ngIf="!isLoggedIn">
             <li class="nav-item">
-                <a class="nav-link" routerLink="/login" *ngIf="!isLoggedIn">Sign in</a>
+                <a class="nav-link" routerLink="/login">Sign in</a>
             </li>
             <li class=" nav-item">
-                <a class="nav-link" routerLink="/register" *ngIf="!isLoggedIn">Sign up</a>
+                <a class="nav-link" routerLink="/register">Sign up</a>
+            </li>
+
+        </ul>
+
+
+
+        <ul class="nav" *ngIf="isLoggedIn">
+            <li class="nav-item">
+                <div class="dropdown">
+                    <button class="btn logged-in-user" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <i class="fa fa-user" aria-hidden="true"></i> {{loggedInUser?.firstName}}
+                        {{loggedInUser?.lastName}}
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                        <li><a *ngIf="isDoctor" class="dropdown-item"
+                                routerLink="/find-a-doctor/{{loggedInUser.username}}">Profile</a>
+                        </li>
+                        <li><a *ngIf="isAdmin" class="dropdown-item" routerLink="/user/management">Manage
+                                application</a></li>
+                        <li><a class="dropdown-item" routerLink="/settings">Settings</a></li>
+                        <li><a class="dropdown-item" routerLink="/login" (click)="onLogOut()">Logout</a></li>
+                    </ul>
+                </div>
             </li>
         </ul>
     </div>

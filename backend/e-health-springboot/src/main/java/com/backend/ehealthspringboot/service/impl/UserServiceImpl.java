@@ -126,6 +126,7 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
             newUser = validateNewUsernameAndEmail(loggedInUsername ,theUser.getUsername(),theUser.getEmail());
         }
         newUser.setFirstName(theUser.getFirstName());
+        LOGGER.info(theUser.getFirstName());
         newUser.setLastName(theUser.getLastName());
         newUser.setUsername(theUser.getUsername());
         newUser.setPhoneNumber(theUser.getPhoneNumber());

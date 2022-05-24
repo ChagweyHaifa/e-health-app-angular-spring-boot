@@ -168,9 +168,13 @@ export class SettingsComponent implements OnInit {
             this.showLoading = false;
             const token = response.headers.get(HeaderType.JWT_TOKEN);
             this.authenticationService.saveToken(token);
+            this.authenticationService.addUserToLocalCache(response.body);
+            this.loggedInUser =
+              this.authenticationService.getUserFromLocalCache();
+            this.editUserProfileForm.patchValue(this.loggedInUser);
             this.sendNotification(
               NotificationType.SUCCESS,
-              'You have edited your account informations successfully'
+              'Y have edited your account informations successfully'
             );
           },
           (errorResponse: HttpErrorResponse) => {

@@ -5,24 +5,29 @@
         <i class="fa fa-plus"></i> New User
     </button> -->
 
-    <div class="d-flex align-items-start">
-        <div class="nav flex-column nav-pills me-4 " id="v-pills-tab" role="tablist" aria-orientation="vertical">
-            <button class=" btn " id="v-pills-home-tab" data-bs-toggle="pill" data-bs-target="#v-pills-home"
-                type="button" role="tab" aria-controls="v-pills-home" aria-selected="true"
-                (click)="getDoctors()">Doctors</button>
-            <button class="btn" id="v-pills-messages-tab" data-bs-toggle="pill" data-bs-target="#v-pills-messages"
-                type="button" role="tab" aria-controls="v-pills-messages" aria-selected="false"
-                (click)="getUsers('ROLE_USER')">Visitors</button>
-            <button class="btn" id="v-pills-profile-tab" data-bs-toggle="pill" data-bs-target="#v-pills-profile"
-                type="button" role="tab" aria-controls="v-pills-profile" aria-selected="false"
-                (click)="getUsers('ROLE_ADMIN')">Administrators</button>
+    <div class="d-flex align-items-start my-4">
+        <div class="nav flex-column nav-pills me-4 items" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+            <button class="item nav-link active " id="v-pills-home-tab" data-bs-toggle="pill"
+                data-bs-target="#v-pills-home" type="button" role="tab" aria-controls="v-pills-home"
+                aria-selected="true" (click)="getDoctors()">Doctors</button>
+            <button class="item nav-link " id="v-pills-messages-tab" data-bs-toggle="pill"
+                data-bs-target="#v-pills-messages" type="button" role="tab" aria-controls="v-pills-messages"
+                aria-selected="false" (click)="getUsers('ROLE_USER')">Visitors</button>
+            <button class=" item nav-link" id="v-pills-profile-tab" data-bs-toggle="pill"
+                data-bs-target="#v-pills-profile" type="button" role="tab" aria-controls="v-pills-profile"
+                aria-selected="false" (click)="getUsers('ROLE_ADMIN')">Administrators</button>
 
-            <button class="btn" id="v-pills-settings-tab" data-bs-toggle="pill" data-bs-target="#v-pills-settings"
-                type="button" role="tab" aria-controls="v-pills-settings" aria-selected="false"
-                (click)="getSpecialities()">Specialities</button>
+            <button class="item nav-link " id="v-pills-settings-tab" data-bs-toggle="pill"
+                data-bs-target="#v-pills-settings" type="button" role="tab" aria-controls="v-pills-settings"
+                aria-selected="false" (click)="getSpecialities()">Specialities</button>
         </div>
         <div class="tab-content col" id="v-pills-tabContent">
+
             <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+                    <button class="btn green-btn-wg ">Add doctor</button>
+                </div>
+
                 <table class="table table-hover">
                     <tbody>
                         <tr class="text-center bg-light">
@@ -31,7 +36,6 @@
                             <td>First Name</td>
                             <td>Last Name</td>
                             <td>Speciality</td>
-
                             <td>Email</td>
                             <td>Status</td>
                             <td>Account</td>
@@ -50,7 +54,7 @@
 
                             <td (click)=" launchEditDoctorModal(tempDoctor)">{{tempDoctor?.email}}</td>
                             <td (click)=" launchEditDoctorModal(tempDoctor)">
-                                <span *ngIf="tempDoctor?.status=='VERIFIED'" class="badge bg-success">Verified</span>
+                                <span *ngIf="tempDoctor?.status=='VERIFIED'" class="badge green-badge">Verified</span>
                                 <span *ngIf="tempDoctor?.status=='NOT_VERIFIED'" class="badge bg-danger">Not
                                     verified</span>
                                 <span *ngIf="tempDoctor?.status=='UNDER_VERIFICATION'" class="badge bg-warning">Under
@@ -62,13 +66,13 @@
                                     Locked
                                 </span>
                                 <span [hidden]="!tempDoctor.notLocked">
-                                    <i class="fa fa-unlock float-right" style="color: green;">
+                                    <i class="fa fa-unlock float-right" style="color: #17a2b8;">
                                     </i>
                                     Unlocked
                                 </span>
                             </td>
                             <td (click)=" launchEditDoctorModal(tempDoctor)">
-                                <span [hidden]="!tempDoctor?.active" class="badge bg-success">Active</span>
+                                <span [hidden]="!tempDoctor?.active" class="badge green-badge">Active</span>
                                 <span [hidden]="tempDoctor?.active" class="badge bg-danger">Inactive</span>
                             </td>
                             <td>
@@ -86,7 +90,64 @@
                 </table>
             </div>
 
+            <div class="tab-pane fade" id="v-pills-messages" role="tabpanel" aria-labelledby="v-pills-messages-tab">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+                    <button class="btn green-btn-wg ">Add visitor</button>
+                </div>
+                <table class="table table-hover">
+                    <tbody>
+                        <tr class="text-center bg-light">
+                            <td>User ID</td>
+                            <td>First Name</td>
+                            <td>Last Name</td>
+                            <td>Username</td>
+                            <td>Email</td>
+                            <td>Active status</td>
+                            <td>Account</td>
+                            <td>Actions</td>
+                        </tr>
+                        <tr *ngFor="let appUser of users" class="text-center">
+                            <td (click)="onSelectUser(appUser)">{{appUser?.userId}}</td>
+                            <td (click)="onSelectUser(appUser)">{{appUser?.firstName}}</td>
+                            <td (click)="onSelectUser(appUser)">{{appUser?.lastName}}</td>
+                            <td (click)="onSelectUser(appUser)">{{appUser?.username}}</td>
+                            <td (click)="onSelectUser(appUser)">{{appUser?.email}}</td>
+                            <td (click)="onSelectUser(appUser)">
+                                <span [hidden]="!appUser?.active" class="badge green-badge">Active</span>
+                                <span [hidden]="appUser?.active" class="badge bg-danger">Inactive</span>
+                            </td>
+                            <td><span [hidden]="appUser?.notLocked">
+                                    <i class="fa fa-lock float-right" style="color: red;">
+                                    </i>
+                                    Locked
+                                </span>
+                                <span [hidden]="!appUser.notLocked">
+                                    <i class="fa fa-unlock float-right" style="color: #17a2b8;">
+                                    </i>
+                                    Unlocked
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <button (click)="onEditUser(appUser)" class="btn "><i class="fa fa-pencil-square-o"
+                                            aria-hidden="true"></i>
+
+                                    </button>
+                                    <button (click)="onDeleteUser(appUser.username)" class="btn "><i
+                                            class="fa fa-trash-o" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+
             <div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+                    <button class="btn green-btn-wg ">Add administrator</button>
+                </div>
                 <table class="table table-hover">
                     <tbody>
                         <tr class="text-center bg-light">
@@ -123,47 +184,11 @@
                 </table>
             </div>
 
-            <div class="tab-pane fade" id="v-pills-messages" role="tabpanel" aria-labelledby="v-pills-messages-tab">
 
-                <table class="table table-hover">
-                    <tbody>
-
-                        <tr class="text-center bg-light">
-                            <td>User ID</td>
-                            <td>First Name</td>
-                            <td>Last Name</td>
-                            <td>Username</td>
-                            <td>Email</td>
-                            <td>Status</td>
-                            <td>Actions</td>
-                        </tr>
-                        <tr *ngFor="let appUser of users" class="text-center">
-                            <td (click)="onSelectUser(appUser)">{{appUser?.userId}}</td>
-                            <td (click)="onSelectUser(appUser)">{{appUser?.firstName}}</td>
-                            <td (click)="onSelectUser(appUser)">{{appUser?.lastName}}</td>
-                            <td (click)="onSelectUser(appUser)">{{appUser?.username}}</td>
-                            <td (click)="onSelectUser(appUser)">{{appUser?.email}}</td>
-                            <td (click)="onSelectUser(appUser)">
-                                <span [hidden]="!selectedDoctor?.active" class="badge bg-success">Active</span>
-                                <span [hidden]="selectedDoctor?.active" class="badge bg-danger">Inactive</span>
-                            </td>
-                            <td>
-                                <div class="btn-group">
-                                    <button (click)="onEditUser(appUser)" class="btn "><i class="fa fa-pencil-square-o"
-                                            aria-hidden="true"></i>
-
-                                    </button>
-                                    <button (click)="onDeleteUser(appUser.username)" class="btn "><i
-                                            class="fa fa-trash-o" aria-hidden="true"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-            </div>
             <div class="tab-pane fade" id="v-pills-settings" role="tabpanel" aria-labelledby="v-pills-settings-tab">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+                    <button class="btn green-btn-wg ">Add speciality</button>
+                </div>
                 <table class="table table-hover">
                     <tbody>
                         <tr class=" text-center bg-light">
@@ -295,7 +320,7 @@
         <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Edit doctor</h5>
+                    <h5 class="modal-title" id="exampleModalLabel"> Doctor details</h5>
 
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -320,7 +345,7 @@
                                         {{selectedDoctor?.averageOfRatings}} ({{selectedDoctor?.nbOfRatings}} reviews)
                                     </div>
                                     <div class="">Active status:
-                                        <span [hidden]="!selectedDoctor?.active" class="badge bg-success">Active</span>
+                                        <span [hidden]="!selectedDoctor?.active" class="badge green-badge">Active</span>
                                         <span [hidden]="selectedDoctor?.active" class="badge bg-danger">Inactive</span>
                                     </div>
                                     <div *ngIf="selectedDoctor?.lastLoginDateDisplay" class="text-muted">
@@ -590,7 +615,7 @@
                                     <div class="row mb-2">
                                         <div class="col"> <b>Status: </b><span
                                                 *ngIf="selectedDoctor?.status=='VERIFIED'"
-                                                class="badge bg-success">Verified</span>
+                                                class="badge green-badge">Verified</span>
                                             <span *ngIf="selectedDoctor?.status=='NOT_VERIFIED'"
                                                 class="badge bg-danger">Not
                                                 verified</span>
@@ -603,7 +628,7 @@
                                         <div class="col">
                                             <div class="mb-2"> <b> Active status: </b> <span
                                                     [hidden]="!selectedDoctor?.active"
-                                                    class="badge bg-success">Active</span>
+                                                    class="badge green-badge">Active</span>
                                                 <span [hidden]="selectedDoctor?.active" class="badge bg-danger">Inactive
                                                 </span>
                                             </div>
@@ -615,7 +640,7 @@
                                                 </span>
 
                                                 <span [hidden]="!selectedDoctor?.notLocked">
-                                                    <i class="fa fa-unlock float-right" style="color: green;">
+                                                    <i class="fa fa-unlock float-right" style="color: #17a2b8;">
                                                     </i>
                                                     Account Unlocked
                                                 </span>

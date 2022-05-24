@@ -1,6 +1,7 @@
 package com.backend.ehealthspringboot.service.impl;
 
 import com.backend.ehealthspringboot.domain.*;
+import com.backend.ehealthspringboot.enumeration.Role;
 import com.backend.ehealthspringboot.exception.domain.*;
 import com.backend.ehealthspringboot.repository.DoctorRepository;
 import com.backend.ehealthspringboot.repository.QuestionRepository;
@@ -83,7 +84,7 @@ public class QuestionServiceImpl implements QuestionService {
         if (theQuestion == null){
             throw new QuestionNotFoundException(NO_QUESTION_FOUND);
         }
-        if (user.getRole() != ROLE_ADMIN.name() ) {
+        if ((getRoleEnumName(user.getRole()) != ROLE_ADMIN)) {
             if (theQuestion.getUser().getUsername() != user.getUsername()) {
                 throw new Exception("You don't have permission to edit this question");
             }
@@ -113,7 +114,7 @@ public class QuestionServiceImpl implements QuestionService {
         if (theQuestion == null){
             throw new QuestionNotFoundException(NO_QUESTION_FOUND);
         }
-        if (user.getRole() != ROLE_ADMIN.name() ) {
+        if ((getRoleEnumName(user.getRole()) != ROLE_ADMIN)) {
             if (theQuestion.getUser().getUsername() != user.getUsername()) {
                 throw new Exception("You don't have permission to delete this question");
             }
@@ -152,13 +153,13 @@ public class QuestionServiceImpl implements QuestionService {
             throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + loggedInUsername);
         }
         if (theQuestion.getResponse() == null){
-                throw new QuestionResponseNotFound(QUESTION_RESPONSE_NOT_FOUND);
+            throw new QuestionResponseNotFound(QUESTION_RESPONSE_NOT_FOUND);
         }
-        if (theQuestion.getResponse().getDoctor().getRole() == ROLE_DOCTOR.name()){
-            if(theQuestion.getResponse().getDoctor().getUsername() != user.getUsername()){
-                throw new Exception("You don't have permission to edit this response");
-            }
+
+        if(theQuestion.getResponse().getDoctor().getUsername() != user.getUsername()){
+            throw new Exception("You don't have permission to edit this response");
         }
+
         theQuestion.getResponse().setContent(questionResponse.getContent());
         questionRepository.save(theQuestion);
         return theQuestion;
@@ -179,7 +180,7 @@ public class QuestionServiceImpl implements QuestionService {
             throw new QuestionResponseNotFound(QUESTION_RESPONSE_NOT_FOUND);
         }
 
-        if (theQuestion.getResponse().getDoctor().getRole() == ROLE_DOCTOR.name()){
+        if ((getRoleEnumName(user.getRole()) != ROLE_ADMIN)){
             if(theQuestion.getResponse().getDoctor().getUsername() != user.getUsername()){
                 throw new Exception("You don't have permission to delete this response");
             }
@@ -194,6 +195,9 @@ public class QuestionServiceImpl implements QuestionService {
     public Question[] findQuestionsBySpecialityName(String specialityName) {
         Question[]  questions= questionRepository.findBySpecialityName(specialityName);
         return  questions;
+    }
+    private Role getRoleEnumName(String role) {
+        return Role.valueOf(role.toUpperCase());
     }
 }
 

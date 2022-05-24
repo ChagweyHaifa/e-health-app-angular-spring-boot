@@ -5,7 +5,7 @@
             <div class="header ">
                 <div class="header-text">
                     <h1 class="mb-4">Do you have concerns about your health?</h1>
-                    <p>Thousands of doctors are here to help you and answer your questions! </p>
+                    <p class="lead-text">Thousands of doctors are here to help you and answer your questions! </p>
                 </div>
                 <div class="header-img">
                     <img src="../../assets/question.jpg" alt="" class="ml-5">
@@ -35,10 +35,12 @@
                 <div class="row my-4">
                     <aside class="col-auto">
                         <div class="mb-3">
-                            <button class="btn purple-btn" type="button" id="openUserEdit" data-bs-toggle="modal"
-                                data-bs-target="#askQustionModal" style="width: 100%;">
+                            <button class="btn purple-btn" type="button" (click)="launchAskQuestionModal()"
+                                style="width: 100%;">
                                 Ask a question
                             </button>
+                            <button id="launch-ask-question-modal-trigger-btn" data-bs-toggle="modal"
+                                data-bs-target="#askQustionModal" [hidden]="true"></button>
                         </div>
 
                         <div class="list-group">
@@ -55,15 +57,15 @@
 
                             <div class="card-header">
                                 <div class="row justify-content-between">
-                                    <h5 class="card-title col-auto">{{tempQuestion.title}}</h5>
-                                    <div class=" col-auto">
-                                        <button class="btn">
-                                            <i class="fa fa-pencil-square-o" aria-hidden="true"
-                                                (click)="launchEditQuestionModal(tempQuestion)"></i>
+                                    <h5 class="card-title col-auto">{{tempQuestion.title}}
+                                        {{tempQuestion.user.firstName}}</h5>
+                                    <div class=" col-auto"
+                                        *ngIf=" tempQuestion.user.username== loggedInUser.username||isAdmin">
+                                        <button class="btn" (click)="launchEditQuestionModal(tempQuestion)">
+                                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                                         </button>
-                                        <button class="btn">
-                                            <i class="fa fa-trash-o" aria-hidden="true"
-                                                (click)="deleteQuestion(tempQuestion.id)" style="cursor: pointer;"></i>
+                                        <button class="btn" (click)="deleteQuestion(tempQuestion.id)">
+                                            <i class="fa fa-trash-o" aria-hidden="true" style="cursor: pointer;"></i>
                                         </button>
                                     </div>
 
@@ -71,10 +73,15 @@
                             </div>
                             <div class=" card-body">
                                 <p class="card-text">{{tempQuestion.question}}.</p>
-                                <p *ngIf="tempQuestion.currentTreatment"><span>Current Treatment:</span>
-                                    {{tempQuestion.currentTreatment}}</p>
-                                <p *ngIf="tempQuestion.medicalHistory">}<span>Medical
-                                        History</span>{{tempQuestion.medicalHistory}</p>
+                                <p
+                                    [hidden]="(tempQuestion.currentTreatment) == 'null'||tempQuestion.currentTreatment==''">
+                                    <span>Current Treatment:</span>
+                                    {{tempQuestion.currentTreatment}}
+                                </p>
+                                <p [hidden]="tempQuestion.medicalHistory=='null' || tempQuestion.medicalHistory=='' ">
+                                    <span>Medical
+                                        History</span>{{tempQuestion.medicalHistory}}
+                                </p>
                                 <p *ngIf="tempQuestion.questionerWeight != 0">
                                     <span>Weight: </span>{{tempQuestion.questionerWeight}}
                                 </p>
@@ -83,7 +90,7 @@
                                 </p>
                                 <div class="my-2" style="text-align: right;">
 
-                                    <button *ngIf="!tempQuestion.response" class="btn purple-btn"
+                                    <button *ngIf="isDoctor && !tempQuestion.response" class="btn purple-btn"
                                         (click)="launchRespondToQuestionModal(tempQuestion)">respond</button>
                                 </div>
 
@@ -95,10 +102,14 @@
                                             <small>({{tempQuestion.response.doctor.speciality.name}})</small>
                                         </div>
                                         <div class=" col-auto">
-                                            <button class="btn" (click)=" onEditQuestionResponse(tempQuestion)">
+                                            <button
+                                                *ngIf="isDoctor && tempQuestion.response.doctor.username== loggedInUser.username "
+                                                class="btn" (click)=" onEditQuestionResponse(tempQuestion)">
                                                 <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                                             </button>
-                                            <button class="btn" (click)="deleteQuestionResponse(tempQuestion.id)">
+                                            <button class="btn"
+                                                *ngIf=" isAdmin||(isDoctor && tempQuestion.response.doctor.username== loggedInUser.username) "
+                                                (click)="deleteQuestionResponse(tempQuestion.id)">
                                                 <i class="fa fa-trash-o" aria-hidden="true"
                                                     style=" cursor: pointer;"></i>
                                             </button>
@@ -198,7 +209,8 @@
                 <button type="button" id="my-question-form-close-btn" class="btn btn-secondary"
                     data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn purple-btn" [disabled]="myQuestionForm.invalid">
-                    <i *ngIf="showLoading" class="fas fa-spinner fa-spin"></i>&nbsp;&nbsp;
+                    <span *ngIf="showLoading" class="spinner-grow spinner-grow-sm" role="status"
+                        aria-hidden="true"></span>
                     <span *ngIf="showLoading">Loading...</span>
                     <span *ngIf="!showLoading" (click)="addQuestion()">Submit</span>
                 </button>

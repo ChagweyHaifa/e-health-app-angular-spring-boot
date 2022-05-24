@@ -19,3 +19,17 @@
 .save-doctor-info-btn {
   border-radius: 5px;
 }
+.item {
+  color: #17a2b8;
+  border-bottom: 1px solid #17a2b8;
+  border-radius: 0;
+}
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  color: #fff;
+  background-color: #17a2b8;
+}
+
+/* .items {
+  border: 1px solid #17a2b8;
+  /* border-radius: 10px; */

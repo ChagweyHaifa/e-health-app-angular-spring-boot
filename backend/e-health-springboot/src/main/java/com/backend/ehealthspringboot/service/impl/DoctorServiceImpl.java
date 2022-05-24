@@ -105,11 +105,11 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Override
     public List<Doctor> findDoctorsByAllParameters(Doctor doctor){
-        return doctorRepository.findBySpecialityNameAndAddressCountryAndAddressStateAndAddressCity
+        return doctorRepository.findBySpecialityNameAndAddressCountryAndAddressStateAndAddressCityAndByIsNotLocked
                 (doctor.getSpeciality().getName(),
                         doctor.getAddress().getCountry(),
                         doctor.getAddress().getState(),
-                        doctor.getAddress().getCity());
+                        doctor.getAddress().getCity(),true);
     }
 
 

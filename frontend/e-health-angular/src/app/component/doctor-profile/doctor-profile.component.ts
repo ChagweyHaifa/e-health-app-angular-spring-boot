@@ -1,6 +1,6 @@
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { NotificationType } from 'src/app/enum/notification-type.enum';
 import { Doctor } from 'src/app/model/doctor';
@@ -59,7 +59,8 @@ export class DoctorProfileComponent implements OnInit, OnDestroy {
     private ratingService: RatingService,
     private authenticationService: AuthenticationService,
     private formService: FormService,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private router: Router
   ) {
     this.addRatingForm = this.formBuilder.group({
       rating: ['', Validators.required],
@@ -140,6 +141,10 @@ export class DoctorProfileComponent implements OnInit, OnDestroy {
   }
 
   addOrEditDoctorRating() {
+    if (!this.authenticationService.isUserLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
     for (let rating of this.ratings) {
       if (rating.user.username == this.loggedInUser.username) {
         this.myRating = rating;
@@ -372,6 +377,7 @@ export class DoctorProfileComponent implements OnInit, OnDestroy {
         )
     );
   }
+
   // update profile image
 
   clickProfileImageBtn() {
@@ -402,18 +408,18 @@ export class DoctorProfileComponent implements OnInit, OnDestroy {
     );
   }
 
-  get isLoggedIn(): boolean {
-    return this.authenticationService.isUserLoggedIn();
+  get isDoctor() {
+    if (this.loggedInUser != null) {
+      if (this.loggedInUser.role == 'ROLE_DOCTOR') return true;
+    }
+    return false;
   }
 
-  public get isVisitor(): boolean {
-    if (!this.isLoggedIn) return false;
-    else return this.getUserRole() === Role.VISITOR;
-  }
-
-  public get isDoctor(): boolean {
-    if (!this.isLoggedIn) return false;
-    else return this.getUserRole() === Role.DOCTOR;
+  get isAdmin() {
+    if (this.loggedInUser != null) {
+      if (this.loggedInUser.role == 'ROLE_ADMIN') return true;
+    }
+    return false;
   }
 
   private sendNotification(

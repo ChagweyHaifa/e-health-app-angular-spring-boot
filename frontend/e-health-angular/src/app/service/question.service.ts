@@ -15,7 +15,7 @@ export class QuestionService {
 
   getQuestionsBySpeciality(specialityName: string): Observable<Question[]> {
     return this.http.get<Question[]>(
-      `${this.host}/questions/${specialityName}`
+      `${this.host}/questions/search/findBySpecialityName/${specialityName}`
     );
   }
 

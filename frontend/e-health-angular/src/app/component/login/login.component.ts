@@ -38,7 +38,7 @@ export class LoginComponent implements OnInit, OnDestroy {
           // console.log(response);
           const token = response.headers.get(HeaderType.JWT_TOKEN);
           this.authenticationService.saveToken(token);
-          // this.authenticationService.isLoggedIn.next(true);
+
           this.authenticationService.addUserToLocalCache(response.body);
           this.router.navigateByUrl('/find-a-doctor');
           this.showLoading = false;
