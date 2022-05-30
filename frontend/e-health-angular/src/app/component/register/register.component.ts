@@ -123,8 +123,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
           this.showLoading = false;
           this.sendNotification(
             NotificationType.SUCCESS,
-            `A new account was created for ${response.firstName}.
-          Please check your email for password to log in.`
+            `A new account was created for ${response.firstName}`
           );
           this.router.navigateByUrl('/login');
         },
@@ -165,8 +164,10 @@ export class RegisterComponent implements OnInit, OnDestroy {
           this.sendNotification(
             NotificationType.SUCCESS,
             `A new account was created for ${response.firstName}.
-          Please check your email for password to log in.`
+          Please check your email`
           );
+          form.reset();
+          this.router.navigateByUrl('/login');
         },
         (errorResponse: HttpErrorResponse) => {
           this.showLoading = false;

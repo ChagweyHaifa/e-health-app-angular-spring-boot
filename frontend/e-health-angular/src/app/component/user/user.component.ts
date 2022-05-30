@@ -352,6 +352,8 @@ export class UserComponent implements OnInit, OnDestroy {
         this.selectedDoctor.role =
           this.editDoctorForm.controls['about'].value.role;
 
+        this.selectedDoctor.gender =
+          this.editDoctorForm.controls['about'].value.gender;
         break;
       }
       case 'contact': {
@@ -383,9 +385,10 @@ export class UserComponent implements OnInit, OnDestroy {
         .updateDoctor(this.selectedDoctor, this.currentUserUsername)
         .subscribe(
           (response: HttpResponse<Doctor>) => {
-            // this.selectedDoctor = response.body;
-            // this.getDoctors();
+            this.selectedDoctor = response.body;
+            this.getDoctors();
             this.showLoading = false;
+
             this.sendNotification(
               NotificationType.SUCCESS,
               'you have edited successfully'

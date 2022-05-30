@@ -74,7 +74,8 @@
                             <div class="mt-3 ">
                                 <button [disabled]="visitorRegisterForm.invalid || showLoading" type="submit"
                                     name="button" class="btn login_btn">
-                                    <i *ngIf="showLoading" class="fas fa-spinner fa-spin"></i>&nbsp;&nbsp;
+                                    <span *ngIf="showLoading" class="spinner-grow spinner-grow-sm" role="status"
+                                        aria-hidden="true"></span>
                                     <span *ngIf="showLoading">Loading...</span>
                                     <span *ngIf="!showLoading">Register</span>
                                 </button>
@@ -214,7 +215,8 @@
                                 <!--  -->
                                 <button type="submit" [disabled]="DoctorRegisterForm.invalid || showLoading"
                                     name="button" class="btn login_btn">
-                                    <i *ngIf="showLoading" class="fas fa-spinner fa-spin"></i>&nbsp;&nbsp;
+                                    <span *ngIf="showLoading" class="spinner-grow spinner-grow-sm" role="status"
+                                        aria-hidden="true"></span>
                                     <span *ngIf="showLoading">Loading...</span>
                                     <span *ngIf="!showLoading">Register</span>
                                 </button>

@@ -87,7 +87,7 @@ public class DoctorServiceImpl implements DoctorService {
         doctor.setActive(true);
         doctor.setStatus(UNDER_VERIFICATION.name());
         doctor.setNotLocked(false);
-//        emailService.sendNewPasswordEmail(firstName, password, email);
+//        emailService.sendNewPasswordEmail(doctor.getFirstName(), doctor.getEmail());
 //        set a default image for doctor
         LOGGER.info("New doctor password: " + doctor.getPassword());
         doctor.setRole(ROLE_DOCTOR.name());

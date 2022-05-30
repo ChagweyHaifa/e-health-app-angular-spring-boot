@@ -15,7 +15,7 @@ import java.util.Set;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
-@Table(name="user")
+@Table(name="medix_users")
 public class User  {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
