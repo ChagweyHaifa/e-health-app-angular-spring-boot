@@ -1,5 +1,6 @@
+### Entity-Relationship-Diagram
 <p align="center">
-<img src="./demo/diagramme de classe global (1).png" alt="My Project GIF" width="800" height="700"> <br/> 
+<img src="./demo/diagramme de classe global (1).png" alt="My Project GIF" width="800" height="700"> <br/> <br/>
   </p>
 <p align="center">
 <img src="./demo/lofin-visitor-gif.gif" alt="My Project GIF" width="800" height="400"> <br/> 
