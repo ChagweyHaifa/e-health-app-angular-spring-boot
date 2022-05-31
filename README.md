@@ -1,4 +1,5 @@
-### Entity-Relationship-Diagram
+# Tele-med-app
+## Entity-Relationship-Diagram
 <p align="center">
 <img src="./demo/diagramme de classe global (1).png" alt="My Project GIF" width="800" height="800"> <br/> <br/>
   </p>
