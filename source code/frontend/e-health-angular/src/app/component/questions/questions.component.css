@@ -1,0 +1,11 @@
+.card {
+  border-radius: 0.7rem;
+}
+.question-response {
+  border-top: solid 1px #ddd;
+}
+/* .question-item {
+  border: #ddd 1px solid;
+  padding: 1.5rem;
+  border-radius: 0.8rem;
+} */

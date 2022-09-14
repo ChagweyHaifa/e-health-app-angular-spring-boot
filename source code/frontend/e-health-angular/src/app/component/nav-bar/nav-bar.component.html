@@ -1,0 +1,55 @@
+<nav class="navbar">
+    <div class="container">
+
+        <ul class="nav">
+            <a class="navbar-brand" routerLink="/">Medix</a>
+            <li class="nav-item active">
+                <a class="nav-link" routerLink="/find-a-doctor"><i class="fa fa-user-md" aria-hidden="true"></i>
+                    Find a doctor </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" routerLink="/ask-a-question"><i class="fa fa-question-circle"
+                        aria-hidden="true"></i> Ask a question</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" routerLink="/ask-a-question"><i class="fa fa-newspaper-o" aria-hidden="true"></i>
+                    Medical magazine</a>
+            </li>
+        </ul>
+
+
+
+        <ul class="nav" *ngIf="!isLoggedIn">
+            <li class="nav-item">
+                <a class="nav-link" routerLink="/login">Sign in</a>
+            </li>
+            <li class=" nav-item">
+                <a class="nav-link" routerLink="/register">Sign up</a>
+            </li>
+
+        </ul>
+
+
+
+        <ul class="nav" *ngIf="isLoggedIn">
+            <li class="nav-item">
+                <div class="dropdown">
+                    <button class="btn logged-in-user" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <i class="fa fa-user" aria-hidden="true"></i> {{loggedInUser?.firstName}}
+                        {{loggedInUser?.lastName}}
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                        <li><a *ngIf="isDoctor" class="dropdown-item"
+                                routerLink="/find-a-doctor/{{loggedInUser.username}}">Profile</a>
+                        </li>
+                        <li><a *ngIf="isAdmin" class="dropdown-item" routerLink="/user/management">Manage
+                                application</a></li>
+                        <li><a class="dropdown-item" routerLink="/settings">Settings</a></li>
+                        <li><a class="dropdown-item" routerLink="/login" (click)="onLogOut()">Logout</a></li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
