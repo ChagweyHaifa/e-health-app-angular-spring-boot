@@ -16,5 +16,5 @@
 <img src="./demo/manage-rating-gif.gif" alt="My Project GIF" width="800" height="400"> <br/> 
 </p>
  <p align="center">
-<img src="./demo/Screenshot 2024-04-10 235541.png" alt="My Project GIF" width="800" height="400"> <br/> 
+<img src="./demo/read-doctor-info.png" alt="My Project GIF" width="800" height="400"> <br/> 
 </p>
